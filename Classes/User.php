@@ -250,12 +250,80 @@ class User implements DataObject {
         // TODO: Implement
     }
 
-    public static function registerAccount($username, $password, $email, $systemAccount = false) {
-        // TODO: Implement
+    public static function registerAccount($username, $password, $email, $activated = true, $systemAccount = false) {
+        $username = \trim(Database::getConnection()->real_escape_string($username));
+        $password = \trim(Database::getConnection()->real_escape_string($password));
+        $email = \trim(Database::getConnection()->real_escape_string($email));
+        if(!\is_string($username) || $username == '') {
+            // TODO: Throw exception
+            return false;
+        }
+        if(User::userExists($username, true)) {
+            // TODO: Throw exception
+            return false;
+        }
+        if(!\is_string($password) || $password == '') {
+            // TODO: Throw exception
+            return false;
+        }
+        if(!\is_string($email) || $email == '') {
+            // TODO: Throw exception
+            return false;
+        }
+        if(User::emailExists($email, true)) {
+            // TODO: Throw exception
+            return false;
+        }
+        if(!\is_bool($activated)) {
+            // TODO: Throw exception
+            return false;
+        }
+        if(!\is_bool($systemAccount)) {
+            // TODO: Throw exception
+            return false;
+        }
+        $options = [
+            'cost' => 12,
+        ];
+        $passwordHash = \password_hash($password, PASSWORD_BCRYPT, $options);
+        $user = new User();
+        $user->setUsername($username);
+        $user->setPasswordHash($passwordHash);
+        $user->setEmail($email);
+        $user->setActivated($activated);
+        $user->setBanned(false);
+        $user->setLastLogin(-1);
+        $user->setSystemAccount($systemAccount);
+        $user->commit();
+        // TODO: create notification for user registered
+        return true;
     }
 
     public static function login($username, $password) {
-        //TODO: Implement
+        if(User::userExists($username)) {
+            $uid = User::userExists($username, false, true);
+            $user = User::get($uid);
+            if(\password_verify($password, $user->getPasswordHash())) {
+                $return = $user;
+                $result = 'Success';
+            }
+            else {
+                $return = null;
+                $result = "Failed";
+            }
+
+        }
+        else {
+            if(User::userExists($username, true)){
+                $return = null;
+                $result = "Banned";
+            }
+            else {
+                return null;
+            }
+        }
+        // TODO: Login log
+        return $return;
     }
 
 }
