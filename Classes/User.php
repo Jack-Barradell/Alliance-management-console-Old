@@ -300,12 +300,14 @@ class User implements DataObject {
     }
 
     public static function login($username, $password) {
+        $time = \time();
         if(User::userExists($username)) {
             $uid = User::userExists($username, false, true);
             $user = User::get($uid);
             if(\password_verify($password, $user->getPasswordHash())) {
                 $return = $user;
                 $result = 'Success';
+                $user->setLastLogin($time);
             }
             else {
                 $return = null;
@@ -315,6 +317,7 @@ class User implements DataObject {
         }
         else {
             if(User::userExists($username, true)){
+                $uid = User::userExists($username, true, true);
                 $return = null;
                 $result = "Banned";
             }
@@ -322,7 +325,12 @@ class User implements DataObject {
                 return null;
             }
         }
-        // TODO: Login log
+        $login = new LoginLog();
+        $login->setUserID($uid);
+        $login->setResult($result);
+        $login->setIP($_SERVER['REMOTE_ADDR']);
+        $login->setTimestamp($time);
+        $login->commit();
         return $return;
     }
 
