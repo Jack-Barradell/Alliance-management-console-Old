@@ -171,16 +171,14 @@ class User implements DataObject {
             $userResult = [];
             $typeArray =[];
             $refs = [];
-            $typeArray[0] = '';
+            $typeArray[0] = 'i';
             $questionString = '?';
             foreach($id as $key => $value) {
                 $refs[$key] =& $id[$key];
             }
-            for($i = 0; $i < \count($id); $i++) {
+            for($i = 0; $i < \count($id) - 1; $i++) {
                 $typeArray[0] .= 'i';
-                if($i < \count($id) - 1) {
-                    $questionString .= ',?';
-                }
+                $questionString .= ',?';
             }
             $param = \array_merge($typeArray, $refs);
             if($stmt = Database::getConnection()->prepare("SELECT `UserID`,`Username`,`PasswordHash`,`Email`,`Banned`,`Activated`,`LastLogin`,`SystemAccount` FROM `Users` WHERE `UserID` IN (" . $questionString . ")")) {

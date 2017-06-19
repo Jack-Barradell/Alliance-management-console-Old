@@ -122,16 +122,14 @@ class LoginLog implements DataObject {
             $loginLogResult = [];
             $refs = [];
             $typeArray = [];
-            $typeArray[0] = '';
+            $typeArray[0] = 'i';
             $questionString = '?';
             foreach($id as $key => $value) {
                 $refs[$key] =& $id[$key];
             }
-            for($i = 0; $i < \count($id); $i++) {
+            for($i = 0; $i < \count($id) - 1; $i++) {
                 $typeArray[0] .= 'i';
-                if($i < \count($id) - 1) {
-                    $questionString .= ',?';
-                }
+                $questionString .= ',?';
             }
             $param = \array_merge($typeArray, $refs);
             if($stmt = Database::getConnection()->prepare("SELECT `LoginLogID`,`UserID`,`LoginLogResult`,`LoginLogIP`,`LoginLogTimestamp` FROM `Login_Log` WHERE `LoginLogID` IN (" . $questionString . ")")) {
@@ -194,9 +192,10 @@ class LoginLog implements DataObject {
             $stmt->bind_param('i', $userID);
             $stmt->execute();
             $stmt->bind_result($loginLogID);
-            $stmt->fetch();
             $input = [];
-            $input[] = $loginLogID;
+            while($stmt->fetch()) {
+                $input[] = $loginLogID;
+            }
             $stmt->close();
             if(\count($input) > 0) {
                 return LoginLog::get($input);
@@ -210,5 +209,15 @@ class LoginLog implements DataObject {
             return null;
         }
     }
+
+    public static function getByIP($ip) {
+        //TODO: Implement
+    }
+
+    public static function getByTimestamp($timestamp) {
+        //TODO: Implement
+    }
+
+
 
 }
