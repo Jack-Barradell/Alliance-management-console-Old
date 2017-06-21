@@ -6,6 +6,7 @@ class User implements DataObject {
     use Storable;
 
     private $_id = null;
+    private $_factionID = null;
     private $_username = null;
     private $_passwordHash = null;
     private $_email = null;
@@ -15,7 +16,7 @@ class User implements DataObject {
     private $_systemAccount = null;
     private $_connection = null;
 
-    public function __construct($id = null, $username = null, $passwordHash = null, $email = null, $banned = null, $activated = null, $lastLogin = null, $systemAccount = null)  {
+    public function __construct($id = null, $username = null, $passwordHash = null, $email = null, $banned = null, $activated = null, $lastLogin = null, $systemAccount = null, $factionID = null)  {
         $this->_id = $id;
         $this->_username = $username;
         $this->_passwordHash = $passwordHash;
@@ -24,6 +25,7 @@ class User implements DataObject {
         $this->_activated = $activated;
         $this->_lastLogin = $lastLogin;
         $this->_systemAccount = $systemAccount;
+        $this->_factionID = $factionID;
         $this->_connection = Database::getConnection();
     }
 
@@ -32,8 +34,8 @@ class User implements DataObject {
             //TODO: Throw exception
         }
         else {
-            if($stmt = $this->_connection->prepare("INSERT INTO `Users` (`Username`,`PasswordHash`,`Email`,`Banned`,`Activated`,`LastLogin`,`SystemAccount`) VALUES (?,?,?,?,?,?,?)")) {
-                $stmt->bind_param('sssiiii', $this->_username, $this->_passwordHash, $this->_email, Database::toNumeric($this->_banned), Database::toNumeric($this->_activated), $this->_lastLogin, Database::toNumeric($this->_systemAccount));
+            if($stmt = $this->_connection->prepare("INSERT INTO `Users` (`Username`,`PasswordHash`,`Email`,`Banned`,`Activated`,`LastLogin`,`SystemAccount`, `FactionID`) VALUES (?,?,?,?,?,?,?,?)")) {
+                $stmt->bind_param('sssiiiii', $this->_username, $this->_passwordHash, $this->_email, Database::toNumeric($this->_banned), Database::toNumeric($this->_activated), $this->_lastLogin, Database::toNumeric($this->_systemAccount), $this->_factionID);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -48,8 +50,8 @@ class User implements DataObject {
             // TODO: Throw exception
         }
         else {
-            if($stmt = $this->_connection->prepare("UPDATE `Users` SET `Username`=?,`PasswordHash`=?,`Email`=?,`Banned`=?,`Activated`=?,`LastLogin`=?,`SystemAccount`=? WHERE `UserID`=?")) {
-                $stmt->bind_param('sssiiiii', $this->_username, $this->_passwordHash, $this->_email,  Database::toNumeric($this->_banned), Database::toNumeric($this->_activated), $this->_lastLogin, Database::toNumeric($this->_systemAccount, $this->_id));
+            if($stmt = $this->_connection->prepare("UPDATE `Users` SET `Username`=?,`PasswordHash`=?,`Email`=?,`Banned`=?,`Activated`=?,`LastLogin`=?,`SystemAccount`=?,`FactionID`=? WHERE `UserID`=?")) {
+                $stmt->bind_param('sssiiiiii', $this->_username, $this->_passwordHash, $this->_email,  Database::toNumeric($this->_banned), Database::toNumeric($this->_activated), $this->_lastLogin, Database::toNumeric($this->_systemAccount, $this->_factionID, $this->_id));
                 $stmt->execute();
                 $stmt->close();
             }
@@ -70,7 +72,7 @@ class User implements DataObject {
 
     public function eql($anotherObject) {
         if(\get_class($anotherObject) == \get_class($this)) {
-            if($this->_id == $anotherObject->getID() && $this->_username == $anotherObject->getUsername() && $this->_passwordHash == $anotherObject->getPasswordHash() && $this->_email == $anotherObject->getEmail() && $this->_banned == $anotherObject->getBanned() && $this->_activated == $anotherObject->getActivated() && $this->_lastLogin == $anotherObject->getLastLogin() && $this->_systemAccount == $anotherObject->getSystemAccount()) {
+            if($this->_id == $anotherObject->getID() && $this->_username == $anotherObject->getUsername() && $this->_passwordHash == $anotherObject->getPasswordHash() && $this->_email == $anotherObject->getEmail() && $this->_banned == $anotherObject->getBanned() && $this->_activated == $anotherObject->getActivated() && $this->_lastLogin == $anotherObject->getLastLogin() && $this->_systemAccount == $anotherObject->getSystemAccount() && $this->_factionID == $anotherObject->getFactionID()) {
                 return true;
             }
             else {
@@ -132,6 +134,10 @@ class User implements DataObject {
         return $this->_systemAccount;
     }
 
+    public function getFactionID() {
+        return $this->_factionID;
+    }
+
     public function setID($id) {
         $this->_id = $id;
     }
@@ -164,6 +170,10 @@ class User implements DataObject {
         $this->_systemAccount = $systemAccount;
     }
 
+    public function setFactionID($id) {
+        $this->_factionID = $id;
+    }
+
     // Statics
 
     public static function select($id) {
@@ -181,10 +191,10 @@ class User implements DataObject {
                 $questionString .= ',?';
             }
             $param = \array_merge($typeArray, $refs);
-            if($stmt = Database::getConnection()->prepare("SELECT `UserID`,`Username`,`PasswordHash`,`Email`,`Banned`,`Activated`,`LastLogin`,`SystemAccount` FROM `Users` WHERE `UserID` IN (" . $questionString . ")")) {
+            if($stmt = Database::getConnection()->prepare("SELECT `UserID`,`Username`,`PasswordHash`,`Email`,`Banned`,`Activated`,`LastLogin`,`SystemAccount`,`FactionID` FROM `Users` WHERE `UserID` IN (" . $questionString . ")")) {
                 \call_user_func_array(array($stmt, 'bind_param'), $param);
                 $stmt->execute();
-                $stmt->bind_result($userID, $username, $passwordHash, $email, $banned, $activated, $lastLogin, $systemAccount);
+                $stmt->bind_result($userID, $username, $passwordHash, $email, $banned, $activated, $lastLogin, $systemAccount, $factionID);
                 while($stmt->fetch()) {
                     $user = new User();
                     $user->setID($userID);
@@ -195,6 +205,7 @@ class User implements DataObject {
                     $user->setActivated(Database::toBoolean($activated));
                     $user->setLastLogin($lastLogin);
                     $user->setSystemAccount(Database::toBoolean($systemAccount));
+                    $user->setFactionID($factionID);
                     $userResult[] = $user;
                 }
                 $stmt->close();
@@ -211,9 +222,9 @@ class User implements DataObject {
         }
         else if(\is_array($id) && \count($id) == 0) {
             $userResult = [];
-            if($stmt = Database::getConnection()->prepare("SELECT `UserID`,`Username`,`PasswordHash`,`Email`,`Banned`,`Activated`,`LastLogin`,`SystemAccount` FROM `Users`")) {
+            if($stmt = Database::getConnection()->prepare("SELECT `UserID`,`Username`,`PasswordHash`,`Email`,`Banned`,`Activated`,`LastLogin`,`SystemAccount`,`FactionID` FROM `Users`")) {
                 $stmt->execute();
-                $stmt->bind_result($userID, $username, $passwordHash, $email, $banned, $activated, $lastLogin, $systemAccount);
+                $stmt->bind_result($userID, $username, $passwordHash, $email, $banned, $activated, $lastLogin, $systemAccount, $factionID);
                 while($stmt->fetch()) {
                     $user = new User();
                     $user->setID($userID);
@@ -224,6 +235,7 @@ class User implements DataObject {
                     $user->setActivated(Database::toBoolean($activated));
                     $user->setLastLogin($lastLogin);
                     $user->setSystemAccount(Database::toBoolean($systemAccount));
+                    $user->setFactionID($factionID);
                     $userResult[] = $user;
                 }
                 $stmt->close();
@@ -241,11 +253,126 @@ class User implements DataObject {
     }
 
     public static function userExists($usernameOrID, $includeInactive = false, $returnUsernameOrID = false) {
-        // TODO: Implement
+        if(\is_numeric($usernameOrID)) {
+            $vars = [];
+            $typeArray = [];
+            if($includeInactive) {
+                $query = "SELECT `Username` FROM `Users` WHERE `UserID`=?";
+                $typeArray[0] = 'i';
+                $vars[] = $usernameOrID;
+            }
+            else {
+                $query = "SELECT `Username` FROM `Users` WHERE `UserID`=?,`Activated`=?";
+                $typeArray[0] = 'ii';
+                $vars[] = $usernameOrID;
+                $vars[] = Database::toNumeric(false);
+            }
+            if($stmt = Database::getConnection()->prepare($query)) {
+                $param = \array_merge($typeArray, $vars);
+                \call_user_func_array(array($stmt, 'bind_param'), $param);
+                $stmt->execute();
+                $stmt->bind_result($username);
+                $stmt->fetch();
+                $stmt->close();
+                if(\is_string($username)) {
+                    if($returnUsernameOrID) {
+                        return $username;
+                    }
+                    else {
+                        return true;
+                    }
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                // TODO: Throw exception
+            }
+        }
+        else if(\is_string($usernameOrID)) {
+            $vars = [];
+            $typeArray = [];
+            if($includeInactive) {
+                $query = "SELECT `UserID` FROM `Users` WHERE `Username`=?";
+                $typeArray[0] = 's';
+                $vars[] = $usernameOrID;
+            }
+            else {
+                $query = "SELECT `UserID` FROM `Users` WHERE `Username`=?,`Activated`=?";
+                $typeArray[0] = 'si';
+                $vars[] = $usernameOrID;
+                $vars[] = Database::toNumeric(false);
+            }
+            if($stmt = Database::getConnection()->prepare($query)) {
+                $param = \array_merge($typeArray, $vars);
+                \call_user_func_array(array($stmt, 'bind_param'), $param);
+                $stmt->execute();
+                $stmt->bind_result($userID);
+                $stmt->fetch();
+                $stmt->close();
+                if(\is_numeric($userID)) {
+                    if($returnUsernameOrID) {
+                        return $userID;
+                    }
+                    else {
+                        return true;
+                    }
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                // TODO: Throw exception
+            }
+        }
+        else {
+            // TODO: Throw exception
+        }
     }
 
     public static function emailExists($email, $includeInactive = false, $returnID = false) {
-        // TODO: Implement
+        if(\is_string($email)) {
+            $typeArray = [];
+            $vars = [];
+            if($includeInactive) {
+                $query = "SELECT `UserID` FROM `Users` WHERE `Email`=?";
+                $typeArray[0] = 's';
+                $vars[] = $email;
+            }
+            else {
+                $query = "SELECT `UserID` FROM `Users` WHERE `Email`=?,`Activated`=?";
+                $typeArray[0] = 'si';
+                $vars[] = $email;
+                $vars[] = Database::toNumeric(false);
+            }
+            if($stmt = Database::getConnection()->prepare($query)) {
+                $param = \array_merge($typeArray, $vars);
+                \call_user_func_array(array($stmt, 'bind_param'), $param);
+                $stmt->execute();
+                $stmt->bind_result($userID);
+                $stmt->fetch();
+                $stmt->close();
+                if(\is_numeric($userID)) {
+                    if($returnID) {
+                        return $userID;
+                    }
+                    else {
+                        return true;
+                    }
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                //TODO: Throw exception
+            }
+        }
+        else {
+            // TODO: Throw exception
+        }
     }
 
     public static function registerAccount($username, $password, $email, $activated = true, $systemAccount = false) {

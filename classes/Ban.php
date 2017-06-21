@@ -241,17 +241,74 @@ class Ban implements DataObject {
                return null;
            }
        }
+       else {
+        // TODO: Throw exception
+       }
     }
 
     public static function getByAdminID($adminID) {
-        //TODO: Implement
+        if($stmt = Database::getConnection()->prepare("SELECT `BanID` FROM `Bans` WHERE `AdminID`=?")) {
+            $stmt->bind_param('i', $adminID);
+            $stmt->execute();
+            $stmt->bind_result($banID);
+            $input = [];
+            while($stmt->fetch()) {
+                $input[] = $banID;
+            }
+            $stmt->close();
+            if(\count($input) > 0) {
+                return Ban::get($input);
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            // TODO: Throw exception
+        }
     }
 
     public static function getByUnbanAdminID($unbanAdminID) {
-        //TODO: Implement
+        if($stmt = Database::getConnection()->prepare("SELECT `BanID` FROM `Bans` WHRE `UnbanAdminID`=?")) {
+            $stmt->bind_param('i', $unbanAdminID);
+            $stmt->execute();
+            $stmt->bind_result($banID);
+            $input = [];
+            while($stmt->fetch()) {
+                $input[] = $banID;
+            }
+            $stmt->close();
+            if(\count($input) > 0) {
+                return Ban::get($input);
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            //TODO: Throw exception
+        }
     }
 
     public static function getByBanDate($banDate) {
-        //TODO: Implement
+        if($stmt = Database::getConnection()->prepare("SELECT `BanID` FROM `Bans` WHERE `BanDate`=?")) {
+            $stmt->bind_param('i', $banDate);
+            $stmt->execute();
+            $stmt->bind_result($banID);
+            $input = [];
+            while($stmt->fetch()) {
+                $input[] = $banID;
+            }
+            $stmt->close();
+            if(\count($input) > 0) {
+                return Ban::get($input);
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            // TODO: Throw exception
+        }
     }
 }
