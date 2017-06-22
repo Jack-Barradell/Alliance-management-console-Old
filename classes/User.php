@@ -85,7 +85,26 @@ class User implements DataObject {
     }
 
     public function ban($adminID, $banReason, $banExpiry) {
-        //TODO: Implement
+        if(self::userExists($adminID)) {
+            if(\is_numeric($banExpiry)) {
+                $banReason = $this->_connection->real_escape_string($banReason);
+                $ban = new Ban();
+                $ban->setUserID($this->_id);
+                $ban->setAdminID($adminID);
+                $ban->setBanDate(\time());
+                $ban->setBanReason($banReason);
+                $ban->setBanExpiry($banExpiry);
+                $ban->commit();
+                $this->_banned = true;
+                $this->commit();
+            }
+            else {
+                //TODO: Throw exception
+            }
+        }
+        else {
+            //TODO: Throw exception (invalid admin)
+        }
     }
 
     public function unban($unbanAdminID, $reactivateAccount = true) {

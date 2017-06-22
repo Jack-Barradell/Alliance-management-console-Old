@@ -13,9 +13,10 @@ class Ban implements DataObject {
     private $_banDate = null;
     private $_unbanDate = null;
     private $_banActive = null;
+    private $_banExpiry = null;
     private $_connection = null;
 
-    public function __construct($id = null, $userID = null, $adminID = null, $unbanAdminID = null, $banReason = null, $banDate = null, $unbanDate = null, $banActive = null) {
+    public function __construct($id = null, $userID = null, $adminID = null, $unbanAdminID = null, $banReason = null, $banDate = null, $unbanDate = null, $banActive = null, $banExpiry = null) {
         $this->_id = $id;
         $this->_userID = $userID;
         $this->_adminID = $adminID;
@@ -24,6 +25,7 @@ class Ban implements DataObject {
         $this->_banDate = $banDate;
         $this->_unbanDate = $unbanDate;
         $this->_banActive = $banActive;
+        $this->_banExpiry = $banExpiry;
         $this->_connection = Database::getConnection();
     }
 
@@ -32,8 +34,8 @@ class Ban implements DataObject {
             //TODO: Throw exception
         }
         else {
-            if($stmt = $this->_connection->prepare("INSERT INTO `Bans` (`UserID`,`AdminID`,`UnbanAdminID`,`BanReason`,`BanDate`,`UnbanDate`,`BanActive`) VALUES (?,?,?,?,?,?,?)")) {
-                $stmt->bind_param('iiisiii', $this->_userID, $this->_adminID, $this->_unbanAdminID, $this->_banReason, $this->_banDate, $this->_unbanDate, Database::toNumeric($this->_banActive));
+            if($stmt = $this->_connection->prepare("INSERT INTO `Bans` (`UserID`,`AdminID`,`UnbanAdminID`,`BanReason`,`BanDate`,`UnbanDate`,`BanActive`,`BanExpiry`) VALUES (?,?,?,?,?,?,?,?)")) {
+                $stmt->bind_param('iiisiii', $this->_userID, $this->_adminID, $this->_unbanAdminID, $this->_banReason, $this->_banDate, $this->_unbanDate, Database::toNumeric($this->_banActive), $this->_banExpiry);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -48,8 +50,8 @@ class Ban implements DataObject {
             //TODO: Throw exception
         }
         else {
-            if($stmt = $this->_connection->prepare("UPDATE `Bans` SET `UserID`=?,`AdminID`=?,`UnbanAdminID`=?,`BanReason`=?,`BanDate`=?,`UnbanDate`=?,`BanActive`=? WHERE `BanID`=?")) {
-                $stmt->bind_param('iiisiii', $this->_userID, $this->_adminID, $this->_unbanAdminID, $this->_banReason, $this->_banDate, $this->_unbanDate, Database::toNumeric($this->_banActive));
+            if($stmt = $this->_connection->prepare("UPDATE `Bans` SET `UserID`=?,`AdminID`=?,`UnbanAdminID`=?,`BanReason`=?,`BanDate`=?,`UnbanDate`=?,`BanActive`=?,`BanExpiry`=? WHERE `BanID`=?")) {
+                $stmt->bind_param('iiisiii', $this->_userID, $this->_adminID, $this->_unbanAdminID, $this->_banReason, $this->_banDate, $this->_unbanDate, Database::toNumeric($this->_banActive), $this->_banExpiry, $this->_id);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -113,6 +115,10 @@ class Ban implements DataObject {
         return $this->_banActive;
     }
 
+    public function getBanExpiry() {
+        return $this->_banExpiry;
+    }
+
     public function setID($id) {
         $this->_id = $id;
     }
@@ -145,6 +151,10 @@ class Ban implements DataObject {
         $this->_banActive = $banActive;
     }
 
+    public function setBanExpiry($banExpiry) {
+        $this->_banExpiry = $banExpiry;
+    }
+
     // Statics
 
     public static function select($id) {
@@ -162,10 +172,10 @@ class Ban implements DataObject {
                 $questionString .= ',?';
             }
             $param = \array_merge($typeArray, $refs);
-            if($stmt = Database::getConnection()->prepare("SELECT `BanID`,`UserID`,`AdminID`,`UnbanAdminID`,`BanReason`,`BanDate`,`UnbanDate`,`BanActive` FROM `Bans` WHERE `BanID` IN (" . $questionString . ")")) {
+            if($stmt = Database::getConnection()->prepare("SELECT `BanID`,`UserID`,`AdminID`,`UnbanAdminID`,`BanReason`,`BanDate`,`UnbanDate`,`BanActive`,`BanExpiry` FROM `Bans` WHERE `BanID` IN (" . $questionString . ")")) {
                 \call_user_func_array(array($stmt, 'bind_param'), $param);
                 $stmt->execute();
-                $stmt->bind_result($banID, $userID, $adminID, $unbanAdminID, $banReason, $banDate, $unbanDate, $banActive);
+                $stmt->bind_result($banID, $userID, $adminID, $unbanAdminID, $banReason, $banDate, $unbanDate, $banActive, $banExpiry);
                 while($stmt->fetch()) {
                     $ban = new Ban();
                     $ban->setID($banID);
@@ -176,6 +186,7 @@ class Ban implements DataObject {
                     $ban->setBanDate($banDate);
                     $ban->setUnbanDate($unbanDate);
                     $ban->setBanActive(Database::toBoolean($banActive));
+                    $ban->setBanExpiry($banExpiry);
                     $banResult[] = $ban;
                 }
                 $stmt->close();
@@ -192,9 +203,9 @@ class Ban implements DataObject {
         }
         else if(\is_array($id) && \count($id) == 0) {
             $banResult = [];
-            if($stmt = Database::getConnection()->prepare("SELECT `BanID`,`UserID`,`AdminID`,`UnbanAdminID`,`BanReason`,`BanDate`,`UnbanDate`,`BanActive` FROM `Bans`")) {
+            if($stmt = Database::getConnection()->prepare("SELECT `BanID`,`UserID`,`AdminID`,`UnbanAdminID`,`BanReason`,`BanDate`,`UnbanDate`,`BanActive`,`BanExpiry` FROM `Bans`")) {
                 $stmt->execute();
-                $stmt->bind_result($banID, $userID, $adminID, $unbanAdminID, $banReason, $banDate, $unbanDate, $banActive);
+                $stmt->bind_result($banID, $userID, $adminID, $unbanAdminID, $banReason, $banDate, $unbanDate, $banActive, $banExpiry);
                 while($stmt->fetch()) {
                     $ban = new Ban();
                     $ban->setID($banID);
@@ -205,6 +216,7 @@ class Ban implements DataObject {
                     $ban->setBanDate($banDate);
                     $ban->setUnbanDate($unbanDate);
                     $ban->setBanActive(Database::toBoolean($banActive));
+                    $ban->setBanExpiry($banExpiry);
                     $banResult[] = $ban;
                 }
                 $stmt->close();
