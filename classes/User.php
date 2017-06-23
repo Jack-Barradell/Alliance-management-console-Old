@@ -108,7 +108,31 @@ class User implements DataObject {
     }
 
     public function unban($unbanAdminID, $reactivateAccount = true) {
-        //TODO: Implement
+        if($this->_banned) {
+            if(self::userExists($unbanAdminID)) {
+                if(!\is_null($bans = Ban::getByUserID($this->_id))) {
+                    $time = \time();
+                    foreach($bans as $ban) {
+                        $ban->setActive(false);
+                        $ban->setUnbanTime($time);
+                        $ban->setUnbanAdminID($unbanAdminID);
+                        $ban->commit();
+                        $this->_banned = false;
+                        $this->_activated = $reactivateAccount;
+                        $this->commit();
+                    }
+                }
+                else {
+                    //TODO: Throw exception
+                }
+            }
+            else {
+                // TODO: Throw exception
+            }
+        }
+        else {
+            //TODO: Throw exception
+        }
     }
 
     public function changePassword($newPassword) {

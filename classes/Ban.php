@@ -323,4 +323,24 @@ class Ban implements DataObject {
             // TODO: Throw exception
         }
     }
+
+    public static function getByUserID($userID) {
+        if($stmt = Database::getConnection()->prepare("SELECT `BanID` FROM `Bans` WHREE `UserID`=?")) {
+            $stmt->bind_param('i', $userID);
+            $stmt->execute();
+            $stmt->bind_result($banID);
+            $input = [];
+            while($stmt->fetch()) {
+                $input[] = $banID;
+            }
+            $stmt->close();
+            if(\count($input) > 0) {
+                return Ban::get($input);
+            }
+            else {
+                return null;
+            }
+        }
+    }
+
 }
