@@ -1,6 +1,14 @@
 <?php
 namespace AMC\Classes;
 
+use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\DuplicateEntryException;
+use AMC\Exceptions\IncorrectTypeException;
+use AMC\Exceptions\InvalidUserException;
+use AMC\Exceptions\MissingPrerequisiteException;
+use AMC\Exceptions\NullGetException;
+use AMC\Exceptions\QueryStatementException;
+
 class User implements DataObject {
     use Getable;
     use Storable;
@@ -31,7 +39,7 @@ class User implements DataObject {
 
     public function create() {
         if($this->eql(new User())) {
-            //TODO: Throw exception
+            throw new BlankObjectException('Cannot store blank user');
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Users` (`Username`,`PasswordHash`,`Email`,`Banned`,`Activated`,`LastLogin`,`SystemAccount`, `FactionID`) VALUES (?,?,?,?,?,?,?,?)")) {
@@ -40,14 +48,14 @@ class User implements DataObject {
                 $stmt->close();
             }
             else {
-                //TODO: Throw exception
+                throw new QueryStatementException('Failed to bind query');
             }
         }
     }
 
     public function update() {
         if($this->eql(new User())) {
-            // TODO: Throw exception
+            throw new BlankObjectException('Cannot store blank user');
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `Users` SET `Username`=?,`PasswordHash`=?,`Email`=?,`Banned`=?,`Activated`=?,`LastLogin`=?,`SystemAccount`=?,`FactionID`=? WHERE `UserID`=?")) {
@@ -56,7 +64,7 @@ class User implements DataObject {
                 $stmt->close();
             }
             else {
-                //TODO: Throw exception
+                throw new QueryStatementException('Failed to bind query');
             }
         }
     }
@@ -99,11 +107,11 @@ class User implements DataObject {
                 $this->commit();
             }
             else {
-                //TODO: Throw exception
+                throw new IncorrectTypeException('AdminID must be an int was given ' . $adminID);
             }
         }
         else {
-            //TODO: Throw exception (invalid admin)
+            throw new InvalidUserException('No admin with ID' . $adminID);
         }
     }
 
@@ -123,15 +131,15 @@ class User implements DataObject {
                     }
                 }
                 else {
-                    //TODO: Throw exception
+                    throw new NullGetException('No bans found for userID: ' . $this->_id);
                 }
             }
             else {
-                // TODO: Throw exception
+                throw new InvalidUserException('No admin with ID: ' . $unbanAdminID);
             }
         }
         else {
-            //TODO: Throw exception
+            throw new MissingPrerequisiteException('Tried to unban a non-banned user with ID: ' . $this->_id);
         }
     }
 
@@ -260,7 +268,7 @@ class User implements DataObject {
                 }
             }
             else {
-                //TODO: Throw exception
+                throw new QueryStatementException('Failed to bind query');
             }
         }
         else if(\is_array($id) && \count($id) == 0) {
@@ -288,6 +296,9 @@ class User implements DataObject {
                 else {
                     return null;
                 }
+            }
+            else {
+                throw new QueryStatementException('Failed to bind query');
             }
         }
         else {
@@ -330,7 +341,7 @@ class User implements DataObject {
                 }
             }
             else {
-                // TODO: Throw exception
+                throw new QueryStatementException('Failed to bind query');
             }
         }
         else if(\is_string($usernameOrID)) {
@@ -367,11 +378,11 @@ class User implements DataObject {
                 }
             }
             else {
-                // TODO: Throw exception
+                throw new QueryStatementException('Failed to bind query');
             }
         }
         else {
-            // TODO: Throw exception
+            throw new IncorrectTypeException("Must provide id (int) or string for name was given " . $usernameOrID);
         }
     }
 
@@ -410,11 +421,11 @@ class User implements DataObject {
                 }
             }
             else {
-                //TODO: Throw exception
+                throw new QueryStatementException('Failed to bind query');
             }
         }
         else {
-            // TODO: Throw exception
+            throw new IncorrectTypeException('Email must be provided as string was given' . $email);
         }
     }
 
@@ -423,32 +434,25 @@ class User implements DataObject {
         $password = \trim(Database::getConnection()->real_escape_string($password));
         $email = \trim(Database::getConnection()->real_escape_string($email));
         if(!\is_string($username) || $username == '') {
-            // TODO: Throw exception
-            return false;
+            throw new IncorrectTypeException('Username must be a string and not be blank was given ' . $username);
         }
         if(User::userExists($username, true)) {
-            // TODO: Throw exception
-            return false;
+            throw new DuplicateEntryException('User with username ' . $username . ' already exists');
         }
         if(!\is_string($password) || $password == '') {
-            // TODO: Throw exception
-            return false;
+            throw new IncorrectTypeException('Password must be a string and not be blank was given ' . $password);
         }
         if(!\is_string($email) || $email == '') {
-            // TODO: Throw exception
-            return false;
+            throw new IncorrectTypeException('Email must be a string and not be blank was given ' . $email);
         }
         if(User::emailExists($email, true)) {
-            // TODO: Throw exception
-            return false;
+            throw new DuplicateEntryException('User with email ' . $email . ' already exists');
         }
         if(!\is_bool($activated)) {
-            // TODO: Throw exception
-            return false;
+            throw new IncorrectTypeException('Activated state must be a boolean was given ' . $activated);
         }
         if(!\is_bool($systemAccount)) {
-            // TODO: Throw exception
-            return false;
+            throw new IncorrectTypeException('System account state must be a boolean was given ' . $systemAccount);
         }
         $options = [
             'cost' => 12,
@@ -464,7 +468,6 @@ class User implements DataObject {
         $user->setSystemAccount($systemAccount);
         $user->commit();
         // TODO: create notification for user registered
-        return true;
     }
 
     public static function login($username, $password) {
