@@ -76,6 +76,9 @@ class User implements DataObject {
             $stmt->close();
             $this->_id = null;
         }
+        else {
+            throw new QueryStatementException("Failed to bind query");
+        }
     }
 
     public function eql($anotherObject) {

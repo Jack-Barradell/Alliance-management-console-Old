@@ -1,6 +1,9 @@
 <?php
 namespace AMC\Classes;
 
+use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\QueryStatementException;
+
 class LoginLog implements DataObject {
     use Getable;
     use Storable;
@@ -23,7 +26,7 @@ class LoginLog implements DataObject {
 
     public function create() {
         if($this->eql(new LoginLog())) {
-            //TODO: Throw exception
+            throw new BlankObjectException('Cannot store blank login log');
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Login_Log` (`UserID`,`LoginLogResult`,`LoginLogIP`,`LoginLogTimestamp`) VALUES (?,?,?,?)")) {
@@ -36,7 +39,7 @@ class LoginLog implements DataObject {
 
     public function update() {
         if($this->eql(new LoginLog())) {
-            //TODO: Throw exception
+            throw new BlankObjectException('Object store blank login log');
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `Login_Log` SET `UserID`=?,`LoginLogResult`=?,`LoginLogIP`=?,`LoginLogTimestamp`=? WHERE `LoginLogID`=?")) {
@@ -45,7 +48,7 @@ class LoginLog implements DataObject {
                 $stmt->close();
             }
             else {
-                //TODO: Throw exception
+                throw new QueryStatementException("Failed to bind query");
             }
         }
     }
@@ -56,6 +59,9 @@ class LoginLog implements DataObject {
             $stmt->execute();
             $stmt->close();
             $this->_id = null;
+        }
+        else {
+            throw new QueryStatementException("Failed to bind query");
         }
     }
 
@@ -154,7 +160,7 @@ class LoginLog implements DataObject {
                 }
             }
             else {
-                return null;
+                throw new QueryStatementException("Failed to bind query");
             }
         }
         else if(\is_array($id) && \count($id) == 0) {
@@ -179,7 +185,7 @@ class LoginLog implements DataObject {
                 }
             }
             else {
-                return null;
+                throw new QueryStatementException("Failed to bind query");
             }
         }
         else {
@@ -205,19 +211,52 @@ class LoginLog implements DataObject {
             }
         }
         else {
-            // TODO: Throw exception
-            return null;
+            throw new QueryStatementException("Failed to bind query");
         }
     }
 
     public static function getByIP($ip) {
-        //TODO: Implement
+        if($stmt = Database::getConnection()->prepare("SELECT `LoginLogID` FROM `Login_Log` WHERE `LoginLogIP`=?")) {
+            $stmt->bind_param('s', $ip);
+            $stmt->execute();
+            $stmt->bind_result($loginLogID);
+            $input = [];
+            while($stmt->fetch()) {
+                $input[] = $loginLogID;
+            }
+            $stmt->close();
+            if(\count($input) > 0) {
+                return LoginLog::get($input);
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            throw new QueryStatementException("Failed to bind query");
+        }
     }
 
     public static function getByTimestamp($timestamp) {
-        //TODO: Implement
+        if($stmt = Database::getConnection()->prepare("SELECT `LoginLogID` FROM `LoginLog` WHERE `LoginLogTimestamp`=?")) {
+            $stmt->bind_param('s', $timestamp);
+            $stmt->execute();
+            $stmt->bind_result($loginLogID);
+            $input = [];
+            while($stmt->fetch()) {
+                $input[] = $loginLogID;
+            }
+            $stmt->close();
+            if(\count($input) > 0) {
+                return LoginLog::get($input);
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            throw new QueryStatementException("Failed to bind query");
+        }
     }
-
-
 
 }

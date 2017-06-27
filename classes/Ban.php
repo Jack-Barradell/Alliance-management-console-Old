@@ -1,6 +1,9 @@
 <?php
 namespace AMC\Classes;
 
+use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\QueryStatementException;
+
 class Ban implements DataObject {
     use Getable;
     use Storable;
@@ -31,7 +34,7 @@ class Ban implements DataObject {
 
     public function create() {
         if($this->eql(new Ban())) {
-            //TODO: Throw exception
+            throw new BlankObjectException("Cannot store a blank ban");
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Bans` (`UserID`,`AdminID`,`UnbanAdminID`,`BanReason`,`BanDate`,`UnbanDate`,`BanActive`,`BanExpiry`) VALUES (?,?,?,?,?,?,?,?)")) {
@@ -40,20 +43,23 @@ class Ban implements DataObject {
                 $stmt->close();
             }
             else {
-                //TODO: Throw exception
+                throw new QueryStatementException("Failed to bind query");
             }
         }
     }
 
     public function update() {
         if($this->eql(new Ban())) {
-            //TODO: Throw exception
+            throw new BlankObjectException("Cannot store a blank ban");
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `Bans` SET `UserID`=?,`AdminID`=?,`UnbanAdminID`=?,`BanReason`=?,`BanDate`=?,`UnbanDate`=?,`BanActive`=?,`BanExpiry`=? WHERE `BanID`=?")) {
                 $stmt->bind_param('iiisiii', $this->_userID, $this->_adminID, $this->_unbanAdminID, $this->_banReason, $this->_banDate, $this->_unbanDate, Database::toNumeric($this->_banActive), $this->_banExpiry, $this->_id);
                 $stmt->execute();
                 $stmt->close();
+            }
+            else {
+                throw new QueryStatementException("Failed to bind query");
             }
         }
     }
@@ -64,6 +70,9 @@ class Ban implements DataObject {
             $stmt->execute();
             $stmt->close();
             $this->_id = null;
+        }
+        else {
+            throw new QueryStatementException("Failed to bind query");
         }
     }
 
@@ -198,7 +207,7 @@ class Ban implements DataObject {
                 }
             }
             else {
-                //TODO: Throw exception
+                throw new QueryStatementException("Failed to bind query");
             }
         }
         else if(\is_array($id) && \count($id) == 0) {
@@ -228,7 +237,7 @@ class Ban implements DataObject {
                 }
             }
             else {
-                //TODO: Throw exception
+                throw new QueryStatementException("Failed to bind query");
             }
         }
         else {
@@ -254,7 +263,7 @@ class Ban implements DataObject {
            }
        }
        else {
-        // TODO: Throw exception
+           throw new QueryStatementException("Failed to bind query");
        }
     }
 
@@ -276,7 +285,7 @@ class Ban implements DataObject {
             }
         }
         else {
-            // TODO: Throw exception
+            throw new QueryStatementException("Failed to bind query");
         }
     }
 
@@ -298,7 +307,7 @@ class Ban implements DataObject {
             }
         }
         else {
-            //TODO: Throw exception
+            throw new QueryStatementException("Failed to bind query");
         }
     }
 
@@ -320,7 +329,7 @@ class Ban implements DataObject {
             }
         }
         else {
-            // TODO: Throw exception
+            throw new QueryStatementException("Failed to bind query");
         }
     }
 
@@ -340,6 +349,9 @@ class Ban implements DataObject {
             else {
                 return null;
             }
+        }
+        else {
+            throw new QueryStatementException("Failed to bind query");
         }
     }
 
