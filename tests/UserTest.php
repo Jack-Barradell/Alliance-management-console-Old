@@ -13,6 +13,7 @@ require '../classes/exceptions/BlankObjectException.php';
 use AMC\Classes\Database;
 use AMC\Classes\User;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\IncorrectTypeException;
 use PHPUnit\Framework\TestCase;
 
 
@@ -287,11 +288,11 @@ class UserTest extends TestCase {
         $testUser->setActivated(false);
         $testUser->update();
 
-        // Check old tests return null
-        self::assertNull(User::userExists($testUser->getID()));
-        self::assertNull(User::userExists('testName'));
-        self::assertNull(User::userExists($testUser->getID(), false, true));
-        self::assertNull(User::userExists('testName', false, true));
+        // Check old tests return false
+        self::assertFalse(User::userExists($testUser->getID()));
+        self::assertFalse(User::userExists('testName'));
+        self::assertFalse(User::userExists($testUser->getID(), false, true));
+        self::assertFalse(User::userExists('testName', false, true));
 
         // Now check they work when including inactive
         // Check they exist by ID
@@ -305,10 +306,66 @@ class UserTest extends TestCase {
 
         // Check ID is returned by username
         self::assertEquals($testUser->getID(), User::userExists('testName', true, true));
+
+        // Clean up the user from db
+        $testUser->delete();
+    }
+
+    public function testUserExistsInputException() {
+
+        // Set the correct exception expectation
+        self::expectException(IncorrectTypeException::class);
+
+        // Now trigger it
+        User::userExists(false, false, false);
     }
 
     public function testEmailExists() {
-        //TODO: Implement
+        // Create a test user
+        $testUser = new User();
+
+        $testUser->setUsername('testName');
+        $testUser->setPasswordHash("testHash");
+        $testUser->setEmail("test@email.com");
+        $testUser->setBanned(false);
+        $testUser->setActivated(true);
+        $testUser->setLastLogin(123);
+        $testUser->setSystemAccount(false);
+        $testUser->create();
+
+        // Check if the email is in
+        self::assertTrue(User::emailExists("test@email.com"));
+
+        // Check correct id is returned
+        self::assertEmpty($testUser->getID(), User::emailExists("test@email.com", false, true));
+
+        // Now de activate the user
+        $testUser->setActivated(false);
+        $testUser->update();
+
+        // Check it no longer shows up
+        self::assertFalse(User::emailExists("test@email.com"));
+        self::assertFalse(User::emailExists("test@email.com", false, true));
+
+        // Check it shows up when including inactive
+        // Check if the email is in
+        self::assertTrue(User::emailExists("test@email.com"), true, true);
+
+        // Check correct id is returned
+        self::assertEmpty($testUser->getID(), User::emailExists("test@email.com", true, true));
+
+        // Clean up the user from db
+        $testUser->delete();
+    }
+
+    public function testEmailExistsInputException() {
+
+        // Set the correct exception expectation
+        self::expectException(IncorrectTypeException::class);
+
+        // Now trigger it
+        User::emailExists(false, false, false);
+        User::emailExists(1, false, false);
     }
 
     public function testRegisterAccount() {
