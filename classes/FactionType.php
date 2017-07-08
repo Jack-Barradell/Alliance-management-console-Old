@@ -108,7 +108,7 @@ class FactionType implements DataObject {
                 $refs[$key] =& $id[$key];
             }
             for($i = 0; $i < \count($id); $i++) {
-                $questionString .= '?';
+                $questionString .= ',?';
                 $typeArray[0] .= 'i';
             }
             $param = \array_merge($typeArray, $refs);
