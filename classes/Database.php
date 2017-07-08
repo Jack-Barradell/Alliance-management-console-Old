@@ -3,6 +3,8 @@ namespace AMC\Classes;
 
 class Database {
 
+    // TODO ########### ADD A FUNCTION FOR SQLITE DBs ##########
+
     private static $_connection = null;
 
     public static function newConnection($host, $username, $password, $database) {
