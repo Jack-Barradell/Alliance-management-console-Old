@@ -14,9 +14,7 @@ class Merit implements DataObject {
     private $_meritValue = null;
     private $_meritReason = null;
     private $_meritTimestamp = null;
-    private $_connection;
-
-    // TODO: Implement
+    private $_connection = null;
 
     public function __construct($id = null, $userID = null, $adminID = null, $meritValue = null, $meritReason = null, $meritTimestamp = null) {
         $this->_id = $id;
