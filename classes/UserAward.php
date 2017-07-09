@@ -196,4 +196,70 @@ class UserAward implements DataObject {
             return null;
         }
     }
+
+    public static function getByUserID($userID) {
+        if($stmt = Database::getConnection()->prepare("SELECT `UserAwardID` FROM `User_Awards` WHERE `UserID`=?")) {
+            $stmt->bind_param('i', $userID);
+            $input = [];
+            $stmt->execute();
+            $stmt->bind_result($userAwardID);
+            while($stmt->fetch()) {
+                $input[] = $userAwardID;
+            }
+            $stmt->close();
+            if(\count($input) > 0) {
+                return UserAward::get($input);
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            throw new QueryStatementException("Failed to bind query");
+        }
+    }
+
+    public static function getByIssuerID($issuerID) {
+        if($stmt = Database::getConnection()->prepare("SELECT `UserAwardID` FROM `User_Awards` WHERE `IssuerID`=?")) {
+            $stmt->bind_param('i', $issuerID);
+            $input = [];
+            $stmt->execute();
+            $stmt->bind_result($userAwardID);
+            while($stmt->fetch()) {
+                $input[] = $userAwardID;
+            }
+            $stmt->close();
+            if(\count($input) > 0) {
+                return UserAward::get($input);
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            throw new QueryStatementException("Failed to bind query");
+        }
+    }
+
+    public static function getByAwardID($awardID) {
+        if($stmt = Database::getConnection()->prepare("SELECT `UserAwardID` FROM `User_Awards` WHERE `AwardID`=?")) {
+            $stmt->bind_param('i', $awardID);
+            $input = [];
+            $stmt->execute();
+            $stmt->bind_result($userAwardID);
+            while($stmt->fetch()) {
+                $input[] = $userAwardID;
+            }
+            $stmt->close();
+            if(\count($input) > 0) {
+                return UserAward::get($input);
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            throw new QueryStatementException("Failed to bind query");
+        }
+    }
 }

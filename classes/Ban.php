@@ -250,7 +250,7 @@ class Ban implements DataObject {
            $stmt->bind_param('i', Database::toNumeric($active));
            $input = [];
            $stmt->execute();
-           $stmt->bindResult($banID);
+           $stmt->bind_result($banID);
            while($stmt->fetch()) {
                $input[] = $banID;
            }
