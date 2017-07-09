@@ -103,8 +103,8 @@ class User implements DataObject {
                 $ban->setUserID($this->_id);
                 $ban->setAdminID($adminID);
                 $ban->setBanDate(\time());
-                $ban->setBanReason($banReason);
-                $ban->setBanExpiry($banExpiry);
+                $ban->setReason($banReason);
+                $ban->setExpiry($banExpiry);
                 $ban->commit();
                 $this->_banned = true;
                 $this->commit();

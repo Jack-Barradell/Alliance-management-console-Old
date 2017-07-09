@@ -11,18 +11,18 @@ class Merit implements DataObject {
     private $_id = null;
     private $_userID = null;
     private $_adminID = null;
-    private $_meritValue = null;
-    private $_meritReason = null;
-    private $_meritTimestamp = null;
+    private $_value = null;
+    private $_reason = null;
+    private $_timestamp = null;
     private $_connection = null;
 
     public function __construct($id = null, $userID = null, $adminID = null, $meritValue = null, $meritReason = null, $meritTimestamp = null) {
         $this->_id = $id;
         $this->_userID = $userID;
         $this->_adminID = $adminID;
-        $this->_meritValue = $meritValue;
-        $this->_meritReason = $meritReason;
-        $this->_meritTimestamp = $meritTimestamp;
+        $this->_value = $meritValue;
+        $this->_reason = $meritReason;
+        $this->_timestamp = $meritTimestamp;
         $this->_connection = Database::getConnection();
     }
 
@@ -32,7 +32,7 @@ class Merit implements DataObject {
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Merits` (`UserID`,`AdminID`,`MeritValue`,`MeritReason`,`MeritTimestamp`) VALUES (?,?,?,?,?)")) {
-                $stmt->bind_param('iiisi', $this->_userID, $this->_adminID, $this->_meritValue, $this->_meritReason, $this->_meritTimestamp);
+                $stmt->bind_param('iiisi', $this->_userID, $this->_adminID, $this->_value, $this->_reason, $this->_timestamp);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -48,7 +48,7 @@ class Merit implements DataObject {
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `Merits` SET `UserID`=?,`AdminID`=?,`MeritValue`=?,`MeritReason`=?,`MeritTimestamp`=? WHERE `MeritID`=? ")) {
-                $stmt->bind_param('iiisii', $this->_userID, $this->_adminID, $this->_meritValue, $this->_meritReason, $this->_meritTimestamp, $this->_id);
+                $stmt->bind_param('iiisii', $this->_userID, $this->_adminID, $this->_value, $this->_reason, $this->_timestamp, $this->_id);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -74,7 +74,7 @@ class Merit implements DataObject {
 
     public function eql($anotherObject) {
         if(\get_class($this) == \get_class($anotherObject)) {
-            if($this->_id == $anotherObject->getID() && $this->_userID == $anotherObject->getUserID() && $this->_adminID == $anotherObject->getAdminID() && $this->_meritValue == $anotherObject->getMeritValue() && $this->_meritReason == $anotherObject->getMeritReason() && $this->_meritTimestamp == $anotherObject->getMeritTimestamp) {
+            if($this->_id == $anotherObject->getID() && $this->_userID == $anotherObject->getUserID() && $this->_adminID == $anotherObject->getAdminID() && $this->_value == $anotherObject->getMeritValue() && $this->_reason == $anotherObject->getMeritReason() && $this->_timestamp == $anotherObject->getMeritTimestamp) {
                 return true;
             }
             else {
@@ -100,16 +100,16 @@ class Merit implements DataObject {
         return $this->_adminID;
     }
 
-    public function getMeritValue() {
-        return $this->_meritValue;
+    public function getValue() {
+        return $this->_value;
     }
 
-    public function getMeritReason() {
-        return $this->_meritReason;
+    public function getReason() {
+        return $this->_reason;
     }
 
-    public function getMeritTimestamp() {
-        return $this->_meritTimestamp;
+    public function getTimestamp() {
+        return $this->_timestamp;
     }
 
     public function setID($id) {
@@ -124,16 +124,16 @@ class Merit implements DataObject {
         $this->_adminID = $adminID;
     }
 
-    public function setMeritValue($meritValue) {
-        $this->_meritValue = $meritValue;
+    public function setValue($meritValue) {
+        $this->_value = $meritValue;
     }
 
-    public function setMeritReason($meritReason) {
-        $this->_meritReason = $meritReason;
+    public function setReason($meritReason) {
+        $this->_reason = $meritReason;
     }
 
-    public function setMeritTimestamp($meritTimestamp) {
-        $this->_meritTimestamp = $meritTimestamp;
+    public function setTimestamp($meritTimestamp) {
+        $this->_timestamp = $meritTimestamp;
     }
 
     // Statics
@@ -162,9 +162,9 @@ class Merit implements DataObject {
                     $merit->setID($meritID);
                     $merit->setUserID($userID);
                     $merit->setAdminID($adminID);
-                    $merit->setMeritValue($meritValue);
-                    $merit->setMeritReason($meritReason);
-                    $merit->setMeritTimestamp($meritTimestamp);
+                    $merit->setValue($meritValue);
+                    $merit->setReason($meritReason);
+                    $merit->setTimestamp($meritTimestamp);
                     $meritResult[] = $merit;
                 }
                 $stmt->close();
@@ -189,9 +189,9 @@ class Merit implements DataObject {
                     $merit->setID($meritID);
                     $merit->setUserID($userID);
                     $merit->setAdminID($adminID);
-                    $merit->setMeritValue($meritValue);
-                    $merit->setMeritReason($meritReason);
-                    $merit->setMeritTimestamp($meritTimestamp);
+                    $merit->setValue($meritValue);
+                    $merit->setReason($meritReason);
+                    $merit->setTimestamp($meritTimestamp);
                     $meritResult[] = $merit;
                 }
                 $stmt->close();

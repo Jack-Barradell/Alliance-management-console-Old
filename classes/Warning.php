@@ -3,7 +3,6 @@ namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
 use AMC\Exceptions\QueryStatementException;
-use phpDocumentor\Reflection\DocBlock\Tags\Param;
 
 class Warning implements DataObject {
     use Getable;
@@ -12,16 +11,16 @@ class Warning implements DataObject {
     private $_id = null;
     private $_userID = null;
     private $_adminID = null;
-    private $_warningReason = null;
-    private $_warningTimestamp = null;
+    private $_reason = null;
+    private $_timestamp = null;
     private $_connection = null;
 
     public function __construct($id = null, $userID = null, $adminID = null, $warningReason = null, $warningTimestamp = null) {
         $this->_id = $id;
         $this->_userID = $userID;
         $this->_adminID = $adminID;
-        $this->_warningReason = $warningReason;
-        $this->_warningTimestamp = $warningTimestamp;
+        $this->_reason = $warningReason;
+        $this->_timestamp = $warningTimestamp;
         $this->_connection = Database::getConnection();
     }
 
@@ -31,7 +30,7 @@ class Warning implements DataObject {
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Warnings`(`UserID`,`AdminID`,`WarningReason`,`WarningTimestamp`) VALUES (?,?,?,?)")) {
-                $stmt->bind_param('iisi', $this->_userID, $this->_adminID, $this->_warningReason, $this->_warningTimestamp);
+                $stmt->bind_param('iisi', $this->_userID, $this->_adminID, $this->_reason, $this->_timestamp);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -47,7 +46,7 @@ class Warning implements DataObject {
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `Warnings` SET `UserID`=?,`AdminID`=?,`WarningReason`=?,`WarningTimestamp`=? WHERE `WarningID`=?")) {
-                $stmt->bind_param('iisii', $this->_userID, $this->_adminID, $this->_warningReason, $this->_warningTimestamp, $this->_id);
+                $stmt->bind_param('iisii', $this->_userID, $this->_adminID, $this->_reason, $this->_timestamp, $this->_id);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -71,7 +70,7 @@ class Warning implements DataObject {
 
     public function eql($anotherObject) {
         if(\get_class($this) == \get_class($anotherObject)) {
-            if($this->_id == $anotherObject->getID() && $this->_userID == $anotherObject->getUserID() && $this->_adminID == $anotherObject->getAdminID() && $this->_warningReason == $anotherObject->getWarningReason() && $this->_warningTimestamp == $anotherObject->getWarningReason()) {
+            if($this->_id == $anotherObject->getID() && $this->_userID == $anotherObject->getUserID() && $this->_adminID == $anotherObject->getAdminID() && $this->_reason == $anotherObject->getWarningReason() && $this->_timestamp == $anotherObject->getWarningReason()) {
                 return true;
             }
             else {
@@ -97,12 +96,12 @@ class Warning implements DataObject {
         return $this->_adminID;
     }
 
-    public function getWarningReason() {
-        return $this->_warningReason;
+    public function getReason() {
+        return $this->_reason;
     }
 
-    public function getWarningTimestamp() {
-        return $this->_warningTimestamp;
+    public function getTimestamp() {
+        return $this->_timestamp;
     }
 
     public function setID($id) {
@@ -117,12 +116,12 @@ class Warning implements DataObject {
         $this->_adminID = $adminID;
     }
 
-    public function setWarningReason($reason) {
-        $this->_warningReason = $reason;
+    public function setReason($reason) {
+        $this->_reason = $reason;
     }
 
-    public function setWarningTimestamp($timestamp) {
-        $this->_warningTimestamp = $timestamp;
+    public function setTimestamp($timestamp) {
+        $this->_timestamp = $timestamp;
     }
 
     // Statics
@@ -152,8 +151,8 @@ class Warning implements DataObject {
                     $warning->setID($warningID);
                     $warning->setUserID($userID);
                     $warning->setAdminID($adminID);
-                    $warning->setWarningReason($warningReason);
-                    $warning->setWarningTimestamp($warningTime);
+                    $warning->setReason($warningReason);
+                    $warning->setTimestamp($warningTime);
                     $warningResult[] = $warning;
                 }
                 $stmt->close();
@@ -175,8 +174,8 @@ class Warning implements DataObject {
                     $warning->setID($warningID);
                     $warning->setUserID($userID);
                     $warning->setAdminID($adminID);
-                    $warning->setWarningReason($warningReason);
-                    $warning->setWarningTimestamp($warningTime);
+                    $warning->setReason($warningReason);
+                    $warning->setTimestamp($warningTime);
                     $warningResult[] = $warning;
                 }
                 $stmt->close();

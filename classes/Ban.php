@@ -12,11 +12,11 @@ class Ban implements DataObject {
     private $_userID = null;
     private $_adminID = null;
     private $_unbanAdminID = null;
-    private $_banReason = null;
+    private $_reason = null;
     private $_banDate = null;
     private $_unbanDate = null;
-    private $_banActive = null;
-    private $_banExpiry = null;
+    private $_active = null;
+    private $_expiry = null;
     private $_connection = null;
 
     public function __construct($id = null, $userID = null, $adminID = null, $unbanAdminID = null, $banReason = null, $banDate = null, $unbanDate = null, $banActive = null, $banExpiry = null) {
@@ -24,11 +24,11 @@ class Ban implements DataObject {
         $this->_userID = $userID;
         $this->_adminID = $adminID;
         $this->_unbanAdminID = $unbanAdminID;
-        $this->_banReason = $banReason;
+        $this->_reason = $banReason;
         $this->_banDate = $banDate;
         $this->_unbanDate = $unbanDate;
-        $this->_banActive = $banActive;
-        $this->_banExpiry = $banExpiry;
+        $this->_active = $banActive;
+        $this->_expiry = $banExpiry;
         $this->_connection = Database::getConnection();
     }
 
@@ -38,7 +38,7 @@ class Ban implements DataObject {
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Bans` (`UserID`,`AdminID`,`UnbanAdminID`,`BanReason`,`BanDate`,`UnbanDate`,`BanActive`,`BanExpiry`) VALUES (?,?,?,?,?,?,?,?)")) {
-                $stmt->bind_param('iiisiii', $this->_userID, $this->_adminID, $this->_unbanAdminID, $this->_banReason, $this->_banDate, $this->_unbanDate, Database::toNumeric($this->_banActive), $this->_banExpiry);
+                $stmt->bind_param('iiisiii', $this->_userID, $this->_adminID, $this->_unbanAdminID, $this->_reason, $this->_banDate, $this->_unbanDate, Database::toNumeric($this->_active), $this->_expiry);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -54,7 +54,7 @@ class Ban implements DataObject {
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `Bans` SET `UserID`=?,`AdminID`=?,`UnbanAdminID`=?,`BanReason`=?,`BanDate`=?,`UnbanDate`=?,`BanActive`=?,`BanExpiry`=? WHERE `BanID`=?")) {
-                $stmt->bind_param('iiisiii', $this->_userID, $this->_adminID, $this->_unbanAdminID, $this->_banReason, $this->_banDate, $this->_unbanDate, Database::toNumeric($this->_banActive), $this->_banExpiry, $this->_id);
+                $stmt->bind_param('iiisiii', $this->_userID, $this->_adminID, $this->_unbanAdminID, $this->_reason, $this->_banDate, $this->_unbanDate, Database::toNumeric($this->_active), $this->_expiry, $this->_id);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -78,7 +78,7 @@ class Ban implements DataObject {
 
     public function eql($anotherObject) {
         if(\get_class($this) == \get_class($anotherObject)) {
-            if($this->_id == $anotherObject->getID() && $this->_userID == $anotherObject->getUserID() && $this->_adminID == $anotherObject->getAdminID() && $this->_unbanAdminID == $anotherObject->getUnbanAdminID() && $this->_banReason == $anotherObject->getBanReason() && $this->_banDate == $anotherObject->getBanDate() && $this->_unbanDate == $anotherObject->unbanDate() && $this->_banActive == $anotherObject->getBanActive()) {
+            if($this->_id == $anotherObject->getID() && $this->_userID == $anotherObject->getUserID() && $this->_adminID == $anotherObject->getAdminID() && $this->_unbanAdminID == $anotherObject->getUnbanAdminID() && $this->_reason == $anotherObject->getBanReason() && $this->_banDate == $anotherObject->getBanDate() && $this->_unbanDate == $anotherObject->unbanDate() && $this->_active == $anotherObject->getBanActive()) {
                 return true;
             }
             else {
@@ -108,8 +108,8 @@ class Ban implements DataObject {
         return $this->_unbanAdminID;
     }
 
-    public function getBanReason() {
-        return $this->_banReason;
+    public function getReason() {
+        return $this->_reason;
     }
 
     public function getBanDate() {
@@ -120,12 +120,12 @@ class Ban implements DataObject {
         return $this->_unbanDate;
     }
 
-    public function getBanActive() {
-        return $this->_banActive;
+    public function getActive() {
+        return $this->_active;
     }
 
-    public function getBanExpiry() {
-        return $this->_banExpiry;
+    public function getExpiry() {
+        return $this->_expiry;
     }
 
     public function setID($id) {
@@ -144,8 +144,8 @@ class Ban implements DataObject {
         $this->_unbanAdminID = $unbanAdminID;
     }
 
-    public function setBanReason($banReason) {
-        $this->_banReason = $banReason;
+    public function setReason($banReason) {
+        $this->_reason = $banReason;
     }
 
     public function setBanDate($banDate) {
@@ -156,12 +156,12 @@ class Ban implements DataObject {
         $this->_unbanDate = $unbanDate;
     }
 
-    public function setBanActive($banActive) {
-        $this->_banActive = $banActive;
+    public function setActive($banActive) {
+        $this->_active = $banActive;
     }
 
-    public function setBanExpiry($banExpiry) {
-        $this->_banExpiry = $banExpiry;
+    public function setExpiry($banExpiry) {
+        $this->_expiry = $banExpiry;
     }
 
     // Statics
@@ -191,11 +191,11 @@ class Ban implements DataObject {
                     $ban->setUserID($userID);
                     $ban->setAdminID($adminID);
                     $ban->setUnbanAdminID($unbanAdminID);
-                    $ban->setBanReason($banReason);
+                    $ban->setReason($banReason);
                     $ban->setBanDate($banDate);
                     $ban->setUnbanDate($unbanDate);
-                    $ban->setBanActive(Database::toBoolean($banActive));
-                    $ban->setBanExpiry($banExpiry);
+                    $ban->setActive(Database::toBoolean($banActive));
+                    $ban->setExpiry($banExpiry);
                     $banResult[] = $ban;
                 }
                 $stmt->close();
@@ -221,11 +221,11 @@ class Ban implements DataObject {
                     $ban->setUserID($userID);
                     $ban->setAdminID($adminID);
                     $ban->setUnbanAdminID($unbanAdminID);
-                    $ban->setBanReason($banReason);
+                    $ban->setReason($banReason);
                     $ban->setBanDate($banDate);
                     $ban->setUnbanDate($unbanDate);
-                    $ban->setBanActive(Database::toBoolean($banActive));
-                    $ban->setBanExpiry($banExpiry);
+                    $ban->setActive(Database::toBoolean($banActive));
+                    $ban->setExpiry($banExpiry);
                     $banResult[] = $ban;
                 }
                 $stmt->close();

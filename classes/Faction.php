@@ -11,13 +11,13 @@ class Faction implements DataObject {
 
     private $_id = null;
     private $_factionTypeID = null;
-    private $_factionName = null;
+    private $_name = null;
     private $_connection = null;
 
     public function __construct($id = null, $factionTypeID = null, $factionName = null) {
         $this->_id = $id;
         $this->_factionTypeID = $factionTypeID;
-        $this->_factionName = $factionName;
+        $this->_name = $factionName;
         $this->_connection = Database::getConnection();
     }
 
@@ -27,7 +27,7 @@ class Faction implements DataObject {
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Factions` (`FactionTypeID`, `FactionName`) VALUES (?,?)")) {
-                $stmt->bind_param('is', $this->_factionTypeID, $this->_factionName);
+                $stmt->bind_param('is', $this->_factionTypeID, $this->_name);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -43,7 +43,7 @@ class Faction implements DataObject {
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `Factions` SET `FactionTypeID`=?,`FactionName`=? WHERE `FactionID`=?")) {
-                $stmt->bind_param('isi', $this->_factionTypeID, $this->_factionName, $this->_id);
+                $stmt->bind_param('isi', $this->_factionTypeID, $this->_name, $this->_id);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -67,7 +67,7 @@ class Faction implements DataObject {
 
     public function eql($anotherObject) {
         if(\get_class($anotherObject) == \get_class($this)) {
-            if($this->_id == $anotherObject->getID() && $this->_factionTypeID == $anotherObject->getFactionTypeID() && $this->_factionName == $anotherObject->getFactionName()) {
+            if($this->_id == $anotherObject->getID() && $this->_factionTypeID == $anotherObject->getFactionTypeID() && $this->_name == $anotherObject->getFactionName()) {
                 return true;
             }
             else {
@@ -89,8 +89,8 @@ class Faction implements DataObject {
         return $this->_factionTypeID;
     }
 
-    public function getFactionName() {
-        return $this->_factionName;
+    public function getName() {
+        return $this->_name;
     }
 
     public function setID($newID) {
@@ -101,8 +101,8 @@ class Faction implements DataObject {
         $this->_factionTypeID = $factionTypeID;
     }
 
-    public function setFactionName($name) {
-        $this->_factionName = $name;
+    public function setName($name) {
+        $this->_name = $name;
     }
 
     // STATICS
@@ -130,7 +130,7 @@ class Faction implements DataObject {
                     $faction = new Faction();
                     $faction->setID($factionID);
                     $faction->setFactionTypeID($factionTypeID);
-                    $faction->setFactionName($factionName);
+                    $faction->setName($factionName);
                     $factionResult[] = $faction;
                 }
                 $stmt->close();
@@ -154,7 +154,7 @@ class Faction implements DataObject {
                     $faction = new Faction();
                     $faction->setID($factionID);
                     $faction->setFactionTypeID($factionTypeID);
-                    $faction->setFactionName($factionName);
+                    $faction->setName($factionName);
                     $factionResult[] = $faction;
                 }
                 $stmt->close();

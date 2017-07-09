@@ -1,31 +1,34 @@
 <?php
-
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
 use AMC\Exceptions\QueryStatementException;
 
-class FactionType implements DataObject {
+class Award implements DataObject {
     use Getable;
     use Storable;
 
     private $_id = null;
     private $_name = null;
+    private $_description = null;
+    private $_badge = null;
     private $_connection = null;
 
-    public function __construct($id = null, $factionTypeName = null) {
+    public function __construct($id = null, $name = null, $description = null, $badge = null) {
         $this->_id = $id;
-        $this->_name = $factionTypeName;
+        $this->_name = $name;
+        $this->_description = $description;
+        $this->_badge = $badge;
         $this->_connection = Database::getConnection();
     }
 
     public function create() {
-        if($this->eql(new FactionType())) {
-            throw new BlankObjectException("Cannot store blank faction type");
+        if($this->eql(new Award())) {
+            throw new BlankObjectException("Cannot store a blank award");
         }
         else {
-            if($stmt = $this->_connection->prepare("INSERT INTO `FactionTypes`(`FactionTypeName`) VALUES (?)")) {
-                $stmt->bind_param('s', $this->_name);
+            if($stmt = $this->_connection->prepare("INSERT INTO `Awards`(`AwardName`,`AwardDescription`,`AwardBadge`) VALUES (?,?,?)")) {
+                $stmt->bind_param('sss', $this->_name, $this->_description, $this->_badge);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -36,12 +39,12 @@ class FactionType implements DataObject {
     }
 
     public function update() {
-        if($this->eql(new FactionType())) {
-            throw new BlankObjectException("Cannot store blank faction type");
+        if($this->eql(new Award())) {
+            throw new BlankObjectException("Cannot store a blank object");
         }
         else {
-            if($stmt = $this->_connection->prepare("UPDATE `FactionTypes` SET `FactionTypeName`=? WHERE `FactionTypeID`=?")) {
-                $stmt->bind_param('si', $this->_name, $this->_id);
+            if($stmt = $this->_connection->prepare("UPDATE `Awards` SET `AwardName`=?,`AwardDescription`=?,`AwardBadge`=? WHERE `AwardID`=?")) {
+                $stmt->bind_param('sssi', $this->_name, $this->_description, $this->_badge, $this->_id);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -52,8 +55,8 @@ class FactionType implements DataObject {
     }
 
     public function delete() {
-        if($stmt = $this->_connection->prepare("DELETE FROM `FactionTypes` WHERE `FactionTypeID`=?")) {
-            $stmt->bind_params('i', $this->_id);
+        if($stmt = $this->_connection->prepare("DELETE FROM `Awards` WHERE `AwardID`=?")) {
+            $stmt->bind_param('i', $this->_id);
             $stmt->execute();
             $stmt->close();
             $this->_id = null;
@@ -65,7 +68,7 @@ class FactionType implements DataObject {
 
     public function eql($anotherObject) {
         if(\get_class($this) == \get_class($anotherObject)) {
-            if($this->_id == $anotherObject->getID() && $this->_name == $anotherObject->getFactionTypeName()) {
+            if($this->_id == $anotherObject->getID() && $this->_name == $anotherObject->getName() && $this->_description == $anotherObject->getDescription() && $this->_badge == $anotherObject->getBadge()) {
                 return true;
             }
             else {
@@ -87,6 +90,14 @@ class FactionType implements DataObject {
         return $this->_name;
     }
 
+    public function getDescription() {
+        return $this->_description;
+    }
+
+    public function getBadge() {
+        return $this->_badge;
+    }
+
     public function setID($id) {
         $this->_id = $id;
     }
@@ -95,11 +106,19 @@ class FactionType implements DataObject {
         $this->_name = $name;
     }
 
+    public function setDescription($description) {
+        $this->_description = $description;
+    }
+
+    public function setBadge($badge) {
+        $this->_badge = $badge;
+    }
+
     // Statics
 
     public static function select($id) {
         if(\is_array($id) && \count($id) > 0) {
-            $factionTypeResult = [];
+            $awardResult = [];
             $typeArray = [];
             $refs = [];
             $typeArray[0] = 'i';
@@ -108,23 +127,25 @@ class FactionType implements DataObject {
                 $refs[$key] =& $id[$key];
             }
             for($i = 0; $i < \count($id); $i++) {
-                $questionString .= ',?';
                 $typeArray[0] .= 'i';
+                $questionString .= ',?';
             }
             $param = \array_merge($typeArray, $refs);
-            if($stmt = Database::getConnection()->prepare("SELECT `FactionTypeID`,`FactionTypeName` FROM `FactionTypes` WHERE `FactionTypeID` IN (" . $questionString . ")")) {
+            if($stmt = Database::getConnection()->prepare("SELECT `AwardID`,`AwardName`,`AwardDescription`,`AwardBadge` FROM `Awards` WHERE `AwardID` IN (" . $questionString . ")")) {
                 \call_user_func_array(array($stmt, 'bind_param'), $param);
                 $stmt->execute();
-                $stmt->bind_result($factionTypeID, $factionTypeName);
+                $stmt->bind_result($awardID, $name, $description, $badge);
                 while($stmt->fetch()) {
-                    $factionType = new FactionType();
-                    $factionType->setID($factionTypeID);
-                    $factionType->setName($factionTypeName);
-                    $factionTypeResult[] = $factionType;
+                    $award = new Award();
+                    $award->setID($awardID);
+                    $award->setName($name);
+                    $award->setDescription($description);
+                    $award->setBadge($badge);
+                    $awardResult[] = $award;
                 }
                 $stmt->close();
-                if(\count($factionTypeResult) > 0) {
-                    return $factionTypeResult;
+                if(\count($awardResult) > 0) {
+                    return $awardResult;
                 }
                 else {
                     return null;
@@ -135,19 +156,21 @@ class FactionType implements DataObject {
             }
         }
         else if(\is_array($id) && \count($id) == 0) {
-            $factionTypeResult = [];
-            if($stmt = Database::getConnection()->prepare("SELECT `FactionTypeID`,`FactionTypeName` FROM `FactionTypes`")) {
+            $awardResult = [];
+            if($stmt = Database::getConnection()->prepare("SELECT `AwardID`,`AwardName`,`AwardDescription`,`AwardBadge` FROM `Awards`")) {
                 $stmt->execute();
-                $stmt->bind_result($factionTypeID, $factionTypeName);
+                $stmt->bind_result($awardID, $name, $description, $badge);
                 while($stmt->fetch()) {
-                    $factionType = new FactionType();
-                    $factionType->setID($factionTypeID);
-                    $factionType->setName($factionTypeName);
-                    $factionTypeResult[] = $factionType;
+                    $award = new Award();
+                    $award->setID($awardID);
+                    $award->setName($name);
+                    $award->setDescription($description);
+                    $award->setBadge($badge);
+                    $awardResult[] = $award;
                 }
                 $stmt->close();
-                if(\count($factionTypeResult) > 0) {
-                    return $factionTypeResult;
+                if(\count($awardResult) > 0) {
+                    return $awardResult;
                 }
                 else {
                     return null;
