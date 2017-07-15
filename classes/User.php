@@ -108,6 +108,8 @@ class User implements DataObject {
                 $ban->commit();
                 $this->_banned = true;
                 $this->commit();
+                // TODO: create admin log
+                // TODO: create notification
             }
             else {
                 throw new IncorrectTypeException('AdminID must be an int was given ' . $adminID);
@@ -132,6 +134,8 @@ class User implements DataObject {
                         $this->_activated = $reactivateAccount;
                         $this->commit();
                     }
+                    // TODO: create admin log
+                    // TODO: create notification
                 }
                 else {
                     throw new NullGetException('No bans found for userID: ' . $this->_id);
@@ -152,6 +156,8 @@ class User implements DataObject {
             'cost' => 12,
         ];
         $this->_passwordHash = \password_hash($newPassword, PASSWORD_BCRYPT, $options);
+        $this->commit();
+        // TODO: Create notification
     }
 
     // Setters and getters
