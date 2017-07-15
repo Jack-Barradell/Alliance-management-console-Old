@@ -144,6 +144,7 @@ class UserRank implements DataObject {
             }
         }
         else if (\is_array($id) && \count($id) == 0) {
+            $userRankResult = [];
             if ($stmt = Database::getConnection()->prepare("SELECT `UserRankID`,`UserID`,`RankID` FROM `User_Ranks`")) {
                 $stmt->execute();
                 $stmt->bind_result($userRankID, $userID, $rankID);
