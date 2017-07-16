@@ -61,6 +61,7 @@ class ErrorLog implements DataObject {
             $stmt->bind_param('i', $this->_id);
             $stmt->execute();
             $stmt->close();
+            $this->_id = null;
         }
         else {
             throw new QueryStatementException("Failed to bind query");
