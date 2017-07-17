@@ -173,5 +173,25 @@ class UserNotification implements DataObject {
         }
     }
 
-    // TODO: Implement Get bys
+    public static function getByUser($userID) {
+        if($stmt = Database::getConnection()->prepare("SELECT `UserNotificationID` FROM `User_Notifications` WHERE `UserID`=?")) {
+            $stmt->bind_param('i', $userID);
+            $stmt->execute();
+            $stmt->bind_result($userNotificationID);
+            $input = [];
+            while($stmt->fetch()) {
+                $input[] = $userNotificationID;
+            }
+            $stmt->close();
+            if(\count($input) > 0) {
+                return UserNotification::get($input);
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            throw new QueryStatementException("Failed to bind query");
+        }
+    }
 }
