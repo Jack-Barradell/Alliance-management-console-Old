@@ -172,4 +172,6 @@ class UserNotification implements DataObject {
             return null;
         }
     }
+
+    // TODO: Implement Get bys
 }

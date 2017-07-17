@@ -173,4 +173,5 @@ class UserRank implements DataObject {
         }
     }
 
+    // TODO: Implement Get bys
 }
