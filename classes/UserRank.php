@@ -173,5 +173,48 @@ class UserRank implements DataObject {
         }
     }
 
-    // TODO: Implement Get bys
+    public static function getByUserID($userID) {
+        if($stmt = Database::getConnection()->prepare("SELECT `UserRankID` FROM `User_Ranks` WHERE `UserID`=?")) {
+            $stmt->bind_param('i', $userID);
+            $stmt->execute();
+            $stmt->bind_result($userRankID);
+            $input = [];
+            while($stmt->fetch()) {
+                $input[] = $userRankID;
+            }
+            $stmt->close();
+            if(\count($input) > 0) {
+                return UserRank::get($input);
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            throw new QueryStatementException("Failed to bind query");
+        }
+    }
+
+    public static function getByRankID($rankID) {
+        if($stmt = Database::getConnection()->prepare("SELECT `UserRankID` FROM `User_Ranks` WHERE `RankID`=?")) {
+            $stmt->bind_param('i', $rankID);
+            $stmt->execute();
+            $stmt->bind_result($userRankID);
+            $input = [];
+            while($stmt->fetch()) {
+                $input[] = $userRankID;
+            }
+            $stmt->close();
+            if(\count($input) > 0) {
+                return UserRank::get($input);
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            throw new QueryStatementException("Failed to bind query");
+        }
+    }
+
 }

@@ -194,6 +194,7 @@ class UserMessage implements DataObject {
             while($stmt->fetch()) {
                 $input[] = $userMessageID;
             }
+            $stmt->close();
             if(\count($input) > 0) {
                 return UserMessage::get($input);
             }
@@ -215,6 +216,7 @@ class UserMessage implements DataObject {
             while($stmt->fetch()) {
                 $input[] = $userMessageID;
             }
+            $stmt->close();
             if(\count($input) > 0) {
                 return UserMessage::get($input);
             }
