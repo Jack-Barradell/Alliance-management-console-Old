@@ -197,4 +197,25 @@ class MissionStage implements DataObject {
         }
     }
 
+    public static function getByMissionID($missionID) {
+        if($stmt = Database::getConnection()->prepare("SELECT `MissionStageID` FROM `Mission_Stages` WHERE `MissionID`=?")) {
+            $stmt->bind_param('i', $missionID);
+            $stmt->execute();
+            $stmt->bind_result($missionStageID);
+            $input = [];
+            while($stmt->fetch()) {
+                $input[] = $missionStageID;
+            }
+            if(\count($input) > 0) {
+                return MissionStage::get($input);
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            throw new QueryStatementException("Failed to bind query");
+        }
+    }
+
 }
