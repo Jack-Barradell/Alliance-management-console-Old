@@ -24,7 +24,12 @@ trait Storable {
         }
         elseif(!$this->_markForDelete and $id == null){
             $this->create();
-            $this->setID($this->_connection->insert_id);
+            if(Database::getDatabaseType() == Database::TYPE_MYSQLI) {
+                $this->setID($this->_connection->insert_id);
+            }
+            else if(Database::getDatabaseType() == Database::TYPE_SQLITE) {
+                $this->setID($this->_connection->lastInsertRowID());
+            }
         }
     }
 

@@ -3,16 +3,28 @@ namespace AMC\Classes;
 
 class Database {
 
-    // TODO ########### ADD A FUNCTION FOR SQLITE DBs ##########
+    const TYPE_MYSQLI = 0;
+    const TYPE_SQLITE = 1;
 
     private static $_connection = null;
+    private static $_databaseType = null;
 
     public static function newConnection($host, $username, $password, $database) {
         self::$_connection = new \mysqli($host, $username, $password, $database);
+        self::$_databaseType = self::TYPE_MYSQLI;
+    }
+
+    public static function newSqliteConnection($file) {
+        self::$_connection = new \SQLite3($file);
+        self::$_databaseType = self::TYPE_SQLITE;
     }
 
     public static function getConnection() {
         return self::$_connection;
+    }
+
+    public static function getDatabaseType() {
+        return self::$_databaseType;
     }
 
     public static function isConnected() {
