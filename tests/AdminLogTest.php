@@ -30,20 +30,20 @@ class AdminLogTest extends TestCase {
         $adminLog = new AdminLog();
 
         // Check the object initialised to have null vars
-        self::assertTrue($adminLog->eql(new AdminLog()));
-        self::assertNull($adminLog->getID());
-        self::assertNull($adminLog->getAdminID());
-        self::assertNull($adminLog->getEvent());
-        self::assertNull($adminLog->getTimestamp());
+        $this->assertTrue($adminLog->eql(new AdminLog()));
+        $this->assertNull($adminLog->getID());
+        $this->assertNull($adminLog->getAdminID());
+        $this->assertNull($adminLog->getEvent());
+        $this->assertNull($adminLog->getTimestamp());
 
         $adminLog = new AdminLog(1, 1, 'testEvent', 123);
 
         // Check the object vars are correct
-        self::assertFalse($adminLog->eql(new AdminLog()));
-        self::assertEquals(1, $adminLog->getID());
-        self::assertEquals(1, $adminLog->getAdminID());
-        self::assertEquals('testEvent', $adminLog->getEvent());
-        self::assertEquals(123, $adminLog->getTimestamp());
+        $this->assertFalse($adminLog->eql(new AdminLog()));
+        $this->assertEquals(1, $adminLog->getID());
+        $this->assertEquals(1, $adminLog->getAdminID());
+        $this->assertEquals('testEvent', $adminLog->getEvent());
+        $this->assertEquals(123, $adminLog->getTimestamp());
     }
 
     public function testCreate() {
@@ -61,7 +61,7 @@ class AdminLogTest extends TestCase {
         $testAdminLog->create();
 
         // Check the id becomes numeric
-        self::assertInternalType('int', $testAdminLog->getID());
+        $this->assertInternalType('int', $testAdminLog->getID());
 
         // Pull it from the db
         $stmt = $this->_connection->prepare("SELECT `AdminLogID`,`AdminID`,`AdminLogEvent`,`AdminLogTimestamp` FROM `Admin_Logs` WHERE `AdminLogID`=?");
@@ -70,16 +70,16 @@ class AdminLogTest extends TestCase {
         $stmt->bind_result($adminLogID, $adminID, $adminLogEvent, $adminLogTimestamp);
 
         // Check only one result
-        self::assertEquals(1, $stmt->num_rows);
+        $this->assertEquals(1, $stmt->num_rows);
 
         $stmt->fetch();
         $stmt->close();
 
         // Check the vars match the object
-        self::assertEquals($testAdminLog->getID(), $adminLogID);
-        self::assertEquals($testAdminLog->getAdminID(), $adminID);
-        self::assertEquals($testAdminLog->getEvent(), $adminLogEvent);
-        self::assertEquals($testAdminLog->getTimestamp(), $adminLogTimestamp);
+        $this->assertEquals($testAdminLog->getID(), $adminLogID);
+        $this->assertEquals($testAdminLog->getAdminID(), $adminID);
+        $this->assertEquals($testAdminLog->getEvent(), $adminLogEvent);
+        $this->assertEquals($testAdminLog->getTimestamp(), $adminLogTimestamp);
 
         $testAdminLog->delete();
         $testAdmin->delete();
@@ -92,7 +92,7 @@ class AdminLogTest extends TestCase {
         $adminLog  = new AdminLog();
 
         // Set the expected exception
-        self::expectException(BlankObjectException::class);
+        $this->expectException(BlankObjectException::class);
 
         // Trigger exception
         $adminLog->create();
@@ -131,16 +131,16 @@ class AdminLogTest extends TestCase {
         $stmt->bind_result($adminLogID, $adminID, $adminLogEvent, $adminLogTimestamp);
 
         // Check only one result
-        self::assertEquals(1, $stmt->num_rows);
+        $this->assertEquals(1, $stmt->num_rows);
 
         $stmt->fetch();
         $stmt->close();
 
         // Check the vars match the object
-        self::assertEquals($testAdminLog->getID(), $adminLogID);
-        self::assertEquals($testAdminLog->getAdminID(), $adminID);
-        self::assertEquals($testAdminLog->getEvent(), $adminLogEvent);
-        self::assertEquals($testAdminLog->getTimestamp(), $adminLogTimestamp);
+        $this->assertEquals($testAdminLog->getID(), $adminLogID);
+        $this->assertEquals($testAdminLog->getAdminID(), $adminID);
+        $this->assertEquals($testAdminLog->getEvent(), $adminLogEvent);
+        $this->assertEquals($testAdminLog->getTimestamp(), $adminLogTimestamp);
 
         $testAdminLog->delete();
         $testAdmin->delete();
@@ -152,7 +152,7 @@ class AdminLogTest extends TestCase {
         $adminLog  = new AdminLog();
 
         // Set the expected exception
-        self::expectException(BlankObjectException::class);
+        $this->expectException(BlankObjectException::class);
 
         // Trigger exception
         $adminLog->update();
@@ -178,13 +178,16 @@ class AdminLogTest extends TestCase {
         // Call delete
         $testAdminLog->delete();
 
+        // Check id is now null
+        $this->assertNull($testAdminLog->getID());
+
         $stmt = $this->_connection->prepare("SELECT `AdminLogID`,`AdminID`,`AdminLogEvent`,`AdminLogTimestamp` FROM `Admin_Logs` WHERE `AdminLogID`=?");
-        $stmt->bind_param('i', $testAdminLog->getID());
+        $stmt->bind_param('i', $id);
         $stmt->execute();
         $stmt->bind_result($adminLogID, $adminID, $adminLogEvent, $adminLogTimestamp);
 
         // Check only one result
-        self::assertEquals(0, $stmt->num_rows);
+        $this->assertEquals(0, $stmt->num_rows);
 
         $stmt->close();
         $testAdmin->delete();
@@ -219,16 +222,16 @@ class AdminLogTest extends TestCase {
 
         $selectedSingle = AdminLog::get($testAdminLog[0]->getID());
 
-        self::assertInstanceOf(AdminLog::class, $selectedSingle);
-        self::assertEquals($testAdminLog[0]->getID(), $selectedSingle->getID());
-        self::assertEquals($testAdminLog[0]->getAdminID(), $selectedSingle->getAdminID());
-        self::assertEquals($testAdminLog[0]->getEvent(), $selectedSingle->getEvent());
-        self::assertEquals($testAdminLog[0]->getTimestamp(), $selectedSingle->getTimestamp());
+        $this->assertInstanceOf(AdminLog::class, $selectedSingle);
+        $this->assertEquals($testAdminLog[0]->getID(), $selectedSingle->getID());
+        $this->assertEquals($testAdminLog[0]->getAdminID(), $selectedSingle->getAdminID());
+        $this->assertEquals($testAdminLog[0]->getEvent(), $selectedSingle->getEvent());
+        $this->assertEquals($testAdminLog[0]->getTimestamp(), $selectedSingle->getTimestamp());
 
         $selectedMultiple = AdminLog::get(array($testAdminLog[0]->getID(), $testAdminLog[2]->getID()));
 
-        self::assertTrue(\is_array($selectedMultiple));
-        self::assertEquals(2, \count($selectedMultiple));
+        $this->assertTrue(\is_array($selectedMultiple));
+        $this->assertEquals(2, \count($selectedMultiple));
 
         if($testAdminLog[0]->getID() == $selectedMultiple[0]->getID()) {
             $i = 0;
@@ -239,17 +242,17 @@ class AdminLogTest extends TestCase {
             $j = 0;
         }
 
-        self::assertInstanceOf(AdminLog::class, $selectedSingle[$i]);
-        self::assertEquals($testAdminLog[0]->getID(), $selectedSingle[$i]->getID());
-        self::assertEquals($testAdminLog[0]->getAdminID(), $selectedSingle[$i]->getAdminID());
-        self::assertEquals($testAdminLog[0]->getEvent(), $selectedSingle[$i]->getEvent());
-        self::assertEquals($testAdminLog[0]->getTimestamp(), $selectedSingle[$i]->getTimestamp());
+        $this->assertInstanceOf(AdminLog::class, $selectedSingle[$i]);
+        $this->assertEquals($testAdminLog[0]->getID(), $selectedSingle[$i]->getID());
+        $this->assertEquals($testAdminLog[0]->getAdminID(), $selectedSingle[$i]->getAdminID());
+        $this->assertEquals($testAdminLog[0]->getEvent(), $selectedSingle[$i]->getEvent());
+        $this->assertEquals($testAdminLog[0]->getTimestamp(), $selectedSingle[$i]->getTimestamp());
 
-        self::assertInstanceOf(AdminLog::class, $selectedSingle[$j]);
-        self::assertEquals($testAdminLog[1]->getID(), $selectedSingle[$j]->getID());
-        self::assertEquals($testAdminLog[1]->getAdminID(), $selectedSingle[$j]->getAdminID());
-        self::assertEquals($testAdminLog[1]->getEvent(), $selectedSingle[$j]->getEvent());
-        self::assertEquals($testAdminLog[1]->getTimestamp(), $selectedSingle[$j]->getTimestamp());
+        $this->assertInstanceOf(AdminLog::class, $selectedSingle[$j]);
+        $this->assertEquals($testAdminLog[1]->getID(), $selectedSingle[$j]->getID());
+        $this->assertEquals($testAdminLog[1]->getAdminID(), $selectedSingle[$j]->getAdminID());
+        $this->assertEquals($testAdminLog[1]->getEvent(), $selectedSingle[$j]->getEvent());
+        $this->assertEquals($testAdminLog[1]->getTimestamp(), $selectedSingle[$j]->getTimestamp());
 
         // Clean it up
         $testAdmin->delete();
@@ -279,31 +282,30 @@ class AdminLogTest extends TestCase {
         $testAdminLog[1]->setTimestamp(1234);
         $testAdminLog[1]->create();
 
-        $testAdminLog[2] = new AdminLog();
-        $testAdminLog[2]->setAdminID($testAdmin->getID());
-        $testAdminLog[2]->setEvent('event test3');
-        $testAdminLog[2]->setTimestamp(12345);
-        $testAdminLog[2]->create();
+
 
         $selectedAll = AdminLog::get();
 
-        self::assertInstanceOf(AdminLog::class, $selectedAll[0]);
-        self::assertEquals($testAdminLog[0]->getID(), $selectedAll[0]->getID());
-        self::assertEquals($testAdminLog[0]->getAdminID(), $selectedAll[0]->getAdminID());
-        self::assertEquals($testAdminLog[0]->getEvent(), $selectedAll[0]->getEvent());
-        self::assertEquals($testAdminLog[0]->getTimestamp(), $selectedAll[0]->getTimestamp());
+        if($testAdminLog[0]->getID() == $selectedAll[0]->getID()) {
+            $i = 0;
+            $j = 1;
+        }
+        else {
+            $i = 1;
+            $j = 0;
+        }
 
-        self::assertInstanceOf(AdminLog::class, $selectedAll[1]);
-        self::assertEquals($testAdminLog[1]->getID(), $selectedAll[1]->getID());
-        self::assertEquals($testAdminLog[1]->getAdminID(), $selectedAll[1]->getAdminID());
-        self::assertEquals($testAdminLog[1]->getEvent(), $selectedAll[1]->getEvent());
-        self::assertEquals($testAdminLog[1]->getTimestamp(), $selectedAll[1]->getTimestamp());
+        $this->assertInstanceOf(AdminLog::class, $selectedAll[$i]);
+        $this->assertEquals($testAdminLog[0]->getID(), $selectedAll[$i]->getID());
+        $this->assertEquals($testAdminLog[0]->getAdminID(), $selectedAll[$i]->getAdminID());
+        $this->assertEquals($testAdminLog[0]->getEvent(), $selectedAll[$i]->getEvent());
+        $this->assertEquals($testAdminLog[0]->getTimestamp(), $selectedAll[$i]->getTimestamp());
 
-        self::assertInstanceOf(AdminLog::class, $selectedAll[2]);
-        self::assertEquals($testAdminLog[2]->getID(), $selectedAll[2]->getID());
-        self::assertEquals($testAdminLog[2]->getAdminID(), $selectedAll[2]->getAdminID());
-        self::assertEquals($testAdminLog[2]->getEvent(), $selectedAll[2]->getEvent());
-        self::assertEquals($testAdminLog[2]->getTimestamp(), $selectedAll[2]->getTimestamp());
+        $this->assertInstanceOf(AdminLog::class, $selectedAll[$j]);
+        $this->assertEquals($testAdminLog[1]->getID(), $selectedAll[$j]->getID());
+        $this->assertEquals($testAdminLog[1]->getAdminID(), $selectedAll[$j]->getAdminID());
+        $this->assertEquals($testAdminLog[1]->getEvent(), $selectedAll[$j]->getEvent());
+        $this->assertEquals($testAdminLog[1]->getTimestamp(), $selectedAll[$j]->getTimestamp());
 
         // Clean it up
         $testAdmin->delete();
@@ -332,13 +334,13 @@ class AdminLogTest extends TestCase {
         $testAdminLog[2]->setTimestamp(1234);
 
         // Check same object is eql
-        self::assertTrue($testAdminLog[0]->eql($testAdminLog[0]));
+        $this->assertTrue($testAdminLog[0]->eql($testAdminLog[0]));
 
         // Check same details are eql
-        self::assertTrue($testAdminLog[0]->eql($testAdminLog[1]));
+        $this->assertTrue($testAdminLog[0]->eql($testAdminLog[1]));
 
         // Check different arent equal
-        self::assertFalse($testAdminLog[0]->eql($testAdminLog[2]));
+        $this->assertFalse($testAdminLog[0]->eql($testAdminLog[2]));
     }
 
     public function testGetByAdminID() {
@@ -371,12 +373,12 @@ class AdminLogTest extends TestCase {
 
         $selected = AdminLog::getByAdminID($testAdmin[0]->getID());
 
-        self::assertTrue(\is_array($selected));
-        self::assertEquals(1, \count($selected));
-        self::assertEquals($testAdminLog[0]->getID(), $selected[0]->getID());
-        self::assertEquals($testAdminLog[0]->getAdminID(), $selected[0]->getAdminID());
-        self::assertEquals($testAdminLog[0]->getEvent(), $selected[0]->getEvent());
-        self::assertEquals($testAdminLog[0]->getTimestamp(), $selected[0]->getTimestamp());
+        $this->assertTrue(\is_array($selected));
+        $this->assertEquals(1, \count($selected));
+        $this->assertEquals($testAdminLog[0]->getID(), $selected[0]->getID());
+        $this->assertEquals($testAdminLog[0]->getAdminID(), $selected[0]->getAdminID());
+        $this->assertEquals($testAdminLog[0]->getEvent(), $selected[0]->getEvent());
+        $this->assertEquals($testAdminLog[0]->getTimestamp(), $selected[0]->getTimestamp());
 
         foreach($testAdmin as $admin) {
             $admin->delete();
