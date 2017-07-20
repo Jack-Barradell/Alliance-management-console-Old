@@ -9,6 +9,7 @@ require '../classes/User.php';
 require '../classes/LoginLog.php';
 require '../classes/Ban.php';
 require '../classes/exceptions/BlankObjectException.php';
+require '../classes/exceptions/IncorrectTypeException.php';
 
 use AMC\Classes\Database;
 use AMC\Classes\User;
@@ -25,8 +26,7 @@ class UserTest extends TestCase {
 
     public function setUp() {
         parent::setUp();
-        //TODO: Setup testing db
-        Database::newConnection();
+        Database::newConnection('localhost', 'testingDB', 'testingDB', 'testingdb');
         $this->_connection = Database::getConnection();
     }
 
@@ -44,6 +44,20 @@ class UserTest extends TestCase {
         self::assertNull($user->getActivated());
         self::assertNull($user->getLastLogin());
         self::assertNull($user->getSystemAccount());
+
+        $user = new User(1, 'testName', 'testHash', 'test@email.com', false, false, 123, false, 1);
+
+        // Check vars are correctly defined
+        self::assertFalse($user->eql(new User()));
+        self::assertEquals(1, $user->getID());
+        self::assertEquals('testName', $user->getUsername());
+        self::assertEquals('testHash', $user->getPasswordHash());
+        self::assertEquals('test@email.com', $user->getEmail());
+        self::assertFalse($user->getBanned());
+        self::assertFalse($user->getActivated());
+        self::assertEquals(123, $user->getLastLogin());
+        self::assertFalse($user->getSystemAccount());
+        self::assertEquals(1, $user->getFactionID());
     }
 
     public function testCreate() {
@@ -213,7 +227,7 @@ class UserTest extends TestCase {
         // Now try to pull the data from db
         // Pull it from the db
         $stmt = $this->_connection->prepare("SELECT `UserID`,`Username`,`PasswordHash`,`Email`,`Banned`,`Activated`,`LastLogin`,`SystemAccount` FROM `Users` WHERE `UserID`=?");
-        $stmt->bind_param('i', id);
+        $stmt->bind_param('i', $id);
         $stmt->execute();
 
         // Check there are no results now

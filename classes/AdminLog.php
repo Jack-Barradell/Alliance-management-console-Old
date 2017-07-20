@@ -185,4 +185,26 @@ class AdminLog implements DataObject {
         }
     }
 
+    public static function getByAdminID($adminID) {
+        if($stmt = Database::getConnection()->prepare("SELECT `AdminLogID` FROM `Admin_Logs` WHERE `AdminID`=?")) {
+            $stmt->bind_param('i', $adminID);
+            $stmt->execute();
+            $stmt->bind_result($adminLogID);
+            $input = [];
+            while($stmt->fetch()) {
+                $input[] = $adminLogID;
+            }
+            $stmt->close();
+            if(\count($input) > 0) {
+                return AdminLog::get($input);
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            throw new QueryStatementException("Failed to bind query");
+        }
+    }
+
 }
