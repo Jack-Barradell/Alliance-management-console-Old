@@ -78,7 +78,7 @@ class Ban implements DataObject {
 
     public function eql($anotherObject) {
         if(\get_class($this) == \get_class($anotherObject)) {
-            if($this->_id == $anotherObject->getID() && $this->_userID == $anotherObject->getUserID() && $this->_adminID == $anotherObject->getAdminID() && $this->_unbanAdminID == $anotherObject->getUnbanAdminID() && $this->_reason == $anotherObject->getBanReason() && $this->_banDate == $anotherObject->getBanDate() && $this->_unbanDate == $anotherObject->unbanDate() && $this->_active == $anotherObject->getBanActive()) {
+            if($this->_id == $anotherObject->getID() && $this->_userID == $anotherObject->getUserID() && $this->_adminID == $anotherObject->getAdminID() && $this->_unbanAdminID == $anotherObject->getUnbanAdminID() && $this->_reason == $anotherObject->getReason() && $this->_banDate == $anotherObject->getBanDate() && $this->_unbanDate == $anotherObject->getUnbanDate() && $this->_active == $anotherObject->getActive()) {
                 return true;
             }
             else {

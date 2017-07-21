@@ -193,6 +193,10 @@ class AwardTest extends TestCase {
         $this->assertTrue(\is_array($selectedMultiple));
         $this->assertEquals(2, \count($selectedMultiple));
 
+        // Check they are awards
+        $this->assertInstanceOf(Award::class, $selectedMultiple[0]);
+        $this->assertInstanceOf(Award::class, $selectedMultiple[1]);
+
         if($testAward[1]->getID() == $selectedMultiple[0]->getID()) {
             $i = 0;
             $j = 1;
@@ -202,13 +206,11 @@ class AwardTest extends TestCase {
             $j = 0;
         }
 
-        $this->assertInstanceOf(Award::class, $selectedMultiple[$i]);
         $this->assertEquals($testAward[1]->getID(), $selectedMultiple[$i]->getID());
         $this->assertEquals($testAward[1]->getName(), $selectedMultiple[$i]->getName());
         $this->assertEquals($testAward[1]->getDescription(), $selectedMultiple[$i]->getDescription());
         $this->assertEquals($testAward[1]->getBadge(), $selectedMultiple[$i]->getBadge());
 
-        $this->assertInstanceOf(Award::class, $selectedMultiple[$j]);
         $this->assertEquals($testAward[2]->getID(), $selectedMultiple[$j]->getID());
         $this->assertEquals($testAward[2]->getName(), $selectedMultiple[$j]->getName());
         $this->assertEquals($testAward[2]->getDescription(), $selectedMultiple[$j]->getDescription());
@@ -243,6 +245,10 @@ class AwardTest extends TestCase {
         $this->assertTrue(\is_array($selectedMultiple));
         $this->assertEquals(2, \count($selectedMultiple));
 
+        // Check they are awards
+        $this->assertInstanceOf(Award::class, $selectedMultiple[0]);
+        $this->assertInstanceOf(Award::class, $selectedMultiple[1]);
+
         if($testAward[0]->getID() == $selectedMultiple[0]->getID()) {
             $i = 0;
             $j = 1;
@@ -252,13 +258,11 @@ class AwardTest extends TestCase {
             $j = 0;
         }
 
-        $this->assertInstanceOf(Award::class, $selectedMultiple[$i]);
         $this->assertEquals($testAward[0]->getID(), $selectedMultiple[$i]->getID());
         $this->assertEquals($testAward[0]->getName(), $selectedMultiple[$i]->getName());
         $this->assertEquals($testAward[0]->getDescription(), $selectedMultiple[$i]->getDescription());
         $this->assertEquals($testAward[0]->getBadge(), $selectedMultiple[$i]->getBadge());
 
-        $this->assertInstanceOf(Award::class, $selectedMultiple[$j]);
         $this->assertEquals($testAward[1]->getID(), $selectedMultiple[$j]->getID());
         $this->assertEquals($testAward[1]->getName(), $selectedMultiple[$j]->getName());
         $this->assertEquals($testAward[1]->getDescription(), $selectedMultiple[$j]->getDescription());
