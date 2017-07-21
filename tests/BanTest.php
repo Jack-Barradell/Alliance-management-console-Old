@@ -572,18 +572,306 @@ class BanTest extends TestCase {
     }
 
     public function testGetByUserID() {
-        //TODO: Implement
+        // Create a user
+        $testUser = [];
+
+        $testUser[0] = new User();
+        $testUser[0]->setUsername('testUser');
+        $testUser[0]->create();
+
+        $testUser[1] = new User();
+        $testUser[1]->setUsername('testUser');
+        $testUser[1]->create();
+
+        // Create a admin
+        $testAdmin = [];
+
+        $testAdmin[0] = new User();
+        $testAdmin[0]->setUsername('testAdmin');
+        $testAdmin[0]->create();
+
+        $testAdmin[1] = new User();
+        $testAdmin[1]->setUsername('testAdmin');
+        $testAdmin[1]->create();
+
+        // Create a ban
+        $testBan = [];
+
+        $testBan[0] = new Ban();
+        $testBan[0]->setUserID($testUser[0]->getID());
+        $testBan[0]->setAdminID($testAdmin[0]->getID());
+        $testBan[0]->setUnbanAdminID($testAdmin[0]->getID());
+        $testBan[0]->setReason('testban');
+        $testBan[0]->setBanDate(123);
+        $testBan[0]->setUnbanDate(124);
+        $testBan[0]->setActive(true);
+        $testBan[0]->setExpiry(-1);
+        $testBan[0]->create();
+
+        $testBan[1] = new Ban();
+        $testBan[1]->setUserID($testUser[1]->getID());
+        $testBan[1]->setAdminID($testAdmin[1]->getID());
+        $testBan[1]->setUnbanAdminID($testAdmin[1]->getID());
+        $testBan[1]->setReason('testban2');
+        $testBan[1]->setBanDate(1234);
+        $testBan[1]->setUnbanDate(1245);
+        $testBan[1]->setActive(false);
+        $testBan[1]->setExpiry(123456);
+        $testBan[1]->create();
+
+        // Check the ban is there
+        $selected = Ban::getByUserID($testUser[0]->getID());
+
+        $this->assertTrue(\is_array($selected));
+        $this->assertEquals(1, \count($selected));
+        $this->assertInstanceOf(Ban::class, $selected[0]);
+        $this->assertEquals($testBan[1]->getID(), $selected[0]->getID());
+        $this->assertEquals($testBan[1]->getUserID(), $selected[0]->getUserID());
+        $this->assertEquals($testBan[1]->getAdminID(), $selected[0]->getAdminID());
+        $this->assertEquals($testBan[1]->getUnbanAdminID(), $selected[0]->getUnbanAdminID());
+        $this->assertEquals($testBan[1]->getReason(), $selected[0]->getReason());
+        $this->assertEquals($testBan[1]->getBanDate(), $selected[0]->getBanDate());
+        $this->assertEquals($testBan[1]->getUnbanDate(), $selected[0]->getUnbanDate());
+        $this->assertEquals($testBan[1]->getActive(), $selected[0]->getActive());
+        $this->assertEquals($testBan[1]->getExpiry(), $selected[0]->getExpiry());
+
+        // Cleanup
+        foreach($testBan as $ban) {
+            $ban->delete();
+        }
+        foreach($testAdmin as $admin) {
+            $admin->delete();
+        }
+        foreach ($testUser as $user) {
+            $user->delete();
+        }
     }
 
     public function testGetByAdminID() {
-        //TODO: Implement
+        // Create a user
+        $testUser = [];
+
+        $testUser[0] = new User();
+        $testUser[0]->setUsername('testUser');
+        $testUser[0]->create();
+
+        $testUser[1] = new User();
+        $testUser[1]->setUsername('testUser');
+        $testUser[1]->create();
+
+        // Create a admin
+        $testAdmin = [];
+
+        $testAdmin[0] = new User();
+        $testAdmin[0]->setUsername('testAdmin');
+        $testAdmin[0]->create();
+
+        $testAdmin[1] = new User();
+        $testAdmin[1]->setUsername('testAdmin');
+        $testAdmin[1]->create();
+
+        // Create a ban
+        $testBan = [];
+
+        $testBan[0] = new Ban();
+        $testBan[0]->setUserID($testUser[0]->getID());
+        $testBan[0]->setAdminID($testAdmin[0]->getID());
+        $testBan[0]->setUnbanAdminID($testAdmin[0]->getID());
+        $testBan[0]->setReason('testban');
+        $testBan[0]->setBanDate(123);
+        $testBan[0]->setUnbanDate(124);
+        $testBan[0]->setActive(true);
+        $testBan[0]->setExpiry(-1);
+        $testBan[0]->create();
+
+        $testBan[1] = new Ban();
+        $testBan[1]->setUserID($testUser[1]->getID());
+        $testBan[1]->setAdminID($testAdmin[1]->getID());
+        $testBan[1]->setUnbanAdminID($testAdmin[1]->getID());
+        $testBan[1]->setReason('testban2');
+        $testBan[1]->setBanDate(1234);
+        $testBan[1]->setUnbanDate(1245);
+        $testBan[1]->setActive(false);
+        $testBan[1]->setExpiry(123456);
+        $testBan[1]->create();
+
+        // Check the ban is there
+        $selected = Ban::getByAdminID($testAdmin[0]->getID());
+
+        $this->assertTrue(\is_array($selected));
+        $this->assertEquals(1, \count($selected));
+        $this->assertInstanceOf(Ban::class, $selected[0]);
+        $this->assertEquals($testBan[1]->getID(), $selected[0]->getID());
+        $this->assertEquals($testBan[1]->getUserID(), $selected[0]->getUserID());
+        $this->assertEquals($testBan[1]->getAdminID(), $selected[0]->getAdminID());
+        $this->assertEquals($testBan[1]->getUnbanAdminID(), $selected[0]->getUnbanAdminID());
+        $this->assertEquals($testBan[1]->getReason(), $selected[0]->getReason());
+        $this->assertEquals($testBan[1]->getBanDate(), $selected[0]->getBanDate());
+        $this->assertEquals($testBan[1]->getUnbanDate(), $selected[0]->getUnbanDate());
+        $this->assertEquals($testBan[1]->getActive(), $selected[0]->getActive());
+        $this->assertEquals($testBan[1]->getExpiry(), $selected[0]->getExpiry());
+
+        // Cleanup
+        foreach($testBan as $ban) {
+            $ban->delete();
+        }
+        foreach($testAdmin as $admin) {
+            $admin->delete();
+        }
+        foreach ($testUser as $user) {
+            $user->delete();
+        }
     }
 
     public function testGetByUnbanAdminID() {
-        //TODO: Implement
+        // Create a user
+        $testUser = [];
+
+        $testUser[0] = new User();
+        $testUser[0]->setUsername('testUser');
+        $testUser[0]->create();
+
+        $testUser[1] = new User();
+        $testUser[1]->setUsername('testUser');
+        $testUser[1]->create();
+
+        // Create a admin
+        $testAdmin = [];
+
+        $testAdmin[0] = new User();
+        $testAdmin[0]->setUsername('testAdmin');
+        $testAdmin[0]->create();
+
+        $testAdmin[1] = new User();
+        $testAdmin[1]->setUsername('testAdmin');
+        $testAdmin[1]->create();
+
+        // Create a ban
+        $testBan = [];
+
+        $testBan[0] = new Ban();
+        $testBan[0]->setUserID($testUser[0]->getID());
+        $testBan[0]->setAdminID($testAdmin[0]->getID());
+        $testBan[0]->setUnbanAdminID($testAdmin[0]->getID());
+        $testBan[0]->setReason('testban');
+        $testBan[0]->setBanDate(123);
+        $testBan[0]->setUnbanDate(124);
+        $testBan[0]->setActive(true);
+        $testBan[0]->setExpiry(-1);
+        $testBan[0]->create();
+
+        $testBan[1] = new Ban();
+        $testBan[1]->setUserID($testUser[1]->getID());
+        $testBan[1]->setAdminID($testAdmin[1]->getID());
+        $testBan[1]->setUnbanAdminID($testAdmin[1]->getID());
+        $testBan[1]->setReason('testban2');
+        $testBan[1]->setBanDate(1234);
+        $testBan[1]->setUnbanDate(1245);
+        $testBan[1]->setActive(false);
+        $testBan[1]->setExpiry(123456);
+        $testBan[1]->create();
+
+        // Check the ban is there
+        $selected = Ban::getByUnbanAdminID($testAdmin[0]->getID());
+
+        $this->assertTrue(\is_array($selected));
+        $this->assertEquals(1, \count($selected));
+        $this->assertInstanceOf(Ban::class, $selected[0]);
+        $this->assertEquals($testBan[1]->getID(), $selected[0]->getID());
+        $this->assertEquals($testBan[1]->getUserID(), $selected[0]->getUserID());
+        $this->assertEquals($testBan[1]->getAdminID(), $selected[0]->getAdminID());
+        $this->assertEquals($testBan[1]->getUnbanAdminID(), $selected[0]->getUnbanAdminID());
+        $this->assertEquals($testBan[1]->getReason(), $selected[0]->getReason());
+        $this->assertEquals($testBan[1]->getBanDate(), $selected[0]->getBanDate());
+        $this->assertEquals($testBan[1]->getUnbanDate(), $selected[0]->getUnbanDate());
+        $this->assertEquals($testBan[1]->getActive(), $selected[0]->getActive());
+        $this->assertEquals($testBan[1]->getExpiry(), $selected[0]->getExpiry());
+
+        // Cleanup
+        foreach($testBan as $ban) {
+            $ban->delete();
+        }
+        foreach($testAdmin as $admin) {
+            $admin->delete();
+        }
+        foreach ($testUser as $user) {
+            $user->delete();
+        }
     }
 
     public function testGetByBanDate() {
-        //TODO: Implement
+        // Create a user
+        $testUser = [];
+
+        $testUser[0] = new User();
+        $testUser[0]->setUsername('testUser');
+        $testUser[0]->create();
+
+        $testUser[1] = new User();
+        $testUser[1]->setUsername('testUser');
+        $testUser[1]->create();
+
+        // Create a admin
+        $testAdmin = [];
+
+        $testAdmin[0] = new User();
+        $testAdmin[0]->setUsername('testAdmin');
+        $testAdmin[0]->create();
+
+        $testAdmin[1] = new User();
+        $testAdmin[1]->setUsername('testAdmin');
+        $testAdmin[1]->create();
+
+        // Create a ban
+        $testBan = [];
+
+        $testBan[0] = new Ban();
+        $testBan[0]->setUserID($testUser[0]->getID());
+        $testBan[0]->setAdminID($testAdmin[0]->getID());
+        $testBan[0]->setUnbanAdminID($testAdmin[0]->getID());
+        $testBan[0]->setReason('testban');
+        $testBan[0]->setBanDate(123);
+        $testBan[0]->setUnbanDate(124);
+        $testBan[0]->setActive(true);
+        $testBan[0]->setExpiry(-1);
+        $testBan[0]->create();
+
+        $testBan[1] = new Ban();
+        $testBan[1]->setUserID($testUser[1]->getID());
+        $testBan[1]->setAdminID($testAdmin[1]->getID());
+        $testBan[1]->setUnbanAdminID($testAdmin[1]->getID());
+        $testBan[1]->setReason('testban2');
+        $testBan[1]->setBanDate(1234);
+        $testBan[1]->setUnbanDate(1245);
+        $testBan[1]->setActive(false);
+        $testBan[1]->setExpiry(123456);
+        $testBan[1]->create();
+
+        // Check the ban is there
+        $selected = Ban::getByBanDate($testBan[0]->getBanDate());
+
+        $this->assertTrue(\is_array($selected));
+        $this->assertEquals(1, \count($selected));
+        $this->assertInstanceOf(Ban::class, $selected[0]);
+        $this->assertEquals($testBan[1]->getID(), $selected[0]->getID());
+        $this->assertEquals($testBan[1]->getUserID(), $selected[0]->getUserID());
+        $this->assertEquals($testBan[1]->getAdminID(), $selected[0]->getAdminID());
+        $this->assertEquals($testBan[1]->getUnbanAdminID(), $selected[0]->getUnbanAdminID());
+        $this->assertEquals($testBan[1]->getReason(), $selected[0]->getReason());
+        $this->assertEquals($testBan[1]->getBanDate(), $selected[0]->getBanDate());
+        $this->assertEquals($testBan[1]->getUnbanDate(), $selected[0]->getUnbanDate());
+        $this->assertEquals($testBan[1]->getActive(), $selected[0]->getActive());
+        $this->assertEquals($testBan[1]->getExpiry(), $selected[0]->getExpiry());
+
+        // Cleanup
+        foreach($testBan as $ban) {
+            $ban->delete();
+        }
+        foreach($testAdmin as $admin) {
+            $admin->delete();
+        }
+        foreach ($testUser as $user) {
+            $user->delete();
+        }
     }
 }
