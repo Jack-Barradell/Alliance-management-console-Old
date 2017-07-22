@@ -71,6 +71,8 @@ class AwardTest extends TestCase {
         $this->assertEquals($testAward->getDescription(), $description);
         $this->assertEquals($testAward->getBadge(), $badge);
 
+        $stmt->close();
+
         // Clean up
         $testAward->delete();
     }
@@ -116,6 +118,8 @@ class AwardTest extends TestCase {
         $this->assertEquals($testAward->getDescription(), $description);
         $this->assertEquals($testAward->getBadge(), $badge);
 
+        $stmt->close();
+
         // Clean up
         $testAward->delete();
     }
@@ -151,7 +155,7 @@ class AwardTest extends TestCase {
         $stmt->execute();
         $stmt->bind_result($awardID, $name, $description, $badge);
 
-        // Check only one result
+        // Check no results
         $this->assertEquals(0, $stmt->num_rows);
         $stmt->close();
     }

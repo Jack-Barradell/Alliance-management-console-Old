@@ -98,6 +98,8 @@ class BanTest extends TestCase {
         $this->assertEquals($testBan->getActive(), $active);
         $this->assertEquals($testBan->getExpiry(), $expiry);
 
+        $stmt->close();
+
         // Clean up
         $testBan->delete();
         $testUser->delete();
@@ -179,6 +181,8 @@ class BanTest extends TestCase {
         $this->assertEquals($testBan->getUnbanDate(), $unbanDate);
         $this->assertEquals($testBan->getActive(), $active);
         $this->assertEquals($testBan->getExpiry(), $expiry);
+
+        $stmt->close();
 
         // Clean up
         $testBan->delete();
