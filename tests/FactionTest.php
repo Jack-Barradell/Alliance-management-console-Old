@@ -301,14 +301,17 @@ class FactionTest extends TestCase {
         // Create a faction to test
         $testFaction = [];
         $testFaction[0] = new Faction();
+        $testFaction[0]->setID(1);
         $testFaction[0]->setFactionTypeID(1);
         $testFaction[0]->setName('test');
 
         $testFaction[1] = new Faction();
+        $testFaction[1]->setID(1);
         $testFaction[1]->setFactionTypeID(1);
         $testFaction[1]->setName('test');
 
         $testFaction[2] = new Faction();
+        $testFaction[2]->setID(2);
         $testFaction[2]->setFactionTypeID(2);
         $testFaction[2]->setName('test2');
 
