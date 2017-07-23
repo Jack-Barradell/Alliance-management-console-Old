@@ -174,4 +174,26 @@ class Faction implements DataObject {
         }
     }
 
+    public static function getByFactionTypeID($factionTypeID) {
+        if($stmt = Database::getConnection()->prepare("SELECT `FactionID` FROM `Factions` WHERE `FactionTypeID`=?")) {
+            $stmt->bind_param('i', $factionTypeID);
+            $stmt->execute();
+            $stmt->bind_result($factionID);
+            $input = [];
+            while($stmt->fetch()) {
+                $input[] = $factionID;
+            }
+            $stmt->close();
+            if(\count($input) > 0) {
+                return Faction::get($input);
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            throw new QueryStatementException("Failed to bind query");
+        }
+    }
+
 }
