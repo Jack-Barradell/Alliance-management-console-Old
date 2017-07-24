@@ -210,4 +210,50 @@ class Merit implements DataObject {
             return null;
         }
     }
+
+    public static function getByUserID($userID) {
+        if($stmt = Database::getConnection()->prepare("SELECT `MeritID` FROM `Merits` WHERE `MeritID`=?")) {
+            $stmt->bind_param('i', $userID);
+            $stmt->execute();
+            $stmt->bind_result($meritID);
+            $input = [];
+            while($stmt->fetch()) {
+                $input[] = $meritID;
+            }
+            $stmt->close();
+            if(\count($input)) {
+                return Merit::get($input);
+            }
+            else {
+                return null;
+            }
+
+        }
+        else {
+            throw new QueryStatementException("Failed to bind query");
+        }
+    }
+
+    public static function getByAdminID($adminID) {
+        if($stmt = Database::getConnection()->prepare("SELECT `MeritID` FROM `Merits` WHERE `AdminID`=?")) {
+            $stmt->bind_param('i', $adminID);
+            $stmt->execute();
+            $stmt->bind_result($meritID);
+            $input = [];
+            while($stmt->fetch()) {
+                $input[] = $meritID;
+            }
+            $stmt->close();
+            if(\count($input)) {
+                return Merit::get($input);
+            }
+            else {
+                return null;
+            }
+
+        }
+        else {
+            throw new QueryStatementException("Failed to bind query");
+        }
+    }
 }
