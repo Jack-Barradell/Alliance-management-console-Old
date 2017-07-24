@@ -168,6 +168,9 @@ class FactionTest extends TestCase {
         // Now delete it
         $testFaction->delete();
 
+        // Check id is now null
+        $this->assertNull($testFaction->getID());
+
         // Check its gone
         $stmt = $this->_connection->prepare("SELECT `FactionID` FROM `Factions` WHERE `FactionID`=?");
         $stmt->bind_param('i', $id);

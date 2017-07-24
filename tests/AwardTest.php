@@ -150,6 +150,9 @@ class AwardTest extends TestCase {
         // Now delete it
         $testAward->delete();
 
+        // Check id is now null
+        $this->assertNull($testAward->getID());
+
         $stmt = $this->_connection->prepare("SELECT `AwardID`,`AwardName`,`AwardDescription`,`AwardBadge` FROM `Awards` WHERE `AwardID`=?");
         $stmt->bind_param('i', $id);
         $stmt->execute();

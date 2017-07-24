@@ -155,6 +155,9 @@ class GroupTest extends TestCase {
         // Now delete it
         $testGroup->delete();
 
+        // Check id is null
+        $this->assertNull($testGroup->getID());
+
         // Check its gone
         $stmt = $this->_connection->prepare("SELECT `GroupID` FROM `Groups` WHERE `GroupID`=?");
         $stmt->bind_param('i', $id);

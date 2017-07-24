@@ -154,6 +154,9 @@ class ErrorLogTest extends TestCase {
         // Now delete it
         $testErrorLog->delete();
 
+        // Check id is null
+        $this->assertNull($testErrorLog->getID());
+
         $stmt = $this->_connection->prepare("SELECT `ErrorLogID`,`ErrorLogType`,`ErrorLogMessage`,`ErrorLogSystemError`,`ErrorLogTimestamp` FROM `Error_Log` WHERE `ErrorLogID`=?");
         $stmt->bind_param('i', $id);
         $stmt->execute();
