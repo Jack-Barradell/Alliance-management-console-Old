@@ -259,4 +259,26 @@ class LoginLog implements DataObject {
         }
     }
 
+    public static function getByResult($result) {
+        if($stmt = Database::getConnection()->prepare("SELECT `LoginLogID` FROM `Login_Log` WHERE `Result`=?")) {
+            $stmt->bind_param('s', $result);
+            $stmt->execute();
+            $stmt->bind_result($loginLogID);
+            $input = [];
+            while($stmt->fetch()) {
+                $input[] = $loginLogID;
+            }
+            $stmt->close();
+            if(\count($input) > 0) {
+                return LoginLog::get($input);
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            throw new QueryStatementException("Failed to bind query");
+        }
+    }
+
 }
