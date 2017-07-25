@@ -197,4 +197,26 @@ class Message implements DataObject {
         }
     }
 
+    public static function getBySenderID($senderID) {
+        if($stmt = Database::getConnection()->prepare("SELECT `MessageID` FROM `Messages` WHERE `SenderID`=?")) {
+            $stmt->bind_param('i', $senderID);
+            $stmt->execute();
+            $stmt->bind_result($messageID);
+            $input = [];
+            while ($stmt->fetch()) {
+                $input[] = $senderID;
+            }
+            $stmt->close();
+            if (\count($input) > 0) {
+                return Message::get($input);
+            } else {
+                return null;
+            }
+        }
+        else {
+            throw new QueryStatementException("Failed to bind  query");
+        }
+    }
+
+
 }
