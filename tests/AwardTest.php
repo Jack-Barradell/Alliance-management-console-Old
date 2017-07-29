@@ -186,15 +186,17 @@ class AwardTest extends TestCase {
         $testAward[2]->create();
 
         // Get and check a single award
-        $selectedSingle = Award::get($testAward[0]->getID());
+        $selectedSingle = Award::select(array($testAward[0]->getID()));
 
-        $this->assertInstanceOf(Award::class, $selectedSingle);
-        $this->assertEquals($testAward[0]->getID(), $selectedSingle->getID());
-        $this->assertEquals($testAward[0]->getName(), $selectedSingle->getName());
-        $this->assertEquals($testAward[0]->getDescription(), $selectedSingle->getDescription());
-        $this->assertEquals($testAward[0]->getBadge(), $selectedSingle->getBadge());
+        $this->assertTrue(\is_array($selectedSingle));
+        $this->assertEquals(1, \count($selectedSingle));
+        $this->assertInstanceOf(Award::class, $selectedSingle[0]);
+        $this->assertEquals($testAward[0]->getID(), $selectedSingle[0]->getID());
+        $this->assertEquals($testAward[0]->getName(), $selectedSingle[0]->getName());
+        $this->assertEquals($testAward[0]->getDescription(), $selectedSingle[0]->getDescription());
+        $this->assertEquals($testAward[0]->getBadge(), $selectedSingle[0]->getBadge());
 
-        $selectedMultiple = Award::get(array($testAward[1]->getID(), $testAward[2]->getID()));
+        $selectedMultiple = Award::select(array($testAward[1]->getID(), $testAward[2]->getID()));
 
         // Check it is an array
         $this->assertTrue(\is_array($selectedMultiple));
@@ -246,7 +248,7 @@ class AwardTest extends TestCase {
         $testAward[1]->create();
 
 
-        $selectedMultiple = Award::get();
+        $selectedMultiple = Award::select(array());
 
         // Check it is an array
         $this->assertTrue(\is_array($selectedMultiple));

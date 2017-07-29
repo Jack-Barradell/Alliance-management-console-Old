@@ -192,17 +192,19 @@ class ErrorLogTest extends TestCase {
         $testErrorLog[2]->create();
 
         // Get a single
-        $selectedSingle = ErrorLog::get($testErrorLog[0]->getID());
+        $selectedSingle = ErrorLog::select(array($testErrorLog[0]->getID()));
 
-        $this->assertInstanceOf(ErrorLog::class, $selectedSingle);
-        $this->assertEquals($testErrorLog[0]->getID(), $selectedSingle->getID());
-        $this->assertEquals($testErrorLog[0]->getType(), $selectedSingle->getType());
-        $this->assertEquals($testErrorLog[0]->getMessage(), $selectedSingle->getMessage());
-        $this->assertEquals($testErrorLog[0]->getSystemError(), $selectedSingle->getSystemError());
-        $this->assertEquals($testErrorLog[0]->getTimestamp(), $selectedSingle->getTimestamp());
+        $this->assertTrue(\is_array($selectedSingle));
+        $this->assertEquals(1, \count($selectedSingle));
+        $this->assertInstanceOf(ErrorLog::class, $selectedSingle[0]);
+        $this->assertEquals($testErrorLog[0]->getID(), $selectedSingle[0]->getID());
+        $this->assertEquals($testErrorLog[0]->getType(), $selectedSingle[0]->getType());
+        $this->assertEquals($testErrorLog[0]->getMessage(), $selectedSingle[0]->getMessage());
+        $this->assertEquals($testErrorLog[0]->getSystemError(), $selectedSingle[0]->getSystemError());
+        $this->assertEquals($testErrorLog[0]->getTimestamp(), $selectedSingle[0]->getTimestamp());
 
         // Now do a multi check
-        $selectedMultiple = ErrorLog::get(array($testErrorLog[1]->getID(), $testErrorLog[2]->getID()));
+        $selectedMultiple = ErrorLog::select(array($testErrorLog[1]->getID(), $testErrorLog[2]->getID()));
 
         // Check it is an array with 2 results
         $this->assertTrue(\is_array($selectedMultiple));
@@ -256,7 +258,7 @@ class ErrorLogTest extends TestCase {
         $testErrorLog[1]->create();
 
         // Now do a multi check
-        $selectedMultiple = ErrorLog::get();
+        $selectedMultiple = ErrorLog::select(array());
 
         // Check it is an array with 2 results
         $this->assertTrue(\is_array($selectedMultiple));

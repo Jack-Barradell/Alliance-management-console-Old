@@ -277,18 +277,20 @@ class MeritTest extends TestCase {
         $testMerit[2]->create();
 
         // Select and check a single
-        $selectedSingle = Merit::get($testMerit[0]->getID());
+        $selectedSingle = Merit::select(array($testMerit[0]->getID()));
 
-        $this->assertInstanceOf(Merit::class, $selectedSingle);
-        $this->assertEquals($testMerit[0]->getID(), $selectedSingle->getID());
-        $this->assertEquals($testMerit[0]->getUserID(), $selectedSingle->getUserID());
-        $this->assertEquals($testMerit[0]->getAdminID(), $selectedSingle->getAdminID());
-        $this->assertEquals($testMerit[0]->getValue(), $selectedSingle->getValue());
-        $this->assertEquals($testMerit[0]->getReason(), $selectedSingle->getReason());
-        $this->assertEquals($testMerit[0]->getTimestamp(), $selectedSingle->getTimestamp());
+        $this->assertTrue(\is_array($selectedSingle));
+        $this->assertEquals(1, \count($selectedSingle));
+        $this->assertInstanceOf(Merit::class, $selectedSingle[0]);
+        $this->assertEquals($testMerit[0]->getID(), $selectedSingle[0]->getID());
+        $this->assertEquals($testMerit[0]->getUserID(), $selectedSingle[0]->getUserID());
+        $this->assertEquals($testMerit[0]->getAdminID(), $selectedSingle[0]->getAdminID());
+        $this->assertEquals($testMerit[0]->getValue(), $selectedSingle[0]->getValue());
+        $this->assertEquals($testMerit[0]->getReason(), $selectedSingle[0]->getReason());
+        $this->assertEquals($testMerit[0]->getTimestamp(), $selectedSingle[0]->getTimestamp());
 
         // Select and check multiple
-        $selectedMultiple = Merit::get(array($testMerit[1]->getID(), $testMerit[2]->getID()));
+        $selectedMultiple = Merit::select(array($testMerit[1]->getID(), $testMerit[2]->getID()));
 
         $this->assertTrue(\is_array($selectedMultiple));
         $this->assertEquals(2, \count($selectedMultiple));
@@ -370,7 +372,7 @@ class MeritTest extends TestCase {
         $testMerit[1]->create();
 
         // Select and check multiple
-        $selectedMultiple = Merit::get();
+        $selectedMultiple = Merit::select(array());
 
         $this->assertTrue(\is_array($selectedMultiple));
         $this->assertEquals(2, \count($selectedMultiple));

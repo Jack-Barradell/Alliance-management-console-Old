@@ -297,20 +297,22 @@ class BanTest extends TestCase {
         $testBan[2]->create();
 
         // Get a single ban
-        $selectedSingle = Ban::get($testBan[0]->getID());
+        $selectedSingle = Ban::select(array($testBan[0]->getID()));
 
-        $this->assertInstanceOf(Ban::class, $selectedSingle);
-        $this->assertEquals($testBan[0]->getID(), $selectedSingle->getID());
-        $this->assertEquals($testBan[0]->getUserID(), $selectedSingle->getUserID());
-        $this->assertEquals($testBan[0]->getAdminID(), $selectedSingle->getAdminID());
-        $this->assertEquals($testBan[0]->getUnbanAdminID(), $selectedSingle->getUnbanAdminID());
-        $this->assertEquals($testBan[0]->getReason(), $selectedSingle->getReason());
-        $this->assertEquals($testBan[0]->getBanDate(), $selectedSingle->getBanDate());
-        $this->assertEquals($testBan[0]->getUnbanDate(), $selectedSingle->getUnbanDate());
-        $this->assertEquals($testBan[0]->getActive(), $selectedSingle->getActive());
-        $this->assertEquals($testBan[0]->getExpiry(), $selectedSingle->getExpiry());
+        $this->assertTrue(\is_array($selectedSingle));
+        $this->assertEquals(1, \count($selectedSingle));
+        $this->assertInstanceOf(Ban::class, $selectedSingle[0]);
+        $this->assertEquals($testBan[0]->getID(), $selectedSingle[0]->getID());
+        $this->assertEquals($testBan[0]->getUserID(), $selectedSingle[0]->getUserID());
+        $this->assertEquals($testBan[0]->getAdminID(), $selectedSingle[0]->getAdminID());
+        $this->assertEquals($testBan[0]->getUnbanAdminID(), $selectedSingle[0]->getUnbanAdminID());
+        $this->assertEquals($testBan[0]->getReason(), $selectedSingle[0]->getReason());
+        $this->assertEquals($testBan[0]->getBanDate(), $selectedSingle[0]->getBanDate());
+        $this->assertEquals($testBan[0]->getUnbanDate(), $selectedSingle[0]->getUnbanDate());
+        $this->assertEquals($testBan[0]->getActive(), $selectedSingle[0]->getActive());
+        $this->assertEquals($testBan[0]->getExpiry(), $selectedSingle[0]->getExpiry());
 
-        $selectedMultiple = Ban::get(array($testBan[1]->getID(), $testBan[2]->getID()));
+        $selectedMultiple = Ban::select(array($testBan[1]->getID(), $testBan[2]->getID()));
 
         // Check it is an array
         $this->assertTrue(\is_array($selectedMultiple));
@@ -392,7 +394,7 @@ class BanTest extends TestCase {
         $testBan[1]->setExpiry(123456);
         $testBan[1]->create();
 
-        $selectedMultiple = Ban::get();
+        $selectedMultiple = Ban::select(array());
 
         // Check it is an array
         $this->assertTrue(\is_array($selectedMultiple));

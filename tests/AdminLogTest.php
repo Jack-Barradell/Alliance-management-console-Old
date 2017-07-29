@@ -220,15 +220,17 @@ class AdminLogTest extends TestCase {
         $testAdminLog[2]->setTimestamp(12345);
         $testAdminLog[2]->create();
 
-        $selectedSingle = AdminLog::get($testAdminLog[0]->getID());
+        $selectedSingle = AdminLog::select(array($testAdminLog[0]->getID()));
 
-        $this->assertInstanceOf(AdminLog::class, $selectedSingle);
-        $this->assertEquals($testAdminLog[0]->getID(), $selectedSingle->getID());
-        $this->assertEquals($testAdminLog[0]->getAdminID(), $selectedSingle->getAdminID());
-        $this->assertEquals($testAdminLog[0]->getEvent(), $selectedSingle->getEvent());
-        $this->assertEquals($testAdminLog[0]->getTimestamp(), $selectedSingle->getTimestamp());
+        $this->assertTrue(\is_array($selectedSingle));
+        $this->assertEquals(1, \count($selectedSingle));
+        $this->assertInstanceOf(AdminLog::class, $selectedSingle[0]);
+        $this->assertEquals($testAdminLog[0]->getID(), $selectedSingle[0]->getID());
+        $this->assertEquals($testAdminLog[0]->getAdminID(), $selectedSingle[0]->getAdminID());
+        $this->assertEquals($testAdminLog[0]->getEvent(), $selectedSingle[0]->getEvent());
+        $this->assertEquals($testAdminLog[0]->getTimestamp(), $selectedSingle[0]->getTimestamp());
 
-        $selectedMultiple = AdminLog::get(array($testAdminLog[0]->getID(), $testAdminLog[2]->getID()));
+        $selectedMultiple = AdminLog::select(array($testAdminLog[0]->getID(), $testAdminLog[2]->getID()));
 
         // Check they it is an array
         $this->assertTrue(\is_array($selectedMultiple));
@@ -285,7 +287,7 @@ class AdminLogTest extends TestCase {
         $testAdminLog[1]->setTimestamp(1234);
         $testAdminLog[1]->create();
 
-        $selectedAll = AdminLog::get();
+        $selectedAll = AdminLog::select(array());
 
         // Check its an array
         $this->assertTrue(\is_array($selectedAll));

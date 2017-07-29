@@ -209,15 +209,17 @@ class FactionTest extends TestCase {
         $testFaction[2]->create();
 
         // Get a single faction and check it
-        $selectedSingle = Faction::get($testFaction[0]->getID());
+        $selectedSingle = Faction::select(array($testFaction[0]->getID()));
 
-        $this->assertInstanceOf(Faction::class, $selectedSingle);
-        $this->assertEquals($testFaction[0]->getID(), $selectedSingle->getID());
-        $this->assertEquals($testFaction[0]->getFactionTypeID(), $selectedSingle->getFactionTypeID());
-        $this->assertEquals($testFaction[0]->getName(), $selectedSingle->getName());
+        $this->assertTrue(\is_array($selectedSingle));
+        $this->assertEquals(1, \count($selectedSingle));
+        $this->assertInstanceOf(Faction::class, $selectedSingle[0]);
+        $this->assertEquals($testFaction[0]->getID(), $selectedSingle[0]->getID());
+        $this->assertEquals($testFaction[0]->getFactionTypeID(), $selectedSingle[0]->getFactionTypeID());
+        $this->assertEquals($testFaction[0]->getName(), $selectedSingle[0]->getName());
 
         // Select multiple and check them
-        $selectedMultiple = Faction::get(array($testFaction[1]->getID(), $testFaction[2]->getID()));
+        $selectedMultiple = Faction::select(array($testFaction[1]->getID(), $testFaction[2]->getID()));
 
         // Check its an array with correct content
         $this->assertTrue(\is_array($selectedMultiple));
@@ -268,7 +270,7 @@ class FactionTest extends TestCase {
         $testFaction[1]->create();
 
         // Select multiple and check them
-        $selectedMultiple = Faction::get();
+        $selectedMultiple = Faction::select(array());
 
         // Check its an array with correct content
         $this->assertTrue(\is_array($selectedMultiple));

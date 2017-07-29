@@ -238,17 +238,19 @@ class MessageTest extends TestCase {
         $testMessage[2]->create();
 
         // Check and pull a single
-        $selectedSingle = Message::get($testMessage[0]->getID());
+        $selectedSingle = Message::select(array($testMessage[0]->getID()));
 
-        $this->assertInstanceOf(Message::class, $selectedSingle);
-        $this->assertEquals($testMessage[0]->getID(), $selectedSingle->getID());
-        $this->assertEquals($testMessage[0]->getSenderID(), $selectedSingle->getSenderID());
-        $this->assertEquals($testMessage[0]->getSubject(), $selectedSingle->getSubject());
-        $this->assertEquals($testMessage[0]->getBody(), $selectedSingle->getBody());
-        $this->assertEquals($testMessage[0]->getTimestamp(), $selectedSingle->getTimestamp());
+        $this->assertTrue(\is_array($selectedSingle));
+        $this->assertEquals(1, \count($selectedSingle));
+        $this->assertInstanceOf(Message::class, $selectedSingle[0]);
+        $this->assertEquals($testMessage[0]->getID(), $selectedSingle[0]->getID());
+        $this->assertEquals($testMessage[0]->getSenderID(), $selectedSingle[0]->getSenderID());
+        $this->assertEquals($testMessage[0]->getSubject(), $selectedSingle[0]->getSubject());
+        $this->assertEquals($testMessage[0]->getBody(), $selectedSingle[0]->getBody());
+        $this->assertEquals($testMessage[0]->getTimestamp(), $selectedSingle[0]->getTimestamp());
 
         // Check and pull multiple
-        $selectedMultiple = Message::get(array($testMessage[1]->getID(), $testMessage[2]->getID()));
+        $selectedMultiple = Message::select(array($testMessage[1]->getID(), $testMessage[2]->getID()));
 
         $this->assertTrue(\is_array($selectedMultiple));
         $this->assertEquals(2, \count($selectedMultiple));
@@ -313,7 +315,7 @@ class MessageTest extends TestCase {
         $testMessage[1]->create();
 
         // Check and pull multiple
-        $selectedMultiple = Message::get();
+        $selectedMultiple = Message::select(array());
 
         $this->assertTrue(\is_array($selectedMultiple));
         $this->assertEquals(2, \count($selectedMultiple));

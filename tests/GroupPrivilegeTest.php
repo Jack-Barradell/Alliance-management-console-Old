@@ -253,7 +253,7 @@ class GroupPrivilegeTest extends TestCase {
         $testGroupPriv[2]->create();
 
         // Get a single and check it
-        $selectedSingle = GroupPrivilege::get($testGroupPriv[0]->getID());
+        $selectedSingle = GroupPrivilege::select(array($testGroupPriv[0]->getID()));
 
         $this->assertInstanceOf(GroupPrivilege::class, $selectedSingle);
         $this->assertEquals($testGroupPriv[0]->getID(), $selectedSingle->getID());
@@ -261,7 +261,7 @@ class GroupPrivilegeTest extends TestCase {
         $this->assertEquals($testGroupPriv[0]->getPrivilegeID(), $selectedSingle->getPrivilegeID());
 
         // Now get multiple and check
-        $selectedMultiple = GroupPrivilege::get(array($testGroupPriv[1]->getID(), $testGroupPriv[2]->getID()));
+        $selectedMultiple = GroupPrivilege::select(array($testGroupPriv[1]->getID(), $testGroupPriv[2]->getID()));
 
         $this->assertTrue(\is_array($selectedMultiple));
         $this->assertEquals(2, \count($selectedMultiple));
@@ -333,7 +333,7 @@ class GroupPrivilegeTest extends TestCase {
         $testGroupPriv[1]->create();
 
         // Now get multiple and check
-        $selectedMultiple = GroupPrivilege::get();
+        $selectedMultiple = GroupPrivilege::select(array());
 
         $this->assertTrue(\is_array($selectedMultiple));
         $this->assertEquals(2, \count($selectedMultiple));

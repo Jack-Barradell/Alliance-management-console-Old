@@ -240,17 +240,19 @@ class LoginLogTest extends TestCase {
         $testLoginLog[2]->create();
 
         // Select a single and check it
-        $selectedSingle = LoginLog::get($testLoginLog[0]->getID());
+        $selectedSingle = LoginLog::select(array($testLoginLog[0]->getID()));
 
-        $this->assertInstanceOf(LoginLog::class, $selectedSingle);
-        $this->assertEquals($testLoginLog[0]->getID(), $selectedSingle->getID());
-        $this->assertEquals($testLoginLog[0]->getUserID(), $selectedSingle->getUserID());
-        $this->assertEquals($testLoginLog[0]->getResult(), $selectedSingle->getResult());
-        $this->assertEquals($testLoginLog[0]->getIP(), $selectedSingle->getIP());
-        $this->assertEquals($testLoginLog[0]->getTimestamp(), $selectedSingle->getTimestamp());
+        $this->assertTrue(\is_array($selectedSingle));
+        $this->assertEquals(1, \count($selectedSingle));
+        $this->assertInstanceOf(LoginLog::class, $selectedSingle[0]);
+        $this->assertEquals($testLoginLog[0]->getID(), $selectedSingle[0]->getID());
+        $this->assertEquals($testLoginLog[0]->getUserID(), $selectedSingle[0]->getUserID());
+        $this->assertEquals($testLoginLog[0]->getResult(), $selectedSingle[0]->getResult());
+        $this->assertEquals($testLoginLog[0]->getIP(), $selectedSingle[0]->getIP());
+        $this->assertEquals($testLoginLog[0]->getTimestamp(), $selectedSingle[0]->getTimestamp());
 
         // Select multiple and check them
-        $selectedMultiple = LoginLog::get(array($testLoginLog[1]->getID(), $testLoginLog[2]->getID()));
+        $selectedMultiple = LoginLog::select(array($testLoginLog[1]->getID(), $testLoginLog[2]->getID()));
 
         // Check it is correct
         $this->assertTrue(\is_array($selectedMultiple));
@@ -318,7 +320,7 @@ class LoginLogTest extends TestCase {
         $testLoginLog[1]->create();
 
         // Select multiple and check them
-        $selectedMultiple = LoginLog::get();
+        $selectedMultiple = LoginLog::select(array());
 
         // Check it is correct
         $this->assertTrue(\is_array($selectedMultiple));

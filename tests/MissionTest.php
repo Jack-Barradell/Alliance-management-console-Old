@@ -182,16 +182,18 @@ class MissionTest extends TestCase {
         $testMission[2]->create();
 
         // Now get and check a single
-        $selectedSingle = Mission::get($testMission[0]->getID());
+        $selectedSingle = Mission::select(array($testMission[0]->getID()));
 
-        $this->assertInstanceOf(Mission::class, $selectedSingle);
-        $this->assertEquals($testMission[0]->getID(), $selectedSingle->getID());
-        $this->assertEquals($testMission[0]->getTitle(), $selectedSingle->getTitle());
-        $this->assertEquals($testMission[0]->getDescription(), $selectedSingle->getDescription());
-        $this->assertEquals($testMission[0]->getStatus(), $selectedSingle->getStatus());
+        $this->assertTrue(\is_array($selectedSingle));
+        $this->assertEquals(1, \count($selectedSingle));
+        $this->assertInstanceOf(Mission::class, $selectedSingle[0]);
+        $this->assertEquals($testMission[0]->getID(), $selectedSingle[0]->getID());
+        $this->assertEquals($testMission[0]->getTitle(), $selectedSingle[0]->getTitle());
+        $this->assertEquals($testMission[0]->getDescription(), $selectedSingle[0]->getDescription());
+        $this->assertEquals($testMission[0]->getStatus(), $selectedSingle[0]->getStatus());
 
         // Now get and check multiple
-        $selectedMultiple = Mission::get(array($testMission[1]->getID(), $testMission[2]->getID()));
+        $selectedMultiple = Mission::select(array($testMission[1]->getID(), $testMission[2]->getID()));
 
         $this->assertTrue(\is_array($selectedMultiple));
         $this->assertEquals(2, \count($selectedMultiple));
@@ -239,7 +241,7 @@ class MissionTest extends TestCase {
         $testMission[1]->create();
 
         // Now get and check multiple
-        $selectedMultiple = Mission::get();
+        $selectedMultiple = Mission::select(array());
 
         $this->assertTrue(\is_array($selectedMultiple));
         $this->assertEquals(2, \count($selectedMultiple));
