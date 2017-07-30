@@ -275,14 +275,17 @@ class GroupTest extends TestCase {
         // Create a group
         $testGroup = [];
         $testGroup[0] = new Group();
+        $testGroup[0]->setID(1);
         $testGroup[0]->setName('test');
         $testGroup[0]->setHidden(false);
 
         $testGroup[1] = new Group();
+        $testGroup[1]->setID(1);
         $testGroup[1]->setName('test');
         $testGroup[1]->setHidden(false);
 
         $testGroup[2] = new Group();
+        $testGroup[2]->setID(2);
         $testGroup[2]->setName('test2');
         $testGroup[2]->setHidden(true);
 

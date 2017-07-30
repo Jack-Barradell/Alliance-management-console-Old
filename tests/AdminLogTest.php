@@ -328,16 +328,19 @@ class AdminLogTest extends TestCase {
         $testAdminLog = [];
 
         $testAdminLog[0] = new AdminLog();
+        $testAdminLog[0]->setID(1);
         $testAdminLog[0]->setAdminID(1);
         $testAdminLog[0]->setEvent('event test');
         $testAdminLog[0]->setTimestamp(123);
 
         $testAdminLog[1] = new AdminLog();
+        $testAdminLog[1]->setID(1);
         $testAdminLog[1]->setAdminID(1);
         $testAdminLog[1]->setEvent('event test');
         $testAdminLog[1]->setTimestamp(123);
 
         $testAdminLog[2] = new AdminLog();
+        $testAdminLog[2]->setID(2);
         $testAdminLog[2]->setAdminID(2);
         $testAdminLog[2]->setEvent('event test2');
         $testAdminLog[2]->setTimestamp(1234);

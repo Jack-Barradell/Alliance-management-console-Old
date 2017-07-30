@@ -363,22 +363,25 @@ class LoginLogTest extends TestCase {
         $testLoginLog = [];
 
         $testLoginLog[0] = new LoginLog();
+        $testLoginLog[0]->setID(1);
         $testLoginLog[0]->setUserID(1);
         $testLoginLog[0]->setResult('Fail');
         $testLoginLog[0]->setIP('123.123.123.123');
         $testLoginLog[0]->setTimestamp(123);
 
         $testLoginLog[1] = new LoginLog();
+        $testLoginLog[1]->setID(1);
         $testLoginLog[1]->setUserID(1);
         $testLoginLog[1]->setResult('Fail');
         $testLoginLog[1]->setIP('123.123.123.123');
         $testLoginLog[1]->setTimestamp(123);
 
-        $testLoginLog[0] = new LoginLog();
-        $testLoginLog[0]->setUserID(2);
-        $testLoginLog[0]->setResult('Fail2');
-        $testLoginLog[0]->setIP('123.123.321.321');
-        $testLoginLog[0]->setTimestamp(12345);
+        $testLoginLog[2] = new LoginLog();
+        $testLoginLog[2]->setID(2);
+        $testLoginLog[2]->setUserID(2);
+        $testLoginLog[2]->setResult('Fail2');
+        $testLoginLog[2]->setIP('123.123.321.321');
+        $testLoginLog[2]->setTimestamp(12345);
 
         // Check same object is eql
         $this->assertTrue($testLoginLog[0]->eql($testLoginLog[0]));

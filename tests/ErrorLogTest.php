@@ -298,18 +298,21 @@ class ErrorLogTest extends TestCase {
         $testErrorLog = [];
 
         $testErrorLog[0] = new ErrorLog();
+        $testErrorLog[0]->setID(1);
         $testErrorLog[0]->setType('type');
         $testErrorLog[0]->setMessage('message');
         $testErrorLog[0]->setSystemError('error');
         $testErrorLog[0]->setTimestamp(123);
 
         $testErrorLog[1] = new ErrorLog();
+        $testErrorLog[1]->setID(1);
         $testErrorLog[1]->setType('type');
         $testErrorLog[1]->setMessage('message');
         $testErrorLog[1]->setSystemError('error');
         $testErrorLog[1]->setTimestamp(123);
 
         $testErrorLog[2] = new ErrorLog();
+        $testErrorLog[2]->setID(2);
         $testErrorLog[2]->setType('type2');
         $testErrorLog[2]->setMessage('message2');
         $testErrorLog[2]->setSystemError('error2');

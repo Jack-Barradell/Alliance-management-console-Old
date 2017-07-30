@@ -288,16 +288,19 @@ class AwardTest extends TestCase {
         $testAward = [];
 
         $testAward[0] = new Award();
+        $testAward[0]->setID(1);
         $testAward[0]->setName('name');
         $testAward[0]->setDescription('test description');
         $testAward[0]->setBadge('../test/image.png');
 
         $testAward[1] = new Award();
+        $testAward[1]->setID(1);
         $testAward[1]->setName('name');
         $testAward[1]->setDescription('test description');
         $testAward[1]->setBadge('../test/image.png');
 
         $testAward[2] = new Award();
+        $testAward[2]->setID(2);
         $testAward[2]->setName('name2');
         $testAward[2]->setDescription('test description2');
         $testAward[2]->setBadge('../test/image2.png');

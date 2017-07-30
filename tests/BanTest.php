@@ -446,6 +446,7 @@ class BanTest extends TestCase {
         $testBan = [];
 
         $testBan[0] = new Ban();
+        $testBan[0]->setID(1);
         $testBan[0]->setUserID(1);
         $testBan[0]->setAdminID(2);
         $testBan[0]->setUnbanAdminID(2);
@@ -456,6 +457,7 @@ class BanTest extends TestCase {
         $testBan[0]->setExpiry(-1);
 
         $testBan[1] = new Ban();
+        $testBan[1]->setID(1);
         $testBan[1]->setUserID(1);
         $testBan[1]->setAdminID(2);
         $testBan[1]->setUnbanAdminID(2);
@@ -466,6 +468,7 @@ class BanTest extends TestCase {
         $testBan[1]->setExpiry(-1);
 
         $testBan[2] = new Ban();
+        $testBan[2]->setID(2);
         $testBan[2]->setUserID(2);
         $testBan[2]->setAdminID(3);
         $testBan[2]->setUnbanAdminID(3);

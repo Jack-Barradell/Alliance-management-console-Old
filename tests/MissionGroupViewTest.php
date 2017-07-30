@@ -368,16 +368,19 @@ class MissionGroupViewTest extends TestCase {
         // Create a test mission group view
         $testMissionGroupView = [];
         $testMissionGroupView[0] = new MissionGroupView();
+        $testMissionGroupView[0]->setID(1);
         $testMissionGroupView[0]->setGroupID(1);
         $testMissionGroupView[0]->setMissionID(2);
 
-        $testMissionGroupView[0] = new MissionGroupView();
-        $testMissionGroupView[0]->setGroupID(1);
-        $testMissionGroupView[0]->setMissionID(2);
+        $testMissionGroupView[1] = new MissionGroupView();
+        $testMissionGroupView[1]->setID(1);
+        $testMissionGroupView[1]->setGroupID(1);
+        $testMissionGroupView[1]->setMissionID(2);
 
-        $testMissionGroupView[0] = new MissionGroupView();
-        $testMissionGroupView[0]->setGroupID(3);
-        $testMissionGroupView[0]->setMissionID(4);
+        $testMissionGroupView[2] = new MissionGroupView();
+        $testMissionGroupView[2]->setID(2);
+        $testMissionGroupView[2]->setGroupID(3);
+        $testMissionGroupView[2]->setMissionID(4);
 
         // Check same object is eql
         $this->assertTrue($testMissionGroupView[0]->eql($testMissionGroupView[0]));

@@ -277,16 +277,19 @@ class MissionTest extends TestCase {
         // Create a test mission
         $testMission = [];
         $testMission[0] = new Mission();
+        $testMission[0]->setID(1);
         $testMission[0]->setTitle('test');
         $testMission[0]->setDescription('testDesc');
         $testMission[0]->setStatus('Completed');
 
         $testMission[1] = new Mission();
+        $testMission[1]->setID(1);
         $testMission[1]->setTitle('test');
         $testMission[1]->setDescription('testDesc');
         $testMission[1]->setStatus('Completed');
 
         $testMission[2] = new Mission();
+        $testMission[2]->setID(2);
         $testMission[2]->setTitle('test2');
         $testMission[2]->setDescription('testDesc2');
         $testMission[2]->setStatus('Completed2');

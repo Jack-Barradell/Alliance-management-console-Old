@@ -373,14 +373,17 @@ class GroupPrivilegeTest extends TestCase {
         // Make a test group priv
         $testGroupPriv = [];
         $testGroupPriv[0] = new GroupPrivilege();
+        $testGroupPriv[0]->setID(1);
         $testGroupPriv[0]->setGroupID(1);
         $testGroupPriv[0]->setPrivilegeID(1);
 
         $testGroupPriv[1] = new GroupPrivilege();
+        $testGroupPriv[1]->setID(1);
         $testGroupPriv[1]->setGroupID(1);
         $testGroupPriv[1]->setPrivilegeID(1);
 
         $testGroupPriv[2] = new GroupPrivilege();
+        $testGroupPriv[2]->setID(2);
         $testGroupPriv[2]->setGroupID(2);
         $testGroupPriv[2]->setPrivilegeID(2);
 

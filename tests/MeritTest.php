@@ -418,6 +418,7 @@ class MeritTest extends TestCase {
         // Create a test merit
         $testMerit = [];
         $testMerit[0] = new Merit();
+        $testMerit[0]->setID(1);
         $testMerit[0]->setUserID(1);
         $testMerit[0]->setAdminID(2);
         $testMerit[0]->setValue(1);
@@ -425,6 +426,7 @@ class MeritTest extends TestCase {
         $testMerit[0]->setTimestamp(123);
 
         $testMerit[1] = new Merit();
+        $testMerit[1]->setID(1);
         $testMerit[1]->setUserID(1);
         $testMerit[1]->setAdminID(2);
         $testMerit[1]->setValue(1);
@@ -432,6 +434,7 @@ class MeritTest extends TestCase {
         $testMerit[1]->setTimestamp(123);
 
         $testMerit[2] = new Merit();
+        $testMerit[2]->setID(2);
         $testMerit[2]->setUserID(2);
         $testMerit[2]->setAdminID(3);
         $testMerit[2]->setValue(10);

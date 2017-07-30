@@ -356,18 +356,21 @@ class MessageTest extends TestCase {
         // Create a test message
         $testMessage = [];
         $testMessage[0] = new Message();
+        $testMessage[0]->setID(1);
         $testMessage[0]->setSenderID(1);
         $testMessage[0]->setSubject('testSub');
         $testMessage[0]->setBody('test');
         $testMessage[0]->setTimestamp(123);
 
         $testMessage[1] = new Message();
+        $testMessage[1]->setID(1);
         $testMessage[1]->setSenderID(1);
         $testMessage[1]->setSubject('testSub');
         $testMessage[1]->setBody('test');
         $testMessage[1]->setTimestamp(123);
 
         $testMessage[2] = new Message();
+        $testMessage[2]->setID(2);
         $testMessage[2]->setSenderID(2);
         $testMessage[2]->setSubject('testSub2');
         $testMessage[2]->setBody('test2');
