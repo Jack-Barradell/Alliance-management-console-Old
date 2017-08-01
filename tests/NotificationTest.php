@@ -147,7 +147,7 @@ class NotificationTest extends TestCase {
 
         // Now pull and check
         $stmt = $this->_connection->prepare("SELECT `NotificationID`,`NotificationBody`,`NotificationTimestamp` FROM `Notifications` WHERE `NotificationID`=?");
-        $stmt->bind_param('i', $testNotification->getID());
+        $stmt->bind_param('i', $id);
         $stmt->execute();
 
         // Check there are no results
