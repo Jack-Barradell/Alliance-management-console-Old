@@ -288,4 +288,8 @@ class NotificationTest extends TestCase {
         $this->assertFalse($testNotification[0]->eql($testNotification[2]));
     }
 
+    public function testIssueToUser() {
+        //TODO: Implement
+    }
+
 }

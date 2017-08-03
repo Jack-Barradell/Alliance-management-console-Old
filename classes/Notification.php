@@ -2,6 +2,7 @@
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\QueryStatementException;
 
 class Notification implements DataObject {
@@ -75,6 +76,23 @@ class Notification implements DataObject {
         }
         else {
             return false;
+        }
+    }
+
+    public function issueToUser($userID) {
+        if(User::userExists($userID, true)) {
+            // Commit the notification
+            $this->commit();
+
+            // Attach it to the user
+            $userNotification = new UserNotification();
+            $userNotification->setUserID($userID);
+            $userNotification->setNotificationID($this->_id);
+            $userNotification->setAcknowledged(false);
+            $userNotification->commit();
+        }
+        else {
+            throw new InvalidUserException('User ' . $userID . ' does not exist');
         }
     }
 

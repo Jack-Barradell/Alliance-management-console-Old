@@ -99,17 +99,30 @@ class User implements DataObject {
         if(self::userExists($adminID)) {
             if(\is_numeric($banExpiry)) {
                 $banReason = $this->_connection->real_escape_string($banReason);
+                $time = \time();
                 $ban = new Ban();
                 $ban->setUserID($this->_id);
                 $ban->setAdminID($adminID);
-                $ban->setBanDate(\time());
+                $ban->setBanDate($time);
                 $ban->setReason($banReason);
                 $ban->setExpiry($banExpiry);
                 $ban->commit();
                 $this->_banned = true;
                 $this->commit();
-                // TODO: create admin log
-                // TODO: create notification
+
+                // Create admin log
+                $admin = User::get($adminID);
+                $adminLog = new AdminLog();
+                $adminLog->setAdminID($adminID);
+                $adminLog->setEvent($admin->getUsername() . ' banned user: ' . $this->_username . ' with id: ' . $this->_id);
+                $adminLog->setTimestamp($time);
+                $adminLog->commit();
+
+                // Create notification
+                $notification = new Notification();
+                $notification->setBody('You were banned by ' . $admin->getUsername() . '. Reason: ' . $banReason);
+                $notification->setTimestamp($time);
+                $notification->issueToUser($this->_id);
             }
             else {
                 throw new IncorrectTypeException('AdminID must be an int was given ' . $adminID);
