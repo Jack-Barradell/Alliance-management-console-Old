@@ -147,8 +147,20 @@ class User implements DataObject {
                         $this->_activated = $reactivateAccount;
                         $this->commit();
                     }
-                    // TODO: create admin log
-                    // TODO: create notification
+
+                    // Create admin log
+                    $admin = User::get($unbanAdminID);
+                    $adminLog = new AdminLog();
+                    $adminLog->setAdminID($unbanAdminID);
+                    $adminLog->setEvent($admin->getUsername() . ' unbanned user: ' . $this->_username . ' with id: ' . $this->_id);
+                    $adminLog->setTimestamp($time);
+                    $adminLog->commit();
+
+                    // Create notification
+                    $notification = new Notification();
+                    $notification->setBody('You were unbanned by ' . $admin->getUsername());
+                    $notification->setTimestamp($time);
+                    $notification->issueToUser($this->_id);
                 }
                 else {
                     throw new NullGetException('No bans found for userID: ' . $this->_id);
@@ -170,7 +182,12 @@ class User implements DataObject {
         ];
         $this->_passwordHash = \password_hash($newPassword, PASSWORD_BCRYPT, $options);
         $this->commit();
-        // TODO: Create notification
+
+        // Create a notification
+        $notification = new Notification();
+        $notification->setBody('You changed your password.');
+        $notification->setTimestamp(\time());
+        $notification->issueToUser($this->_id);
     }
 
     // Setters and getters
@@ -489,7 +506,12 @@ class User implements DataObject {
         $user->setLastLogin(-1);
         $user->setSystemAccount($systemAccount);
         $user->commit();
-        // TODO: create notification for user registered
+
+        // Create notification
+        $notification = new Notification();
+        $notification->setBody('Account created.');
+        $notification->setTimestamp(\time());
+        $notification->issueToUser($user->getID());
     }
 
     public static function login($username, $password) {
