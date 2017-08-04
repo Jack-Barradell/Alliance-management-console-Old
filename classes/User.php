@@ -4,6 +4,7 @@ namespace AMC\Classes;
 use AMC\Exceptions\BlankObjectException;
 use AMC\Exceptions\DuplicateEntryException;
 use AMC\Exceptions\IncorrectTypeException;
+use AMC\Exceptions\InvalidGroupException;
 use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\MissingPrerequisiteException;
 use AMC\Exceptions\NullGetException;
@@ -225,6 +226,60 @@ class User implements DataObject {
                 }
             }
             return false;
+        }
+    }
+
+    // Join table controls
+
+    public function addToGroup($groupID) {
+        if(Group::groupExists($groupID)) {
+            $userGroup = new UserGroup();
+            $userGroup->setUserID($this->_id);
+            $userGroup->setGroupID($groupID);
+            $userGroup->commit();
+        }
+        else {
+            throw new InvalidGroupException('No group found with id ' .  $groupID);
+        }
+    }
+
+    public function removeFromGroup($groupID) {
+        if(Group::groupExists($groupID)) {
+            if($this->isInGroup($groupID)) {
+                $userGroups = UserGroup::getByUserID($this->_id);
+                foreach($userGroups as $userGroup) {
+                    if($userGroup->getGroupID() == $groupID) {
+                        $userGroup->toggleDelete();
+                        $userGroup->commit();
+                    }
+                }
+            }
+            else {
+                throw new MissingPrerequisiteException('Tried to remove user with ID ' . $this->_id . ' from group with id ' . $groupID . ' when they are not a member.');
+            }
+        }
+        else {
+            throw new InvalidGroupException('No group found with id ' .  $groupID);
+        }
+    }
+
+    public function isInGroup($groupID) {
+        if(Group::groupExists($groupID)) {
+            $userGroups = UserGroup::getByUserID($this->_id);
+            if(\is_null($userGroups)) {
+                return false;
+            }
+            else {
+                foreach($userGroups as $userGroup) {
+                    if($userGroup->getGroupID() == $groupID) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+        else {
+            throw new InvalidGroupException('No group found with id ' .  $groupID);
         }
     }
 

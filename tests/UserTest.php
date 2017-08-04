@@ -577,6 +577,18 @@ class UserTest extends TestCase {
 
     }
 
+    public function testAddToGroup() {
+
+    }
+
+    public function testRemoveFromGroup() {
+
+    }
+
+    public function testIsInGroup() {
+
+    }
+
     public function testGetGroups() {
 
     }

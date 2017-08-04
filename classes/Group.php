@@ -192,4 +192,8 @@ class Group implements DataObject {
         }
     }
 
+    public static function groupExists($groupNameOrID) {
+
+    }
+
 }
