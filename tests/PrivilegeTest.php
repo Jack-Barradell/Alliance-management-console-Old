@@ -265,4 +265,30 @@ class PrivilegeTest extends TestCase {
         $this->assertFalse($testPrivilege[0]->eql($testPrivilege[2]));
     }
 
+    public function testGetByName() {
+        // Create a test Privilege
+        $testPrivilege = [];
+        $testPrivilege[0] = new Privilege();
+        $testPrivilege[0]->setName('test');
+        $testPrivilege[0]->create();
+
+        $testPrivilege[1] = new Privilege();
+        $testPrivilege[1]->setName('test2');
+        $testPrivilege[1]->create();
+
+        // Now get "test"
+        $selected = Privilege::getByName('test');
+
+        $this->assertTrue(\is_array($selected));
+        $this->assertEquals(1, \count($selected));
+        $this->assertInstanceOf(Privilege::class, $selected[0]);
+        $this->assertEquals($testPrivilege[0]->getID(), $selected->getID());
+        $this->assertEquals($testPrivilege[0]->getName(), $selected->getName());
+
+        // Clean up
+        foreach($testPrivilege as $priv) {
+            $priv->delete();
+        }
+    }
+
 }

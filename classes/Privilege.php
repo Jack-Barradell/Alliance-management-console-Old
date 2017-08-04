@@ -3,6 +3,7 @@ namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
 use AMC\Exceptions\QueryStatementException;
+use PHPUnit\Framework\DataProviderTestSuite;
 
 class Privilege implements DataObject {
     use Getable;
@@ -158,6 +159,27 @@ class Privilege implements DataObject {
         }
         else {
             return null;
+        }
+    }
+
+    public static function getByName($name) {
+        if($stmt = Database::getConnection()->prepare("SELECT `PrivilegeID` FROM `Privileges` WHERE `PrivielegeName`=?")) {
+            $stmt->bind_param('s', $name);
+            $stmt->execute();
+            $stmt->bind_result($privID);
+            $input = [];
+            while($stmt->fetch()) {
+                $input[] = $privID;
+            }
+            if(\count($input) > 0) {
+                return Privilege::get($input);
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            throw new QueryStatementException("Failed to bind query");
         }
     }
 
