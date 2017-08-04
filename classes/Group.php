@@ -4,6 +4,7 @@ namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
 use AMC\Exceptions\QueryStatementException;
+use AMC\Exceptions\NullGetException;
 
 class Group implements DataObject {
     use Getable;
@@ -79,6 +80,23 @@ class Group implements DataObject {
         }
     }
 
+    public function hasGroupPrivilege($privilegeName) {
+        $privilegeArray = Privilege::getByName($privilegeName);
+        if(\is_null($privilegeArray)) {
+            throw new NullGetException("No privilege found with name " . $privilegeName);
+        }
+        else {
+            $privID = $privilegeArray[0]->getPrivilegeID();
+            $groupPrivs = GroupPrivilege::getByGroupID($this->_id);
+            foreach($groupPrivs as $groupPriv) {
+                if($groupPriv->getPrivilegeID() == $privID) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
     // Getters and setters
 
     public function getID() {
@@ -114,7 +132,7 @@ class Group implements DataObject {
             $refs = [];
             $typeArray[0] = 'i';
             $questionString  = '?';
-            foreach($id as $ey => $value) {
+            foreach($id as $key => $value) {
                 $refs[$key] =& $id[$key];
             }
             for($i = 0; $i < \count($id); $i++) {

@@ -190,6 +190,58 @@ class User implements DataObject {
         $notification->issueToUser($this->_id);
     }
 
+    // Checks if the user specifically has the priv
+    public function hasUserPrivilege($privilegeName) {
+        $privilegeArray = Privilege::getByName($privilegeName);
+        if(\is_null($privilegeArray)) {
+            throw new NullGetException("No privilege found with name " . $privilegeName);
+        }
+        else {
+            $privID = $privilegeArray[0]->getID();
+            $userPrivs = UserPrivilege::getByUserID($this->_id);
+            foreach($userPrivs as $userPriv) {
+                // If there is a user priv for the user with matching id to selected priv, then the user has the priv
+                if($userPriv->getPrivilegeID() == $privID) {
+                    return true;
+                }
+            }
+            // If loop is exited without a return then the user did not have the priv
+            return false;
+        }
+    }
+
+    // Checks if the user has the priv, or if they inherit the priv from a group
+    public function hasPrivilege($privilegeName) {
+        if($this->hasUserPrivilege($privilegeName)) {
+            return true;
+        }
+        else {
+            $groups = $this->getGroups();
+            if(\is_array($groups)) {
+                foreach($groups as $group) {
+                    if($group->hasGroupPrivilege($privilegeName)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+
+    public function getGroups() {
+        $userGroups = UserGroup::getByUserID($this->_id);
+        if(\is_null($userGroups)) {
+            return null;
+        }
+        else {
+            $input = [];
+            foreach ($userGroups as $group) {
+                $input[] = $group->getGroupID();
+            }
+            return Group::get($input);
+        }
+    }
+
     // Setters and getters
 
     public function getID() {
