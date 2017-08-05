@@ -3,6 +3,7 @@ namespace AMC\Classes;
 
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\IncorrectTypeException;
 use AMC\Exceptions\QueryStatementException;
 use AMC\Exceptions\NullGetException;
 
@@ -192,8 +193,56 @@ class Group implements DataObject {
         }
     }
 
-    public static function groupExists($groupNameOrID) {
-
+    public static function groupExists($groupNameOrID, $returnGroupNameOrID = false) {
+        if(\is_numeric($groupNameOrID)) {
+            if($stmt = Database::getConnection()->prepare("SELECT `GroupName` FROM `Groups` WHERE `GroupID`=?")) {
+                $stmt->bind_param('i', $groupNameOrID);
+                $stmt->execute();
+                $stmt->bind_result($name);
+                if($stmt->num_rows == 1) {
+                    $stmt->fetch();
+                    $stmt->close();
+                    if($returnGroupNameOrID) {
+                        return $name;
+                    }
+                    else {
+                        return true;
+                    }
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                throw new QueryStatementException('Failed to bind query');
+            }
+        }
+        else if(\is_string($groupNameOrID)) {
+            if($stmt = Database::getConnection()->prepare("SELECT `GroupID` FROM `Groups` WHERE `GroupName`=?")) {
+                $stmt->bind_param('s', $groupNameOrID);
+                $stmt->execute();
+                $stmt->bind_result($id);
+                if($stmt->num_rows == 1) {
+                    $stmt->fetch();
+                    $stmt->close();
+                    if($returnGroupNameOrID) {
+                        return $id;
+                    }
+                    else {
+                        return true;
+                    }
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                throw new QueryStatementException('Failed to bind query');
+            }
+        }
+        else {
+            throw new IncorrectTypeException('Group exists must be passed an int or string, was given ' . $groupNameOrID);
+        }
     }
 
 }

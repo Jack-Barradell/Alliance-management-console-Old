@@ -303,4 +303,8 @@ class GroupTest extends TestCase {
         //TODO: Implement
     }
 
+    public function testGroupExists() {
+        //TODO: Implement
+    }
+
 }
