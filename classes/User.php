@@ -191,6 +191,35 @@ class User implements DataObject {
         $notification->issueToUser($this->_id);
     }
 
+    // Join table controls
+
+    public function issuePrivilege($privilegeID) {
+        if ($this->hasUserPrivilege($privilegeID)) {
+            throw new DuplicateEntryException('User with id ' . $this->_id . ' was issued Privilege with id ' . $privilegeID . ' when they already have it.');
+        }
+        else {
+            $userPrivilege = new UserPrivilege();
+            $userPrivilege->setUserID($this->_id);
+            $userPrivilege->setPrivilegeID($privilegeID);
+            $userPrivilege->commit();
+
+        }
+    }
+    public function revokePrivilege($privilegeID) {
+        $userPrivileges = UserPrivilege::getByUserID($this->_id);
+        if(\is_null($userPrivileges)) {
+            throw new MissingPrerequisiteException('Tried to revoke privilege with id ' . $privilegeID . ' from user with id ' . $this->_id . ' when the user doesnt have it.');
+        }
+        else {
+            foreach($userPrivileges as $userPrivilege) {
+                if($userPrivilege->getPrivilegeID() == $privilegeID) {
+                    $userPrivilege->toggleDelete();
+                    $userPrivilege->commit();
+                }
+            }
+        }
+    }
+
     // Checks if the user specifically has the priv
     public function hasUserPrivilege($privilegeName) {
         $privilegeArray = Privilege::getByName($privilegeName);
@@ -229,14 +258,32 @@ class User implements DataObject {
         }
     }
 
-    // Join table controls
+    public function getPrivileges() {
+        $userPrivileges = UserPrivilege::getByUserID($this->_id);
+        if(\is_null($userPrivileges)) {
+            return null;
+        }
+        else {
+            $input = [];
+            foreach($userPrivileges as $userPrivilege) {
+                $input[] = $userPrivilege->getPrivilegeID();
+            }
+            return Privilege::get($input);
+        }
+    }
 
     public function addToGroup($groupID) {
         if(Group::groupExists($groupID)) {
-            $userGroup = new UserGroup();
-            $userGroup->setUserID($this->_id);
-            $userGroup->setGroupID($groupID);
-            $userGroup->commit();
+            if($this->isInGroup($groupID)) {
+                throw new DuplicateEntryException('User with id ' . $this->_id . ' was added to Group with id ' . $groupID . ' but they were already a member.');
+            }
+            else {
+                $userGroup = new UserGroup();
+                $userGroup->setUserID($this->_id);
+                $userGroup->setGroupID($groupID);
+                $userGroup->commit();
+            }
+
         }
         else {
             throw new InvalidGroupException('No group found with id ' .  $groupID);

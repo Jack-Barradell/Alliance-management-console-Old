@@ -3,7 +3,9 @@ namespace AMC\Classes;
 
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\DuplicateEntryException;
 use AMC\Exceptions\IncorrectTypeException;
+use AMC\Exceptions\MissingPrerequisiteException;
 use AMC\Exceptions\QueryStatementException;
 use AMC\Exceptions\NullGetException;
 
@@ -81,6 +83,35 @@ class Group implements DataObject {
         }
     }
 
+    // Join table controls
+
+    public function issuePrivilege($privilegeID) {
+        if($this->hasGroupPrivilege($privilegeID)) {
+            throw new DuplicateEntryException('Group with id ' . $this->_id . ' was issued privilege with id ' . $privilegeID . ' but they already have it.');
+        }
+        else {
+            $groupPrivilege = new GroupPrivilege();
+            $groupPrivilege->setGroupID($this->_id);
+            $groupPrivilege->setPrivilegeID($privilegeID);
+            $groupPrivilege->commit();
+        }
+    }
+
+    public function revokePrivilege($privilegeID) {
+        $groupPrivileges = GroupPrivilege::getByGroupID($this->_id);
+        if(\is_null($groupPrivileges)) {
+            throw new MissingPrerequisiteException('Tried to remove privilege with id ' . $privilegeID . ' from group with id ' . $this->_id . ' but they did not have it.');
+        }
+        else {
+            foreach($groupPrivileges as $groupPrivilege) {
+                if($groupPrivilege->getPrivilegeID() == $privilegeID) {
+                    $groupPrivilege->toggleDelete();
+                    $groupPrivilege->commit();
+                }
+            }
+        }
+    }
+
     public function hasGroupPrivilege($privilegeName) {
         $privilegeArray = Privilege::getByName($privilegeName);
         if(\is_null($privilegeArray)) {
@@ -95,6 +126,20 @@ class Group implements DataObject {
                 }
             }
             return false;
+        }
+    }
+
+    public function getPrivileges() {
+        $groupPrivileges = GroupPrivilege::getByGroupID($this->_id);
+        if(\is_null($groupPrivileges)) {
+            return null;
+        }
+        else {
+            $input = [];
+            foreach($groupPrivileges as $groupPrivilege) {
+                $input[] = $groupPrivilege->getPrivilegeID();
+            }
+            return Privilege::get($input);
         }
     }
 

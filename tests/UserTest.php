@@ -593,4 +593,16 @@ class UserTest extends TestCase {
 
     }
 
+    public function testIssuePrivilege() {
+
+    }
+
+    public function testRevokePrivilege() {
+
+    }
+
+    public function testGetPrivileges() {
+
+    }
+
 }
