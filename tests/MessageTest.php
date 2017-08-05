@@ -35,9 +35,10 @@ class MessageTest extends TestCase {
         $this->assertNull($message->getSubject());
         $this->assertNull($message->getBody());
         $this->assertNull($message->getTimestamp());
+        $this->assertNull($message->getHideInSentBox());
 
         // Check non null constructor
-        $message = new Message(1, 1, 'subject', 'body', 123);
+        $message = new Message(1, 1, 'subject', 'body', 123, false);
 
         $this->assertFalse($message->eql(new Message()));
         $this->assertEquals(1, $message->getID());
@@ -45,6 +46,7 @@ class MessageTest extends TestCase {
         $this->assertEquals('subject', $message->getSubject());
         $this->assertEquals('body', $message->getBody());
         $this->assertEquals(123, $message->getTimestamp());
+        $this->assertFalse($message->getHideInSentBox());
     }
 
     public function testCreate() {
@@ -59,21 +61,29 @@ class MessageTest extends TestCase {
         $testMessage->setSubject('testSub');
         $testMessage->setBody('test');
         $testMessage->setTimestamp(123);
+        $testMessage->setHideInSentBox(false);
         $testMessage->create();
 
         // Check id is now an int
         $this->assertInternalType('int', $testMessage->getID());
 
         // Now pull it
-        $stmt = $this->_connection->prepare("SELECT `MessageID`,`SenderID`,`MessageSubject`,`MessageBody`,`MessageTimestamp` FROM `Messages` WHERE `MessageID`=?");
+        $stmt = $this->_connection->prepare("SELECT `MessageID`,`SenderID`,`MessageSubject`,`MessageBody`,`MessageTimestamp`,`MessageHideInSentBox` FROM `Messages` WHERE `MessageID`=?");
         $stmt->bind_param('i', $testMessage->getID());
         $stmt->execute();
-        $stmt->bind_result($messageID, $senderID, $subject, $body, $timestamp);
+        $stmt->bind_result($messageID, $senderID, $subject, $body, $timestamp, $hideInSentBox);
 
         // Check there is one result
         $this->assertEquals(1, $stmt->num_rows);
 
         $stmt->fetch();
+
+        if($hideInSentBox == 1) {
+            $hideInSentBox = true;
+        }
+        else {
+            $hideInSentBox = false;
+        }
 
         // Check the results
         $this->assertEquals($testMessage->getID(), $messageID);
@@ -81,6 +91,7 @@ class MessageTest extends TestCase {
         $this->assertEquals($testMessage->getSubject(), $subject);
         $this->assertEquals($testMessage->getBody(), $body);
         $this->assertEquals($testMessage->getTimestamp(), $timestamp);
+        $this->assertEquals($testMessage->getHideInSentBox(), $hideInSentBox);
 
         $stmt->close();
 
@@ -117,6 +128,7 @@ class MessageTest extends TestCase {
         $testMessage->setSubject('testSub');
         $testMessage->setBody('test');
         $testMessage->setTimestamp(123);
+        $testMessage->setHideInSentBox(false);
         $testMessage->create();
 
         // Now update it
@@ -124,18 +136,26 @@ class MessageTest extends TestCase {
         $testMessage->setSubject('testSub2');
         $testMessage->setBody('test2');
         $testMessage->setTimestamp(12345);
+        $testMessage->setHideInSentBox(true);
         $testMessage->update();
 
         // Now pull it
-        $stmt = $this->_connection->prepare("SELECT `MessageID`,`SenderID`,`MessageSubject`,`MessageBody`,`MessageTimestamp` FROM `Messages` WHERE `MessageID`=?");
+        $stmt = $this->_connection->prepare("SELECT `MessageID`,`SenderID`,`MessageSubject`,`MessageBody`,`MessageTimestamp`,`MessageHideInSentBox` FROM `Messages` WHERE `MessageID`=?");
         $stmt->bind_param('i', $testMessage->getID());
         $stmt->execute();
-        $stmt->bind_result($messageID, $senderID, $subject, $body, $timestamp);
+        $stmt->bind_result($messageID, $senderID, $subject, $body, $timestamp, $hideInSentBox);
 
         // Check there is one result
         $this->assertEquals(1, $stmt->num_rows);
 
         $stmt->fetch();
+
+        if($hideInSentBox == 1) {
+            $hideInSentBox = true;
+        }
+        else {
+            $hideInSentBox = false;
+        }
 
         // Check the results
         $this->assertEquals($testMessage->getID(), $messageID);
@@ -143,6 +163,7 @@ class MessageTest extends TestCase {
         $this->assertEquals($testMessage->getSubject(), $subject);
         $this->assertEquals($testMessage->getBody(), $body);
         $this->assertEquals($testMessage->getTimestamp(), $timestamp);
+        $this->assertEquals($testMessage->getHideInSentBox(), $hideInSentBox);
 
         $stmt->close();
 
@@ -176,6 +197,7 @@ class MessageTest extends TestCase {
         $testMessage->setSubject('testSub');
         $testMessage->setBody('test');
         $testMessage->setTimestamp(123);
+        $testMessage->setHideInSentBox(false);
         $testMessage->create();
 
         // Store the id
@@ -189,7 +211,7 @@ class MessageTest extends TestCase {
 
         // Now check its gone
         // Now pull it
-        $stmt = $this->_connection->prepare("SELECT `MessageID`,`SenderID`,`MessageSubject`,`MessageBody`,`MessageTimestamp` FROM `Messages` WHERE `MessageID`=?");
+        $stmt = $this->_connection->prepare("SELECT `MessageID`,`SenderID`,`MessageSubject`,`MessageBody`,`MessageTimestamp`,`HideInSentBox` FROM `Messages` WHERE `MessageID`=?");
         $stmt->bind_param('i', $id);
         $stmt->execute();
 
@@ -221,6 +243,7 @@ class MessageTest extends TestCase {
         $testMessage[0]->setSubject('testSub');
         $testMessage[0]->setBody('test');
         $testMessage[0]->setTimestamp(123);
+        $testMessage[0]->setHideInSentBox(false);
         $testMessage[0]->create();
 
         $testMessage[1] = new Message();
@@ -228,6 +251,7 @@ class MessageTest extends TestCase {
         $testMessage[1]->setSubject('testSub2');
         $testMessage[1]->setBody('test2');
         $testMessage[1]->setTimestamp(12345);
+        $testMessage[1]->setHideInSentBox(true);
         $testMessage[1]->create();
 
         $testMessage[2] = new Message();
@@ -235,6 +259,7 @@ class MessageTest extends TestCase {
         $testMessage[2]->setSubject('testSub3');
         $testMessage[2]->setBody('test3');
         $testMessage[2]->setTimestamp(12345678);
+        $testMessage[2]->setHideInSentBox(false);
         $testMessage[2]->create();
 
         // Check and pull a single
@@ -248,6 +273,7 @@ class MessageTest extends TestCase {
         $this->assertEquals($testMessage[0]->getSubject(), $selectedSingle[0]->getSubject());
         $this->assertEquals($testMessage[0]->getBody(), $selectedSingle[0]->getBody());
         $this->assertEquals($testMessage[0]->getTimestamp(), $selectedSingle[0]->getTimestamp());
+        $this->assertEquals($testMessage[0]->getHideInSentBox(), $selectedSingle[0]->getHideInSentBox());
 
         // Check and pull multiple
         $selectedMultiple = Message::select(array($testMessage[1]->getID(), $testMessage[2]->getID()));
@@ -271,12 +297,14 @@ class MessageTest extends TestCase {
         $this->assertEquals($testMessage[1]->getSubject(), $selectedMultiple[$i]->getSubject());
         $this->assertEquals($testMessage[1]->getBody(), $selectedMultiple[$i]->getBody());
         $this->assertEquals($testMessage[1]->getTimestamp(), $selectedMultiple[$i]->getTimestamp());
+        $this->assertEquals($testMessage[1]->getHideInSentBox(), $selectedMultiple[$i]->getHideInSentBox());
 
         $this->assertEquals($testMessage[2]->getID(), $selectedMultiple[$j]->getID());
         $this->assertEquals($testMessage[2]->getSenderID(), $selectedMultiple[$j]->getSenderID());
         $this->assertEquals($testMessage[2]->getSubject(), $selectedMultiple[$j]->getSubject());
         $this->assertEquals($testMessage[2]->getBody(), $selectedMultiple[$j]->getBody());
         $this->assertEquals($testMessage[2]->getTimestamp(), $selectedMultiple[$j]->getTimestamp());
+        $this->assertEquals($testMessage[2]->getHideInSentBox(), $selectedMultiple[$j]->getHideInSentBox());
 
         // Clean up
         foreach($testMessage as $message) {
@@ -305,6 +333,7 @@ class MessageTest extends TestCase {
         $testMessage[0]->setSubject('testSub');
         $testMessage[0]->setBody('test');
         $testMessage[0]->setTimestamp(123);
+        $testMessage[0]->setHideInSentBox(false);
         $testMessage[0]->create();
 
         $testMessage[1] = new Message();
@@ -312,6 +341,7 @@ class MessageTest extends TestCase {
         $testMessage[1]->setSubject('testSub2');
         $testMessage[1]->setBody('test2');
         $testMessage[1]->setTimestamp(12345);
+        $testMessage[1]->setHideInSentBox(true);
         $testMessage[1]->create();
 
         // Check and pull multiple
@@ -336,12 +366,14 @@ class MessageTest extends TestCase {
         $this->assertEquals($testMessage[0]->getSubject(), $selectedMultiple[$i]->getSubject());
         $this->assertEquals($testMessage[0]->getBody(), $selectedMultiple[$i]->getBody());
         $this->assertEquals($testMessage[0]->getTimestamp(), $selectedMultiple[$i]->getTimestamp());
+        $this->assertEquals($testMessage[0]->getHideInSentBox(), $selectedMultiple[$i]->getHideInSentBox());
 
         $this->assertEquals($testMessage[1]->getID(), $selectedMultiple[$j]->getID());
         $this->assertEquals($testMessage[1]->getSenderID(), $selectedMultiple[$j]->getSenderID());
         $this->assertEquals($testMessage[1]->getSubject(), $selectedMultiple[$j]->getSubject());
         $this->assertEquals($testMessage[1]->getBody(), $selectedMultiple[$j]->getBody());
         $this->assertEquals($testMessage[1]->getTimestamp(), $selectedMultiple[$j]->getTimestamp());
+        $this->assertEquals($testMessage[1]->getHideInSentBox(), $selectedMultiple[$j]->getHideInSentBox());
 
         // Clean up
         foreach($testMessage as $message) {
@@ -361,6 +393,7 @@ class MessageTest extends TestCase {
         $testMessage[0]->setSubject('testSub');
         $testMessage[0]->setBody('test');
         $testMessage[0]->setTimestamp(123);
+        $testMessage[0]->setHideInSentBox(false);
 
         $testMessage[1] = new Message();
         $testMessage[1]->setID(1);
@@ -368,6 +401,7 @@ class MessageTest extends TestCase {
         $testMessage[1]->setSubject('testSub');
         $testMessage[1]->setBody('test');
         $testMessage[1]->setTimestamp(123);
+        $testMessage[1]->setHideInSentBox(false);
 
         $testMessage[2] = new Message();
         $testMessage[2]->setID(2);
@@ -375,6 +409,7 @@ class MessageTest extends TestCase {
         $testMessage[2]->setSubject('testSub2');
         $testMessage[2]->setBody('test2');
         $testMessage[2]->setTimestamp(12345);
+        $testMessage[2]->setHideInSentBox(true);
 
         // Check same object is eql
         $this->assertTrue($testMessage[0]->eql($testMessage[0]));
@@ -404,6 +439,7 @@ class MessageTest extends TestCase {
         $testMessage[0]->setSubject('testSub');
         $testMessage[0]->setBody('test');
         $testMessage[0]->setTimestamp(123);
+        $testMessage[0]->setHideInSentBox(false);
         $testMessage[0]->create();
 
         $testMessage[1] = new Message();
@@ -411,6 +447,7 @@ class MessageTest extends TestCase {
         $testMessage[1]->setSubject('testSub2');
         $testMessage[1]->setBody('test2');
         $testMessage[1]->setTimestamp(12345);
+        $testMessage[1]->setHideInSentBox(true);
         $testMessage[1]->create();
 
         // Select and check for a sender id
@@ -433,6 +470,14 @@ class MessageTest extends TestCase {
         foreach($testSender as $sender) {
             $sender->delete();
         }
+    }
+
+    public function testSendToUser() {
+       //TODO: Implement
+    }
+
+    public function testDeleteFromSentBox() {
+        //TODO: Implement
     }
 
 }

@@ -299,7 +299,19 @@ class GroupTest extends TestCase {
         $this->assertFalse($testGroup[0]->eql($testGroup[2]));
     }
 
+    public function testIssuePrivilege() {
+        //TODO: Implement
+    }
+
+    public function testRevokePrivilege() {
+        //TODO: Implement
+    }
+
     public function testHasGroupPrivilege() {
+        //TODO: Implement
+    }
+
+    public function testGetPrivileges() {
         //TODO: Implement
     }
 
