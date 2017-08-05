@@ -2,6 +2,7 @@
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\QueryStatementException;
 
 class Message implements DataObject {
@@ -13,14 +14,16 @@ class Message implements DataObject {
     private $_subject = null;
     private $_body = null;
     private $_timestamp = null;
+    private $_hideInSentBox = null;
     private $_connection = null;
 
-    public function __construct($id = null, $senderID = null, $subject = null, $body = null, $timestamp = null) {
+    public function __construct($id = null, $senderID = null, $subject = null, $body = null, $timestamp = null, $hideInSentBox = null) {
         $this->_id = $id;
         $this->_senderID = $senderID;
         $this->_subject = $subject;
         $this->_body = $body;
         $this->_timestamp = $timestamp;
+        $this->_hideInSentBox = $hideInSentBox;
         $this->_connection = Database::getConnection();
     }
 
@@ -29,8 +32,8 @@ class Message implements DataObject {
             throw new BlankObjectException("Cannot store a blank message");
         }
         else {
-            if($stmt = $this->_connection->prepare("INSERT INTO `Messages`(`SenderID`,`MessageSubject`,`MessageBody`,`MessageTimestamp`) VALUES (?,?,?,?)")) {
-                $stmt->bind_param('issi', $this->_senderID, $this->_subject, $this->_body, $this->_timestamp);
+            if($stmt = $this->_connection->prepare("INSERT INTO `Messages`(`SenderID`,`MessageSubject`,`MessageBody`,`MessageTimestamp`,`MessageHideInSentBox`) VALUES (?,?,?,?,?)")) {
+                $stmt->bind_param('issi', $this->_senderID, $this->_subject, $this->_body, $this->_timestamp, Database::toNumeric($this->_hideInSentBox));
                 $stmt->execute();
                 $stmt->close();
             }
@@ -45,8 +48,8 @@ class Message implements DataObject {
             throw new BlankObjectException("Cannot store a blank message");
         }
         else {
-            if($stmt = $this->_connection->prepare("UPDATE `Messages` SET `SenderID`=?,`MessageSubject`=?,`MessageBody`=?,`MessageTimestamp`=? WHERE `MessageID`=?")) {
-                $stmt->bind_param('issii', $this->_senderID, $this->_subject, $this->_body, $this->_timestamp, $this->_id);
+            if($stmt = $this->_connection->prepare("UPDATE `Messages` SET `SenderID`=?,`MessageSubject`=?,`MessageBody`=?,`MessageTimestamp`=?,`MessageHideInSentBox`=? WHERE `MessageID`=?")) {
+                $stmt->bind_param('issii', $this->_senderID, $this->_subject, $this->_body, $this->_timestamp, Database::toNumeric($this->_hideInSentBox), $this->_id);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -70,7 +73,7 @@ class Message implements DataObject {
 
     public function eql($anotherObject) {
         if(\get_class($this) == \get_class($anotherObject)) {
-            if($this->_id == $anotherObject->getID() && $this->_senderID == $anotherObject->getSenderID() && $this->_subject == $anotherObject->getSubject() && $this->_body == $anotherObject->getBody() && $this->_timestamp == $anotherObject->getTimestamp()) {
+            if($this->_id == $anotherObject->getID() && $this->_senderID == $anotherObject->getSenderID() && $this->_subject == $anotherObject->getSubject() && $this->_body == $anotherObject->getBody() && $this->_timestamp == $anotherObject->getTimestamp() && $this->_hideInSentBox == $anotherObject->getHideInSentBox()) {
                 return true;
             }
             else {
@@ -80,6 +83,26 @@ class Message implements DataObject {
         else {
             return false;
         }
+    }
+
+    // Join table managers
+
+    public function sendToUser($userID) {
+        if(User::userExists($userID)) {
+            $userMessage = new UserMessage();
+            $userMessage->setUserID($userID);
+            $userMessage->setMessageID($this->_id);
+            $userMessage->setAcknowledged(false);
+            $userMessage->commit();
+        }
+        else {
+            throw new InvalidUserException('There is no user with id ' . $userID);
+        }
+    }
+
+    public function deleteFromSentBox() {
+        $this->_hideInSentBox = true;
+        $this->commit();
     }
 
     // Getters and setters
@@ -104,6 +127,10 @@ class Message implements DataObject {
         return $this->_timestamp;
     }
 
+    public function getHideInSentBox() {
+        return $this->_hideInSentBox;
+    }
+
     public function setID($id) {
         $this->_id = $id;
     }
@@ -124,6 +151,10 @@ class Message implements DataObject {
         $this->_timestamp = $timestamp;
     }
 
+    public function setHideInSentBox($hideInSentBox) {
+        $this->_hideInSentBox = $hideInSentBox;
+    }
+
     // Statics
 
     public static function select($id) {
@@ -141,10 +172,10 @@ class Message implements DataObject {
                 $questionString .= ',?';
             }
             $param = \array_merge($typeArray, $refs);
-            if($stmt = Database::getConnection()->prepare("SELECT `MessageID`,`SenderID`,`MessageSubject`,`MessageBody`,`MessageTimestamp` FROM `Messages` WHERE `MessageID` IN (" . $questionString . ")")) {
+            if($stmt = Database::getConnection()->prepare("SELECT `MessageID`,`SenderID`,`MessageSubject`,`MessageBody`,`MessageTimestamp`,`MessageHideInSentBox` FROM `Messages` WHERE `MessageID` IN (" . $questionString . ")")) {
                 \call_user_func_array(array($stmt, 'bind_param'), $param);
                 $stmt->execute();
-                $stmt->bind_param($messageID, $senderID, $subject, $body, $timestamp);
+                $stmt->bind_param($messageID, $senderID, $subject, $body, $timestamp, $hideInSentBox);
                 while($stmt->fetch()) {
                     $message = new Message();
                     $message->setID($messageID);
@@ -152,6 +183,7 @@ class Message implements DataObject {
                     $message->setSubject($subject);
                     $message->setBody($body);
                     $message->setTimestamp($timestamp);
+                    $message->setHideInSentBox(Database::toBoolean($hideInSentBox));
                     $messageResult[] = $message;
                 }
                 $stmt->close();
@@ -168,9 +200,9 @@ class Message implements DataObject {
         }
         else if(\is_array($id) && \count($id) == 0) {
             $messageResult = [];
-            if($stmt = Database::getConnection()->prepare("SELECT `MessageID`,`SenderID`,`MessageSubject`,`MessageBody`,`MessageTimestamp` FROM `Messages`")) {
+            if($stmt = Database::getConnection()->prepare("SELECT `MessageID`,`SenderID`,`MessageSubject`,`MessageBody`,`MessageTimestamp`,`MessageHideInSentBox` FROM `Messages`")) {
                 $stmt->execute();
-                $stmt->bind_param($messageID, $senderID, $subject, $body, $timestamp);
+                $stmt->bind_param($messageID, $senderID, $subject, $body, $timestamp, $hideInSentBox);
                 while($stmt->fetch()) {
                     $message = new Message();
                     $message->setID($messageID);
@@ -178,6 +210,7 @@ class Message implements DataObject {
                     $message->setSubject($subject);
                     $message->setBody($body);
                     $message->setTimestamp($timestamp);
+                    $message->setHideInSentBox(Database::toBoolean($hideInSentBox));
                     $messageResult[] = $message;
                 }
                 $stmt->close();
