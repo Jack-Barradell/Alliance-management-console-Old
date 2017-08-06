@@ -33,7 +33,7 @@ class Message implements DataObject {
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Messages`(`SenderID`,`MessageSubject`,`MessageBody`,`MessageTimestamp`,`MessageHideInSentBox`) VALUES (?,?,?,?,?)")) {
-                $stmt->bind_param('issi', $this->_senderID, $this->_subject, $this->_body, $this->_timestamp, Database::toNumeric($this->_hideInSentBox));
+                $stmt->bind_param('issii', $this->_senderID, $this->_subject, $this->_body, $this->_timestamp, Database::toNumeric($this->_hideInSentBox));
                 $stmt->execute();
                 $stmt->close();
             }
@@ -49,7 +49,7 @@ class Message implements DataObject {
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `Messages` SET `SenderID`=?,`MessageSubject`=?,`MessageBody`=?,`MessageTimestamp`=?,`MessageHideInSentBox`=? WHERE `MessageID`=?")) {
-                $stmt->bind_param('issii', $this->_senderID, $this->_subject, $this->_body, $this->_timestamp, Database::toNumeric($this->_hideInSentBox), $this->_id);
+                $stmt->bind_param('issiii', $this->_senderID, $this->_subject, $this->_body, $this->_timestamp, Database::toNumeric($this->_hideInSentBox), $this->_id);
                 $stmt->execute();
                 $stmt->close();
             }

@@ -12,13 +12,15 @@ class UserMessage implements DataObject {
     private $_userID = null;
     private $_messageID = null;
     private $_acknowledged = null;
+    private $_hideInInbox = null;
     private $_connection = null;
 
-    public function __construct($id = null, $userID = null, $messagedID = null, $acknowledged = null) {
+    public function __construct($id = null, $userID = null, $messagedID = null, $acknowledged = null, $hideInInbox = null) {
         $this->_id = $id;
         $this->_userID = $userID;
         $this->_messageID = $messagedID;
         $this->_acknowledged = $acknowledged;
+        $this->_hideInInbox = $hideInInbox;
         $this->_connection = Database::getConnection();
     }
 
@@ -27,8 +29,8 @@ class UserMessage implements DataObject {
             throw new BlankObjectException("Cannot store a blank user object");
         }
         else {
-            if($stmt = $this->_connection->prepare("INSERT INTO `User_Messages` (`UserID`,`MessageID`,`UserMessageAcknowledged`) VALUES (?,?,?)")) {
-                $stmt->bind_param('iii', $this->_userID, $this->_messageID, Database::toNumeric($this->_acknowledged));
+            if($stmt = $this->_connection->prepare("INSERT INTO `User_Messages` (`UserID`,`MessageID`,`UserMessageAcknowledged`,`UserMessageHideInInbox`) VALUES (?,?,?,?)")) {
+                $stmt->bind_param('iiii', $this->_userID, $this->_messageID, Database::toNumeric($this->_acknowledged), Database::toNumeric($this->_hideInInbox));
                 $stmt->execute();
                 $stmt->close();
             }
@@ -43,8 +45,8 @@ class UserMessage implements DataObject {
             throw new BlankObjectException("Cannot store a blank user object");
         }
         else {
-            if($stmt = $this->_connection->prepare("UPDATE `User_Messages` SET `UserID`=?,`MessagedID`=?,`UserMessageAcknowledged`=? WHERE `UserMessageID`=?")) {
-                $stmt->bind_param('iiii', $this->_userID, $this->_messageID, Database::toNumeric($this->_acknowledged), $this->_id);
+            if($stmt = $this->_connection->prepare("UPDATE `User_Messages` SET `UserID`=?,`MessagedID`=?,`UserMessageAcknowledged`=?,`UserMessageHideInInbox`=? WHERE `UserMessageID`=?")) {
+                $stmt->bind_param('iiiii', $this->_userID, $this->_messageID, Database::toNumeric($this->_acknowledged), Database::toNumeric($this->_hideInInbox), $this->_id);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -68,7 +70,7 @@ class UserMessage implements DataObject {
 
     public function eql($anotherObject) {
         if(\get_class($this) && \get_class($anotherObject)) {
-            if($this->_id == $anotherObject->getID() && $this->_userID == $anotherObject->getUserID() && $this->_messageID == $anotherObject->getMessageID() && $this->_acknowledged == $anotherObject->getAcknowledged()) {
+            if($this->_id == $anotherObject->getID() && $this->_userID == $anotherObject->getUserID() && $this->_messageID == $anotherObject->getMessageID() && $this->_acknowledged == $anotherObject->getAcknowledged() && $this->_hideInInbox == $anotherObject->getHideInInbox()) {
                 return true;
             }
             else {
@@ -78,6 +80,11 @@ class UserMessage implements DataObject {
         else {
             return false;
         }
+    }
+
+    public function deleteFromInbox() {
+        $this->_hideInInbox = true;
+        $this->commit();
     }
 
     // Getters and setters
@@ -98,6 +105,10 @@ class UserMessage implements DataObject {
         return $this->_acknowledged;
     }
 
+    public function getHideInInbox() {
+        return $this->_hideInInbox;
+    }
+
     public function setID($id) {
         $this->_id = $id;
     }
@@ -112,6 +123,10 @@ class UserMessage implements DataObject {
 
     public function setAcknowledged($acknowledged) {
         $this->_acknowledged = $acknowledged;
+    }
+
+    public function setHideInInbox($hideInInbox) {
+        $this->_hideInInbox = $hideInInbox;
     }
 
     // Statics
@@ -131,16 +146,17 @@ class UserMessage implements DataObject {
                 $questionString .= ',?';
             }
             $param = \array_merge($typeArray, $refs);
-            if($stmt = Database::getConnection()->prepare("SELECT `UserMessageID`,`UserID`,`MessageID`,`UserMessageAcknowledged` FROM `User_Messages` WHERE `UserMessageID` IN (" . $questionString . ")")) {
+            if($stmt = Database::getConnection()->prepare("SELECT `UserMessageID`,`UserID`,`MessageID`,`UserMessageAcknowledged`,`UserMessageHideInInbox` FROM `User_Messages` WHERE `UserMessageID` IN (" . $questionString . ")")) {
                 \call_user_func_array(array($stmt, 'bind_param'), $param);
                 $stmt->execute();
-                $stmt->bind_result($userMessageID, $userID, $messageID, $acknowledged);
+                $stmt->bind_result($userMessageID, $userID, $messageID, $acknowledged, $hideInInbox);
                 while($stmt->fetch()) {
                     $userMessage = new UserMessage();
                     $userMessage->setID($userMessageID);
                     $userMessage->setUserID($userID);
                     $userMessage->setMessageID($messageID);
                     $userMessage->setAcknowledged(Database::toBoolean($acknowledged));
+                    $userMessage->setHideInInbox(Database::toBoolean($hideInInbox));
                     $userMessageResult[] = $userMessage;
                 }
                 $stmt->close();
@@ -157,15 +173,16 @@ class UserMessage implements DataObject {
         }
         else if(\is_array($id) && \count($id) == 0) {
             $userMessageResult = [];
-            if($stmt = Database::getConnection()->prepare("SELECT `UserMessageID`,`UserID`,`MessageID`,`UserMessageAcknowledged` FROM `User_Messages`")) {
+            if($stmt = Database::getConnection()->prepare("SELECT `UserMessageID`,`UserID`,`MessageID`,`UserMessageAcknowledged`,`UserMessageHideInInbox` FROM `User_Messages`")) {
                 $stmt->execute();
-                $stmt->bind_result($userMessageID, $userID, $messageID, $acknowledged);
+                $stmt->bind_result($userMessageID, $userID, $messageID, $acknowledged, $hideInInbox);
                 while($stmt->fetch()) {
                     $userMessage = new UserMessage();
                     $userMessage->setID($userMessageID);
                     $userMessage->setUserID($userID);
                     $userMessage->setMessageID($messageID);
                     $userMessage->setAcknowledged(Database::toBoolean($acknowledged));
+                    $userMessage->setHideInInbox(Database::toBoolean($hideInInbox));
                     $userMessageResult[] = $userMessage;
                 }
                 $stmt->close();
