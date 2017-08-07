@@ -2,6 +2,7 @@
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\MissingPrerequisiteException;
 use AMC\Exceptions\QueryStatementException;
 
 class Mission implements DataObject {
@@ -78,6 +79,67 @@ class Mission implements DataObject {
         else {
             return false;
         }
+    }
+
+    public function issueToUser($userID) {
+        $userMission = new UserMission();
+        $userMission->setUserID($userID);
+        $userMission->setMissionID($this->_id);
+        $userMission->commit();
+    }
+
+    public function removeFromUser($userID) {
+        if($this->userIsAssigned($userID)) {
+            $userMissions = UserMission::getByUserID($userID);
+            foreach($userMissions as $userMission) {
+                if($userMission->getMissionID() == $this->_id) {
+                    $userMission->toggleDelete();
+                    $userMission->commit();
+                }
+            }
+        }
+        else {
+            throw new MissingPrerequisiteException('Tried to unassign user with id ' . $userID . ' from mission with id ' . $this->_id . ' but they were not assigned.');
+        }
+    }
+
+    public function userIsAssigned($userID) {
+        $userMissions = UserMission::getByUserID($userID);
+        if(\is_null($userMissions)) {
+            return false;
+        }
+        else {
+            foreach($userMissions as $userMission) {
+                if($userMission->getMissionID() == $this->_id) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public function showToUser($userID) {
+        //TODO: Implement
+    }
+
+    public function hideFromUser($userID) {
+        //TODO: Implement
+    }
+
+    public function userCanSee($userID) {
+        //TODO: Implement
+    }
+
+    public function showToGroup($groupID) {
+        //TODO: Implement
+    }
+
+    public function hideFromGroup($groupID) {
+        //TODO: Implement
+    }
+
+    public function groupCanSee($groupID) {
+        //TODO: Implement
     }
 
     // Getters and setters

@@ -336,4 +336,43 @@ class MissionTest extends TestCase {
         }
     }
 
+    public function testIssueToUser() {
+        //TODO: Implement
+
+        //TODO: ###### DONT FORGET EXCEPTION TESTS AND NOT JUST IN THIS CLASS
+    }
+
+    public function testRemoveFromUser() {
+        //TODO: Implement
+    }
+
+    public function testUserIsAssigned() {
+        //TODO: Implement
+    }
+
+    public function testShowToUser() {
+        //TODO: Implement
+    }
+
+    public function testHideFromUser() {
+        //TODO: Implement
+    }
+
+    public function testUserCanSee() {
+        //TODO: Implement
+    }
+
+    public function testShowToGroup() {
+        //TODO: Implement
+    }
+
+    public function testHideFromGroup() {
+        //TODO: Implement
+    }
+
+    public function testGroupCanSee() {
+        //TODO: Implement
+    }
+
+
 }
