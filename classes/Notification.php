@@ -2,6 +2,7 @@
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidGroupException;
 use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\QueryStatementException;
 
@@ -79,7 +80,7 @@ class Notification implements DataObject {
         }
     }
 
-    public function issueToUser($userID) {
+    public function issueToUser($userID, $commit = true) {
         if(User::userExists($userID, true)) {
             // Commit the notification
             $this->commit();
@@ -92,12 +93,24 @@ class Notification implements DataObject {
             $userNotification->commit();
         }
         else {
-            throw new InvalidUserException('User ' . $userID . ' does not exist');
+            throw new InvalidUserException('User with id ' . $userID . ' does not exist');
         }
     }
 
     public function issueToGroup($groupID) {
-        //TODO: Implement
+        if(Group::groupExists($groupID, true)) {
+            // Commit the notification
+            $this->commit();
+
+            // Get the user groups
+            $userGroups = UserGroup::getByGroupID($groupID);
+            foreach($userGroups as $userGroup) {
+                $this->issueToUser($userGroup->getUserID(), false);
+            }
+        }
+        else {
+            throw new InvalidGroupException('Group with id ' . $groupID . ' does not exist.');
+        }
     }
 
     // Getters and setters

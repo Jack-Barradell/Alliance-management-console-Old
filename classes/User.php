@@ -344,6 +344,22 @@ class User implements DataObject {
         }
     }
 
+    public function issueRank($rankID) {
+        //TODO: Implement
+    }
+
+    public function revokeRank($rankID) {
+        //TODO: Implement
+    }
+
+    public function hasRank($rankID) {
+        //TODO: Implement
+    }
+
+    public function getRanks() {
+        //TODO: Implement
+    }
+
     // Setters and getters
 
     public function getID() {

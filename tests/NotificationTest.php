@@ -292,4 +292,16 @@ class NotificationTest extends TestCase {
         //TODO: Implement
     }
 
+    public function testInvalidUserIssueToUser() {
+        //TODO: Implement
+    }
+
+    public function testIssueToGroup() {
+        //TODO: Implement
+    }
+
+    public function testInvalidUserIssueToGroup() {
+        //TODO: Implement
+    }
+
 }
