@@ -605,4 +605,28 @@ class UserTest extends TestCase {
 
     }
 
+    public function testIssueRank() {
+
+    }
+
+    public function testDuplicateEntryIssueRank() {
+
+    }
+
+    public function testRevokeRank() {
+
+    }
+
+    public function testMissingPrerequisiteRevokeRank() {
+
+    }
+
+    public function testHasRank() {
+
+    }
+
+    public function testGetRanks() {
+
+    }
+
 }

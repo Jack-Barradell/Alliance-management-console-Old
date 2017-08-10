@@ -345,19 +345,59 @@ class User implements DataObject {
     }
 
     public function issueRank($rankID) {
-        //TODO: Implement
+        if($this->hasRank($rankID)) {
+            throw new DuplicateEntryException('User with id ' . $this->_id . ' was assigned rank with id ' . $rankID . ' when they already had it.');
+        }
+        else {
+            $userRank = new UserRank();
+            $userRank->setUserID($this->_id);
+            $userRank->setRankID($rankID);
+            $userRank->commit();
+        }
     }
 
     public function revokeRank($rankID) {
-        //TODO: Implement
+        if($this->hasRank($rankID)) {
+            $userRanks = UserRank::getByUserID($this->_id);
+            foreach($userRanks as $userRank) {
+                if($userRank->getRankID() == $rankID) {
+                    $userRank->toggleDelete();
+                    $userRank->commit();
+                }
+            }
+        }
+        else {
+            throw new MissingPrerequisiteException('User with id ' . $this->_id . ' wsa revoked rank with id ' . $rankID . ' but they did not have it.');
+        }
     }
 
     public function hasRank($rankID) {
-        //TODO: Implement
+        $userRanks = UserRank::getByUserID($this->_id);
+        if(\is_null($userRanks)) {
+            return false;
+        }
+        else {
+            foreach($userRanks as $userRank) {
+                if($userRank->getRankID() == $rankID) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     public function getRanks() {
-        //TODO: Implement
+        $userRanks = UserRank::getByUserID($this->_id);
+        if(\is_null($userRanks)) {
+            return null;
+        }
+        else {
+            $input = [];
+            foreach($userRanks as $userRank) {
+                $input[] = $userRank->getRankID();
+            }
+            return Rank::get($input);
+        }
     }
 
     // Setters and getters
