@@ -476,6 +476,10 @@ class MessageTest extends TestCase {
        //TODO: Implement
     }
 
+    public function testInvalidUserSendToUser() {
+        //TODO: Implement
+    }
+
     public function testDeleteFromSentBox() {
         //TODO: Implement
     }

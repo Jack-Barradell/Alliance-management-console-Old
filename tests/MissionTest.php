@@ -338,11 +338,17 @@ class MissionTest extends TestCase {
 
     public function testIssueToUser() {
         //TODO: Implement
+    }
 
-        //TODO: ###### DONT FORGET EXCEPTION TESTS AND NOT JUST IN THIS CLASS
+    public function testDuplicateEntryIssueToUser() {
+        //TODO: Implement
     }
 
     public function testRemoveFromUser() {
+        //TODO: Implement
+    }
+
+    public function testMissingPrerequisiteRemoveFromUser() {
         //TODO: Implement
     }
 
@@ -358,6 +364,10 @@ class MissionTest extends TestCase {
         //TODO: Implement
     }
 
+    public function testMissingPrerequisiteHideFromUser() {
+        //TODO: Implement
+    }
+
     public function testUserCanSee() {
         //TODO: Implement
     }
@@ -366,11 +376,23 @@ class MissionTest extends TestCase {
         //TODO: Implement
     }
 
+    public function testDuplicateEntryShowToGroup() {
+        //TODO: Implement
+    }
+
     public function testHideFromGroup() {
         //TODO: Implement
     }
 
+    public function testMissingPrerequisiteHideFromGroup() {
+        //TODO: Implement
+    }
+
     public function testGroupCanSee() {
+        //TODO: Implement
+    }
+
+    public function testUserHasAccess() {
         //TODO: Implement
     }
 

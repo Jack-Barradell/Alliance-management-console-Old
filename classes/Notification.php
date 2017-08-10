@@ -96,6 +96,10 @@ class Notification implements DataObject {
         }
     }
 
+    public function issueToGroup($groupID) {
+        //TODO: Implement
+    }
+
     // Getters and setters
 
     public function getID() {

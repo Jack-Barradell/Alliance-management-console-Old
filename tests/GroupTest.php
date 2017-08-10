@@ -303,11 +303,23 @@ class GroupTest extends TestCase {
         //TODO: Implement
     }
 
+    public function testDuplicatedEntryIssuePrivilege() {
+        //TODO: Implement
+    }
+
     public function testRevokePrivilege() {
         //TODO: Implement
     }
 
+    public function testMissingPerquisiteRevokePrivilege() {
+        //TODO: Implement
+    }
+
     public function testHasGroupPrivilege() {
+        //TODO: Implement
+    }
+
+    public function testNullGetHasGroupPrivilege() {
         //TODO: Implement
     }
 
@@ -316,6 +328,10 @@ class GroupTest extends TestCase {
     }
 
     public function testGroupExists() {
+        //TODO: Implement
+    }
+
+    public function testIncorrectTypeGroupExists() {
         //TODO: Implement
     }
 

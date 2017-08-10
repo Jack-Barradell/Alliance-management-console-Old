@@ -2,6 +2,7 @@
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\DuplicateEntryException;
 use AMC\Exceptions\MissingPrerequisiteException;
 use AMC\Exceptions\QueryStatementException;
 
@@ -82,10 +83,15 @@ class Mission implements DataObject {
     }
 
     public function issueToUser($userID) {
-        $userMission = new UserMission();
-        $userMission->setUserID($userID);
-        $userMission->setMissionID($this->_id);
-        $userMission->commit();
+        if($this->userIsAssigned($userID)) {
+            throw new DuplicateEntryException('Attempted to assign user with id ' . $userID . ' to mission mission with id ' . $this->_id . ' but they were already issued');
+        }
+        else {
+            $userMission = new UserMission();
+            $userMission->setUserID($userID);
+            $userMission->setMissionID($this->_id);
+            $userMission->commit();
+        }
     }
 
     public function removeFromUser($userID) {
@@ -119,27 +125,103 @@ class Mission implements DataObject {
     }
 
     public function showToUser($userID) {
-        //TODO: Implement
+        if($this->userCanSee($userID)) {
+            throw new DuplicateEntryException('User with id ' . $userID . ' was given access to mission with id ' . $this->_id . ' when they already had it.');
+        }
+        else {
+            $missionUserView = new MissionUserView();
+            $missionUserView->setUserID($userID);
+            $missionUserView->setMissionID($this->_id);
+            $missionUserView->commit();
+        }
     }
 
     public function hideFromUser($userID) {
-        //TODO: Implement
+        if($this->userCanSee($userID)) {
+            $missionUserViews = MissionUserView::getByUserID($userID);
+            foreach($missionUserViews as $missionUserView) {
+                if($missionUserView->getMissionID() == $this->_id) {
+                    $missionUserView->toggleDelete();
+                    $missionUserView->commit();
+                }
+            }
+        }
+        else {
+            throw new MissingPrerequisiteException('User with id ' . $userID . ' was removed from the access list of mission with id ' . $this->_id . ' but they did not have access.');
+        }
     }
 
     public function userCanSee($userID) {
-        //TODO: Implement
+        $missionUserViews = MissionUserView::getByUserID($userID);
+        if(\is_null($missionUserViews)) {
+            return false;
+        }
+        else {
+            foreach($missionUserViews as $missionUserView) {
+                if($missionUserView->getMissionID() == $this->_id) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     public function showToGroup($groupID) {
-        //TODO: Implement
+        if($this->groupCanSee($groupID)) {
+            throw new DuplicateEntryException('Group with id ' . $groupID . ' was given access to mission with id ' . $this->_id . ' but they are already had it.');
+        }
+        else {
+            $missionGroupView = new MissionGroupView();
+            $missionGroupView->setGroupID($groupID);
+            $missionGroupView->setMissionID($this->_id);
+            $missionGroupView->commit();
+        }
     }
 
     public function hideFromGroup($groupID) {
-        //TODO: Implement
+        if($this->groupCanSee($groupID)) {
+            $missionGroupViews = MissionGroupView::getByGroupID($groupID);
+            foreach($missionGroupViews as $missionGroupView) {
+                if($missionGroupView->getMissionID() == $this->_id) {
+                    $missionGroupView->toggleDelete();
+                    $missionGroupView->commit();
+                }
+            }
+        }
+        else {
+            throw new MissingPrerequisiteException('Group with id ' . $groupID . ' was removed from the access list of mission with id ' . $this->_id . ' but they did not have access.');
+        }
     }
 
     public function groupCanSee($groupID) {
-        //TODO: Implement
+        $missionGroupViews = MissionGroupView::getByGroupID($groupID);
+        if(\is_null($missionGroupViews)) {
+            return false;
+        }
+        else {
+            foreach ($missionGroupViews as $missionGroupView) {
+                if($missionGroupView->getMissionID() == $this->_id) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public function userHasAccess($userID) {
+        if($this->userCanSee($userID)) {
+            return true;
+        }
+        else {
+            $user = User::get($userID);
+            $groups = $user->getGroups();
+            foreach($groups as $group) {
+                if($this->groupCanSee($group->getID())) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     // Getters and setters
