@@ -1,7 +1,13 @@
 <?php
 namespace AMC\Tests;
 
-
+require '../classes/DataObject.php';
+require '../classes/Getable.php';
+require '../classes/Storable.php';
+require '../classes/Database.php';
+require '../classes/Intelligence.php';
+require '../classes/User.php';
+require '../classes/exceptions/BlankObjectException.php';
 
 use AMC\Classes\Intelligence;
 use AMC\Classes\Database;

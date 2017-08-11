@@ -1,14 +1,6 @@
 <?php
 namespace AMC\Classes;
 
-require '../classes/DataObject.php';
-require '../classes/Getable.php';
-require '../classes/Storable.php';
-require '../classes/Database.php';
-require '../classes/Intelligence.php';
-require '../classes/User.php';
-require '../classes/exceptions/BlankObjectException.php';
-
 use AMC\Exceptions\BlankObjectException;
 use AMC\Exceptions\QueryStatementException;
 
