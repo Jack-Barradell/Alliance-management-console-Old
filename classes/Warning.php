@@ -126,8 +126,7 @@ class Warning implements DataObject {
 
     // Statics
 
-    public static function select($id)
-    {
+    public static function select($id) {
         if (\is_array($id) && \count($id) > 0) {
             $warningResult = [];
             $typeArray = [];
@@ -158,13 +157,16 @@ class Warning implements DataObject {
                 $stmt->close();
                 if (\count($warningResult) > 0) {
                     return $warningResult;
-                } else {
+                }
+                else {
                     return null;
                 }
-            } else {
+            }
+            else {
                 throw new QueryStatementException("Failed to bind query");
             }
-        } else if (\is_array($id) && \count($id) == 0) {
+        }
+        else if (\is_array($id) && \count($id) == 0) {
             $warningResult = [];
             if ($stmt = Database::getConnection()->prepare("SELECT `WarningID`,`UserID`,`AdminID`,`WarningReason`,`WarningTimestamp` FROM `Warnings`")) {
                 $stmt->execute();
@@ -181,14 +183,59 @@ class Warning implements DataObject {
                 $stmt->close();
                 if (\count($warningResult) > 0) {
                     return $warningResult;
-                } else {
+                }
+                else {
                     return null;
                 }
-            } else {
+            }
+            else {
                 throw new QueryStatementException("Failed to bind query");
             }
-        } else {
+        }
+        else {
             return null;
+        }
+    }
+
+    public static function getByUserID($userID) {
+        if($stmt = Database::getConnection()->prepare("SELECT `WarningID` FROM `Warnings` WHERE `UserID`=?")) {
+            $stmt->bind_param('i', $userID);
+            $stmt->execute();
+            $stmt->bind_result($warningID);
+            $input = [];
+            while($stmt->fetch()) {
+                $input[] = $warningID;
+            }
+            if(\count($input) > 0) {
+                return Warning::get($input);
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            throw new QueryStatementException('Failed to bind query');
+        }
+    }
+
+    public static function getByAdminID($adminID) {
+        if($stmt = Database::getConnection()->prepare("SELECT `WarningID` FROM `Warnings` WHERE `AdminID`=?")) {
+            $stmt->bind_param('i', $adminID);
+            $stmt->execute();
+            $stmt->bind_result($warningID);
+            $input = [];
+            while($stmt->fetch()) {
+                $input[] = $warningID;
+            }
+            if(\count($input) > 0) {
+                return Warning::get($input);
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            throw new QueryStatementException('Failed to bind query');
         }
     }
 
