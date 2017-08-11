@@ -127,25 +127,25 @@ class Warning implements DataObject {
     // Statics
 
     public static function select($id) {
-        if (\is_array($id) && \count($id) > 0) {
+        if(\is_array($id) && \count($id) > 0) {
             $warningResult = [];
             $typeArray = [];
             $refs = [];
             $questionString = '?';
             $typeArray[0] = 'i';
-            foreach ($id as $key => $value) {
+            foreach($id as $key => $value) {
                 $refs[$key] =& $id[$key];
             }
-            for ($i = 0; $i < \count($id); $i++) {
+            for($i = 0; $i < \count($id) - 1; $i++) {
                 $typeArray[0] .= 'i';
                 $questionString .= ',?';
             }
             $param = \array_merge($typeArray, $refs);
-            if ($stmt = Database::getConnection()->prepare("SELECT `WarningID`,`UserID`,`AdminID`,`WarningReason`,`WarningTimestamp` FROM `Warnings` WHERE `WarningID` IN (" . $questionString . ")")) {
+            if($stmt = Database::getConnection()->prepare("SELECT `WarningID`,`UserID`,`AdminID`,`WarningReason`,`WarningTimestamp` FROM `Warnings` WHERE `WarningID` IN (" . $questionString . ")")) {
                 \call_user_func_array(array($stmt, 'bind_param'), $param);
                 $stmt->execute();
                 $stmt->bind_result($warningID, $userID, $adminID, $warningReason, $warningTime);
-                while ($stmt->fetch()) {
+                while($stmt->fetch()) {
                     $warning = new Warning();
                     $warning->setID($warningID);
                     $warning->setUserID($userID);
@@ -155,7 +155,7 @@ class Warning implements DataObject {
                     $warningResult[] = $warning;
                 }
                 $stmt->close();
-                if (\count($warningResult) > 0) {
+                if(\count($warningResult) > 0) {
                     return $warningResult;
                 }
                 else {
@@ -166,12 +166,12 @@ class Warning implements DataObject {
                 throw new QueryStatementException("Failed to bind query");
             }
         }
-        else if (\is_array($id) && \count($id) == 0) {
+        else if(\is_array($id) && \count($id) == 0) {
             $warningResult = [];
-            if ($stmt = Database::getConnection()->prepare("SELECT `WarningID`,`UserID`,`AdminID`,`WarningReason`,`WarningTimestamp` FROM `Warnings`")) {
+            if($stmt = Database::getConnection()->prepare("SELECT `WarningID`,`UserID`,`AdminID`,`WarningReason`,`WarningTimestamp` FROM `Warnings`")) {
                 $stmt->execute();
                 $stmt->bind_result($warningID, $userID, $adminID, $warningReason, $warningTime);
-                while ($stmt->fetch()) {
+                while($stmt->fetch()) {
                     $warning = new Warning();
                     $warning->setID($warningID);
                     $warning->setUserID($userID);
@@ -181,7 +181,7 @@ class Warning implements DataObject {
                     $warningResult[] = $warning;
                 }
                 $stmt->close();
-                if (\count($warningResult) > 0) {
+                if(\count($warningResult) > 0) {
                     return $warningResult;
                 }
                 else {

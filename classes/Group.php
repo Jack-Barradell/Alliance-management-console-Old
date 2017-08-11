@@ -181,7 +181,7 @@ class Group implements DataObject {
             foreach($id as $key => $value) {
                 $refs[$key] =& $id[$key];
             }
-            for($i = 0; $i < \count($id); $i++) {
+            for($i = 0; $i < \count($id) - 1; $i++) {
                 $typeArray[0] .= 'i';
                 $questionString .= ',?';
             }

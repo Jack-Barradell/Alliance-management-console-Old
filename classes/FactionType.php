@@ -107,7 +107,7 @@ class FactionType implements DataObject {
             foreach($id as $key => $value) {
                 $refs[$key] =& $id[$key];
             }
-            for($i = 0; $i < \count($id); $i++) {
+            for($i = 0; $i < \count($id) - 1; $i++) {
                 $questionString .= ',?';
                 $typeArray[0] .= 'i';
             }

@@ -107,21 +107,21 @@ class UserRank implements DataObject {
     // Statics
 
     public static function select($id) {
-        if (\is_array($id) && \count($id) > 0) {
+        if(\is_array($id) && \count($id) > 0) {
             $userRankResult = [];
             $typeArray = [];
             $refs = [];
             $typeArray[0] = 'i';
             $questionString = '?';
-            foreach ($id as $key => $value) {
+            foreach($id as $key => $value) {
                 $refs[$key] =& $id[$key];
             }
-            for ($i = 0; $i < \count($id); $i++) {
+            for($i = 0; $i < \count($id) - 1; $i++) {
                 $questionString .= ',?';
                 $typeArray[0] .= 'i';
             }
             $param = \array_merge($typeArray, $refs);
-            if ($stmt = Database::getConnection()->prepare("SELECT `UserRankID`,`UserID`,`RankID` FROM `User_Ranks` WHERE `UserRankID` IN (" . $questionString . ")")) {
+            if($stmt = Database::getConnection()->prepare("SELECT `UserRankID`,`UserID`,`RankID` FROM `User_Ranks` WHERE `UserRankID` IN (" . $questionString . ")")) {
                 \call_user_func_array(array($stmt, 'bind_param'), $param);
                 $stmt->execute();
                 $stmt->bind_result($userRankID, $userID, $rankID);
@@ -133,7 +133,7 @@ class UserRank implements DataObject {
                     $userRankResult[] = $userRank;
                 }
                 $stmt->close();
-                if (\count($userRankResult) > 0) {
+                if(\count($userRankResult) > 0) {
                     return $userRankResult;
                 }
                 else {
@@ -144,12 +144,12 @@ class UserRank implements DataObject {
                 throw new QueryStatementException("Failed to bind query");
             }
         }
-        else if (\is_array($id) && \count($id) == 0) {
+        else if(\is_array($id) && \count($id) == 0) {
             $userRankResult = [];
-            if ($stmt = Database::getConnection()->prepare("SELECT `UserRankID`,`UserID`,`RankID` FROM `User_Ranks`")) {
+            if($stmt = Database::getConnection()->prepare("SELECT `UserRankID`,`UserID`,`RankID` FROM `User_Ranks`")) {
                 $stmt->execute();
                 $stmt->bind_result($userRankID, $userID, $rankID);
-                while ($stmt->fetch()) {
+                while($stmt->fetch()) {
                     $userRank = new UserRank();
                     $userRank->setID($userRankID);
                     $userRank->setUserID($userID);
@@ -157,7 +157,7 @@ class UserRank implements DataObject {
                     $userRankResult[] = $userRank;
                 }
                 $stmt->close();
-                if (\count($userRankResult) > 0) {
+                if(\count($userRankResult) > 0) {
                     return $userRankResult;
                 }
                 else {
