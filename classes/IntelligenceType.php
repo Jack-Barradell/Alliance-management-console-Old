@@ -63,7 +63,17 @@ class IntelligenceType implements DataObject {
     }
 
     public function eql($anotherObject) {
-        //TODO: Implement
+        if(\get_class($this) == \get_class($anotherObject)) {
+            if($this->_id == $anotherObject->getID() && $this->_name == $anotherObject->getName()) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
     }
 
     // Setters and getters
@@ -87,6 +97,67 @@ class IntelligenceType implements DataObject {
     // Statics
 
     public static function select($id) {
-        //TODO: Implement
+        if(\is_array($id) && \count($id) > 0) {
+            $intelligenceTypeResult = [];
+            $refs = [];
+            $typeArray = [];
+            $typeArray[0] = 'i';
+            $questionString = '?';
+            foreach($id as $key => $value) {
+                $refs[$key] =& $id[$key];
+            }
+            for($i = 0; $i < \count($id) - 1; $i++) {
+                $typeArray[0] .= 'i';
+                $questionString .= ',?';
+            }
+            $param = \array_merge($typeArray, $refs);
+            if($stmt = Database::getConnection()->prepare("SELECT `IntelligenceTypeID`,`IntelligenceTypeName` FROM `Intelligence_Types` WHERE `IntelligenceTypeID` IN ("  . $questionString . ")")) {
+                \call_user_func_array(array($stmt, 'bind_param'), $param);
+                $stmt->execute();
+                $stmt->bind_result($intelligenceTypeID, $name);
+                while($stmt->fetch()) {
+                    $intelligenceType = new IntelligenceType();
+                    $intelligenceType->setID($intelligenceTypeID);
+                    $intelligenceType->setName($name);
+                    $intelligenceTypeResult[] = $intelligenceType;
+                }
+                $stmt->close();
+                if(\count($intelligenceTypeResult) > 0) {
+                    return $intelligenceTypeResult;
+                }
+                else {
+                    return null;
+                }
+            }
+            else {
+                throw new QueryStatementException('Failed to bind query.');
+            }
+        }
+        else if(\is_array($id) && \count($id) == 0) {
+            $intelligenceTypeResult = [];
+            if($stmt = Database::getConnection()->prepare("SELECT `IntelligenceTypeID`,`IntelligenceTypeName` FROM `Intelligence_Types`")) {
+                $stmt->execute();
+                $stmt->bind_result($intelligenceTypeID, $name);
+                while($stmt->fetch()) {
+                    $intelligenceType = new IntelligenceType();
+                    $intelligenceType->setID($intelligenceTypeID);
+                    $intelligenceType->setName($name);
+                    $intelligenceTypeResult[] = $intelligenceType;
+                }
+                $stmt->close();
+                if(\count($intelligenceTypeResult) > 0) {
+                    return $intelligenceTypeResult;
+                }
+                else {
+                    return null;
+                }
+            }
+            else {
+                throw new QueryStatementException('Failed to bind query.');
+            }
+        }
+        else {
+            return null;
+        }
     }
 }
