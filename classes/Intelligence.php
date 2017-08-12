@@ -10,14 +10,16 @@ class Intelligence implements DataObject {
 
     private $_id = null;
     private $_authorID = null;
+    private $_intelligenceTypeID = null;
     private $_subject = null;
     private $_body = null;
     private $_timestamp = null;
     private $_connection = null;
 
-    public function __construct($id = null, $authorID = null, $subject = null, $body = null, $timestamp = null) {
+    public function __construct($id = null, $authorID = null, $intelligenceTypeID = null, $subject = null, $body = null, $timestamp = null) {
         $this->_id = $id;
         $this->_authorID = $authorID;
+        $this->_intelligenceTypeID = $intelligenceTypeID;
         $this->_subject = $subject;
         $this->_body = $body;
         $this->_connection = Database::getConnection();
@@ -25,8 +27,8 @@ class Intelligence implements DataObject {
 
     public function create() {
         if($this->eql(new Intelligence())) {
-            if($stmt = $this->_connection->prepare("INSERT INTO `Intelligence`(`AuthorID`,`IntelligenceSubject`,`IntelligenceBody`,`IntelligenceTimestamp`) VALUES (?,?,?,?)")) {
-                $stmt->bind_param('issi', $this->_authorID, $this->_subject, $this->_body, $this->_timestamp);
+            if($stmt = $this->_connection->prepare("INSERT INTO `Intelligence`(`AuthorID`,`IntelligenceTypeID`,`IntelligenceSubject`,`IntelligenceBody`,`IntelligenceTimestamp`) VALUES (?,?,?,?)")) {
+                $stmt->bind_param('iissi', $this->_authorID, $this->_intelligenceTypeID, $this->_subject, $this->_body, $this->_timestamp);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -41,8 +43,8 @@ class Intelligence implements DataObject {
 
     public function update() {
         if($this->eql(new Intelligence())) {
-            if($stmt = $this->_connection->prepare("UPDATE `Intelligence` SET `AuthorID`=?,`IntelligenceSubject`=?,`IntelligenceBody`=?,`IntelligenceTimestamp`=? WHERE `IntelligenceID`=?")) {
-                $stmt->bind_param('issii', $this->_authorID, $this->_subject, $this->_body, $this->_timestamp, $this->_id);
+            if($stmt = $this->_connection->prepare("UPDATE `Intelligence` SET `AuthorID`=?,`IntelligenceTypeID`=?,`IntelligenceSubject`=?,`IntelligenceBody`=?,`IntelligenceTimestamp`=? WHERE `IntelligenceID`=?")) {
+                $stmt->bind_param('iissii', $this->_authorID, $this->_intelligenceTypeID, $this->_subject, $this->_body, $this->_timestamp, $this->_id);
                 $stmt->exeucte();
                 $stmt->close();
             }
@@ -70,7 +72,7 @@ class Intelligence implements DataObject {
 
     public function eql($anotherObject) {
         if(\get_class($this) == \get_class($anotherObject)) {
-            if($this->_id == $anotherObject->getID() && $this->_authorID == $anotherObject->getAuthorID() && $this->_subject == $anotherObject->getSubject() && $this->_body == $anotherObject->getBody() && $this->_timestamp == $anotherObject->getTimestamp()) {
+            if($this->_id == $anotherObject->getID() && $this->_authorID == $anotherObject->getAuthorID() && $this->_intelligenceTypeID == $anotherObject->getIntelligenceTypeID() && $this->_subject == $anotherObject->getSubject() && $this->_body == $anotherObject->getBody() && $this->_timestamp == $anotherObject->getTimestamp()) {
                 return true;
             }
             else {
@@ -92,6 +94,10 @@ class Intelligence implements DataObject {
         return $this->_authorID;
     }
 
+    public function getIntelligenceTypeID() {
+        return $this->_intelligenceTypeID;
+    }
+
     public function getSubject() {
         return $this->_subject;
     }
@@ -110,6 +116,10 @@ class Intelligence implements DataObject {
 
     public function setAuthorID($authorID) {
         $this->_authorID = $authorID;
+    }
+
+    public function setIntelligenceTypeID($intelligenceTypeID) {
+        $this->_intelligenceTypeID = $intelligenceTypeID;
     }
 
     public function setSubject($subject) {
@@ -141,14 +151,15 @@ class Intelligence implements DataObject {
                 $questionString .= ',?';
             }
             $param = \array_merge($typeArray, $refs);
-            if($stmt = Database::getConnection()->prepare("SELECT `IntelligenceID`,`AuthorID`,`IntelligenceSubject`,`IntelligenceBody`,`IntelligenceTimestamp` FROM `Intelligence` WHERE `IntelligenceID` IN (" . $questionString . ")")) {
+            if($stmt = Database::getConnection()->prepare("SELECT `IntelligenceID`,`AuthorID`,`IntelligenceTypeID`,`IntelligenceSubject`,`IntelligenceBody`,`IntelligenceTimestamp` FROM `Intelligence` WHERE `IntelligenceID` IN (" . $questionString . ")")) {
                 \call_user_func_array(array($stmt, 'bind_param'), $param);
                 $stmt->execute();
-                $stmt->bind_result($intelligenceID, $authorID, $subject, $body, $timestamp);
+                $stmt->bind_result($intelligenceID, $authorID, $intelligenceTypeID, $subject, $body, $timestamp);
                 while($stmt->fetch()) {
                     $intelligence = new Intelligence();
                     $intelligence->setID($intelligenceID);
                     $intelligence->setAuthorID($authorID);
+                    $intelligence->setIntelligenceTypeID($intelligenceTypeID);
                     $intelligence->setSubject($subject);
                     $intelligence->setBody($body);
                     $intelligence->setTimestamp($timestamp);
@@ -168,13 +179,14 @@ class Intelligence implements DataObject {
         }
         else if(\is_array($id) && \count($id) == 0) {
             $intelligenceResult = [];
-            if($stmt = Database::getConnection()->prepare("SELECT `IntelligenceID`,`AuthorID`,`IntelligenceSubject`,`IntelligenceBody`,`IntelligenceTimestamp` FROM `Intelligence`")) {
+            if($stmt = Database::getConnection()->prepare("SELECT `IntelligenceID`,`AuthorID`,`IntelligenceTypeID`,`IntelligenceSubject`,`IntelligenceBody`,`IntelligenceTimestamp` FROM `Intelligence`")) {
                 $stmt->execute();
-                $stmt->bind_result($intelligenceID, $authorID, $subject, $body, $timestamp);
+                $stmt->bind_result($intelligenceID, $authorID, $intelligenceTypeID, $subject, $body, $timestamp);
                 while($stmt->fetch()) {
                     $intelligence = new Intelligence();
                     $intelligence->setID($intelligenceID);
                     $intelligence->setAuthorID($authorID);
+                    $intelligence->setIntelligenceTypeID($intelligenceTypeID);
                     $intelligence->setSubject($subject);
                     $intelligence->setBody($body);
                     $intelligence->setTimestamp($timestamp);
@@ -218,4 +230,28 @@ class Intelligence implements DataObject {
             throw new QueryStatementException('Failed to bind query');
         }
     }
+
+    public static function getByIntelligenceTypeID($intelligenceTypeID) {
+        if($stmt = Database::getConnection()->prepare("SELECT `IntelligenceID` FROM `Intelligence` WHERE `IntelligenceTypeID`=?")) {
+            $stmt->bind_param('i', $intelligenceTypeID);
+            $stmt->execute();
+            $stmt->bind_result($intelligenceID);
+            $input = [];
+            while($stmt->fetch()) {
+                $input[] = $intelligenceID;
+            }
+            $stmt->close();
+            if(\count($input) > 0) {
+                return Intelligence::get($input);
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            throw new QueryStatementException('Failed to bind query');
+        }
+    }
+
+
 }

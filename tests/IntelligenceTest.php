@@ -63,4 +63,8 @@ class IntelligenceTest extends TestCase {
         //TODO: Implement
     }
 
+    public function testGetByIntelligenceTypeID() {
+        //TODO: Implement
+    }
+
 }
