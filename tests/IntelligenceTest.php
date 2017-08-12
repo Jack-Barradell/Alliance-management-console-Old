@@ -67,4 +67,8 @@ class IntelligenceTest extends TestCase {
         //TODO: Implement
     }
 
+    public function testGetByPublic() {
+        //TODO: Implement
+    }
+
 }
