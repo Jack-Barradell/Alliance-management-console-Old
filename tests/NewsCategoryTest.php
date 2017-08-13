@@ -1,6 +1,15 @@
 <?php
 namespace AMC\Tests;
 
+require '../classes/DataObject.php';
+require '../classes/Getable.php';
+require '../classes/Storable.php';
+require '../classes/Database.php';
+require '../classes/News.php';
+require '../classes/NewsCategory.php';
+require '../classes/User.php';
+require '../classes/exceptions/BlankObjectException.php';
+
 use AMC\Classes\NewsCategory;
 use AMC\Classes\Database;
 use PHPUnit\Framework\TestCase;
