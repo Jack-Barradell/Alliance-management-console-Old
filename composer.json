@@ -1,0 +1,6 @@
+{
+    "require": {
+        "nikic/fast-route": "^1.2",
+        "twig/twig": "^2.0"
+    }
+}
