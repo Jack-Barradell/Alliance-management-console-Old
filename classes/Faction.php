@@ -1,5 +1,4 @@
 <?php
-
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;

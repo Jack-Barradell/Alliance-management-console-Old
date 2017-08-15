@@ -10,6 +10,7 @@ require '../classes/exceptions/BlankObjectException.php';
 
 use AMC\Classes\Group;
 use AMC\Classes\Database;
+use AMC\Classes\Privilege;
 use AMC\Exceptions\BlankObjectException;
 use PHPUnit\Framework\TestCase;
 
@@ -300,7 +301,27 @@ class GroupTest extends TestCase {
     }
 
     public function testIssuePrivilege() {
-        //TODO: Implement
+        // Create a test privilege
+        $testPrivilege = new Privilege();
+        $testPrivilege->setName('testPriv');
+        $testPrivilege->commit();
+
+        // Create a test group
+        $testGroup = new Group();
+        $testGroup->setName('testGroup');
+        $testGroup->setHidden(false);
+        $testGroup->create();
+
+        $this->assertFalse($testGroup->hasGroupPrivilege($testPrivilege->getID()));
+
+        $testGroup->issuePrivilege($testPrivilege->getID());
+
+        $this->assertTrue($testGroup->hasGroupPrivilege($testPrivilege->getID()));
+
+        // Clean up
+        $testGroup->revokePrivilege($testPrivilege->getID());
+        $testGroup->delete();
+        $testPrivilege->delete();
     }
 
     public function testDuplicatedEntryIssuePrivilege() {

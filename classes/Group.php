@@ -1,7 +1,6 @@
 <?php
 namespace AMC\Classes;
 
-
 use AMC\Exceptions\BlankObjectException;
 use AMC\Exceptions\DuplicateEntryException;
 use AMC\Exceptions\IncorrectTypeException;
