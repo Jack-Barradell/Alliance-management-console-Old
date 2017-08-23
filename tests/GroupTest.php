@@ -12,6 +12,8 @@ use AMC\Classes\Group;
 use AMC\Classes\Database;
 use AMC\Classes\Privilege;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\DuplicateEntryException;
+use AMC\Exceptions\MissingPrerequisiteException;
 use PHPUnit\Framework\TestCase;
 
 class GroupTest extends TestCase {
@@ -324,16 +326,78 @@ class GroupTest extends TestCase {
         $testPrivilege->delete();
     }
 
-    public function testDuplicatedEntryIssuePrivilege() {
-        //TODO: Implement
+    public function testDuplicatedEntryIssuePrivilege() {// Create a test privilege
+        $testPrivilege = new Privilege();
+        $testPrivilege->setName('testPriv');
+        $testPrivilege->commit();
+
+        // Create a test group
+        $testGroup = new Group();
+        $testGroup->setName('testGroup');
+        $testGroup->setHidden(false);
+        $testGroup->create();
+
+        $testGroup->issuePrivilege($testPrivilege->getID());
+
+        // Set expected exception
+        $this->expectException(DuplicateEntryException::class);
+
+        // Trigger the exception
+        $testGroup->issuePrivilege($testPrivilege->getID());
+
+        // Clean up
+        $testGroup->revokePrivilege($testPrivilege->getID());
+        $testGroup->delete();
+        $testPrivilege->delete();
     }
 
     public function testRevokePrivilege() {
-        //TODO: Implement
+        $testPrivilege = new Privilege();
+        $testPrivilege->setName('testPriv');
+        $testPrivilege->commit();
+
+        // Create a test group
+        $testGroup = new Group();
+        $testGroup->setName('testGroup');
+        $testGroup->setHidden(false);
+        $testGroup->create();
+
+        $testGroup->issuePrivilege($testPrivilege->getID());
+
+        // Check it now has the priv
+        $this->assertTrue($testGroup->hasGroupPrivilege($testPrivilege->getID()));
+
+        // Now revoke the priv
+        $testGroup->revokePrivilege($testPrivilege->getID());
+
+        // Check they no longer have the priv
+        $this->assertFalse($testGroup->hasGroupPrivilege($testPrivilege->getID()));
+
+        // Clean up
+        $testGroup->delete();
+        $testPrivilege->delete();
     }
 
     public function testMissingPerquisiteRevokePrivilege() {
-        //TODO: Implement
+        $testPrivilege = new Privilege();
+        $testPrivilege->setName('testPriv');
+        $testPrivilege->commit();
+
+        // Create a test group
+        $testGroup = new Group();
+        $testGroup->setName('testGroup');
+        $testGroup->setHidden(false);
+        $testGroup->create();
+
+        // Set expected exception
+        $this->expectException(MissingPrerequisiteException::class);
+
+        // Trigger it
+        $testGroup->revokePrivilege($testPrivilege->getID());
+
+        // Clean up
+        $testGroup->delete();
+        $testPrivilege->delete();
     }
 
     public function testHasGroupPrivilege() {
