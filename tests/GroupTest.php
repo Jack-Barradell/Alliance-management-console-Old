@@ -13,7 +13,9 @@ use AMC\Classes\Database;
 use AMC\Classes\Privilege;
 use AMC\Exceptions\BlankObjectException;
 use AMC\Exceptions\DuplicateEntryException;
+use AMC\Exceptions\IncorrectTypeException;
 use AMC\Exceptions\MissingPrerequisiteException;
+use AMC\Exceptions\NullGetException;
 use PHPUnit\Framework\TestCase;
 
 class GroupTest extends TestCase {
@@ -401,23 +403,190 @@ class GroupTest extends TestCase {
     }
 
     public function testHasGroupPrivilege() {
-        //TODO: Implement
+        $testPrivilege = [];
+        $testPrivilege[0] = new Privilege();
+        $testPrivilege[0]->setName('testPriv');
+        $testPrivilege[0]->commit();
+
+        $testPrivilege[1] = new Privilege();
+        $testPrivilege[1]->setName('testPriv2');
+        $testPrivilege[1]->commit();
+
+        // Create a test group
+        $testGroup = [];
+        $testGroup[0] = new Group();
+        $testGroup[0]->setName('testGroup');
+        $testGroup[0]->setHidden(false);
+        $testGroup[0]->create();
+
+        $testGroup[1] = new Group();
+        $testGroup[1]->setName('testGroup2');
+        $testGroup[1]->setHidden(false);
+        $testGroup[1]->create();
+
+        // Now check it
+        $this->assertFalse($testGroup[0]->hasGroupPrivilege($testPrivilege[0]->getID()));
+        $this->assertFalse($testGroup[1]->hasGroupPrivilege($testPrivilege[0]->getID()));
+
+        $this->assertFalse($testGroup[0]->hasGroupPrivilege($testPrivilege[1]->getID()));
+        $this->assertFalse($testGroup[1]->hasGroupPrivilege($testPrivilege[1]->getID()));
+
+        // Issue the priv to one
+        $testGroup[0]->issuePrivilege($testPrivilege[0]->getID());
+
+        $this->assertTrue($testGroup[0]->hasGroupPrivilege($testPrivilege[0]->getID()));
+        $this->assertFalse($testGroup[1]->hasGroupPrivilege($testPrivilege[0]->getID()));
+
+        $this->assertFalse($testGroup[0]->hasGroupPrivilege($testPrivilege[1]->getID()));
+        $this->assertFalse($testGroup[1]->hasGroupPrivilege($testPrivilege[1]->getID()));
+
+        // Issue priv to the other
+        $testGroup[1]->issuePrivilege($testPrivilege[1]->getID());
+
+        $this->assertTrue($testGroup[0]->hasGroupPrivilege($testPrivilege[0]->getID()));
+        $this->assertFalse($testGroup[1]->hasGroupPrivilege($testPrivilege[0]->getID()));
+
+        $this->assertFalse($testGroup[0]->hasGroupPrivilege($testPrivilege[1]->getID()));
+        $this->assertTrue($testGroup[1]->hasGroupPrivilege($testPrivilege[1]->getID()));
+
+        // Clean up
+        $testGroup[0]->revokePrivilege($testPrivilege[0]->getID());
+        $testGroup[1]->revokePrivilege($testPrivilege[1]->getID());
+        foreach($testGroup as $group) {
+            $group->delete();
+        }
+        foreach($testPrivilege as $priv) {
+            $priv->delete();
+        }
     }
 
     public function testNullGetHasGroupPrivilege() {
-        //TODO: Implement
+        $testGroup = new Group();
+        $testGroup->setName('TestGroup');
+        $testGroup->setHidden(false);
+        $testGroup->create();
+
+        // Set expected exception
+        $this->expectException(NullGetException::class);
+
+        // Get highest id of a priv
+        $privID = 0;
+        $stmt = $this->_connection->prepare("SELECT `PrivilegeID` FROM `Privileges` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($priv);
+        $stmt->fetch();
+        $privID = $priv;
+        $stmt->close();
+
+        // Trigger it
+        $testGroup->hasGroupPrivilege($privID + 1);
+
+        // Clean up
+        $testGroup->delete();
     }
 
     public function testGetPrivileges() {
-        //TODO: Implement
+        // Make a test group
+        $testGroup = new Group();
+        $testGroup->setName('TestGroup');
+        $testGroup->setHidden(false);
+        $testGroup->create();
+
+        // Create test privs
+        $testPrivilege = [];
+
+        $testPrivilege[0] = new Privilege();
+        $testPrivilege[0]->setName('TestPriv');
+        $testPrivilege[0]->create();
+
+        $testPrivilege[1] = new Privilege();
+        $testPrivilege[1]->setName('TestPriv2');
+        $testPrivilege[1]->create();
+
+        // Check the group doesnt return privs
+        $this->assertNull($testGroup->getPrivileges());
+
+        // Issue the first privilege
+        $testGroup->issuePrivilege($testPrivilege[0]->getID());
+
+        // Check it
+        $privs = $testGroup->getPrivileges();
+
+        $this->assertTrue(\is_array($privs));
+        $this->assertEquals(1, \count($privs));
+        $this->assertInstanceOf(Privilege::class, $privs[0]);
+        $this->assertEquals($testPrivilege[0]->getID(), $privs[0]->getID());
+        $this->assertEquals($testPrivilege[0]->getName(), $privs[0]->getName());
+
+        // Issue the second privilege
+        $testGroup->issuePrivilege($testPrivilege[1]->getID());
+
+        // Check it
+        $privs = $testGroup->getPrivileges();
+
+        $this->assertTrue(\is_array($privs));
+        $this->assertEquals(2, \count($privs));
+        $this->assertInstanceOf(Privilege::class, $privs[0]);
+        $this->assertInstanceOf(Privilege::class, $privs[1]);
+
+        if($testPrivilege[0]->getID() == $privs[0]->getID()) {
+            $i = 0;
+            $j = 1;
+        }
+        else {
+            $i = 1;
+            $j = 0;
+        }
+
+        $this->assertEquals($testPrivilege[0]->getID(), $privs[$i]->getID());
+        $this->assertEquals($testPrivilege[0]->getName(), $privs[$i]->getName());
+
+        $this->assertEquals($testPrivilege[1]->getID(), $privs[$j]->getID());
+        $this->assertEquals($testPrivilege[1]->getName(), $privs[$j]->getName());
+
+        // Clean up
+        $testGroup->revokePrivilege($testPrivilege[0]->getID());
+        $testGroup->revokePrivilege($testPrivilege[1]->getID());
+        $testGroup->delete();
+        foreach($testPrivilege as $priv) {
+            $priv->delete();
+        }
     }
 
     public function testGroupExists() {
-        //TODO: Implement
+        // Create a test group
+        $testGroup = new Group();
+        $testGroup->setName('TestGroup');
+        $testGroup->setHidden(false);
+        $testGroup->create();
+
+        // Check there is no group with an id bigger than the new one
+        $this->assertFalse(Group::groupExists($testGroup->getID() + 1, false));
+        $this->assertFalse(Group::groupExists($testGroup->getID() + 1, true));
+
+        // Check group that doesnt exist
+        $this->assertFalse(Group::groupExists('TestGroup2', false));
+        $this->assertFalse(Group::groupExists('TestGroup2', true));
+
+        // Check the actual group shows up
+        $this->assertTrue(Group::groupExists($testGroup->getID(), false));
+        $this->assertEquals($testGroup->getName(), Group::groupExists($testGroup->getID(), true));
+
+        $this->assertTrue(Group::groupExists('TestGroup2', false));
+        $this->assertEquals($testGroup->getID(), Group::groupExists('TestGroup2', true));
+
+        // Clean up
+        $testGroup->delete();
     }
 
     public function testIncorrectTypeGroupExists() {
-        //TODO: Implement
+        // Set expected exception
+        $this->expectException(IncorrectTypeException::class);
+
+        // Trigger it
+        Group::groupExists(false);
+        Group::groupExists(array());
+        Group::groupExists(new Privilege());
     }
 
 }
