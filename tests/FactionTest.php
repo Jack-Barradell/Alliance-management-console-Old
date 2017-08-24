@@ -357,10 +357,12 @@ class FactionTest extends TestCase {
         $selectedSingle = Faction::getByFactionTypeID($testFactionType[0]->getID());
 
         // Check it
-        $this->assertInstanceOf(Faction::class, $selectedSingle);
-        $this->assertEquals($testFaction[0]->getID(), $selectedSingle->getID());
-        $this->assertEquals($testFaction[0]->getFactionTypeID(), $selectedSingle->getFactionTypeID());
-        $this->assertEquals($testFaction[0]->getName(), $selectedSingle->getName());
+        $this->assertTrue(\is_array($selectedSingle));
+        $this->assertEquals(1, \count($selectedSingle));
+        $this->assertInstanceOf(Faction::class, $selectedSingle[0]);
+        $this->assertEquals($testFaction[0]->getID(), $selectedSingle[0]->getID());
+        $this->assertEquals($testFaction[0]->getFactionTypeID(), $selectedSingle[0]->getFactionTypeID());
+        $this->assertEquals($testFaction[0]->getName(), $selectedSingle[0]->getName());
 
         // Clean up
         foreach($testFaction as $faction) {
