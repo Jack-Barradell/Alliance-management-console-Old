@@ -196,10 +196,12 @@ class GroupTest extends TestCase {
         $selectedSingle = Group::select(array($testGroup[0]->getID()));
 
         // Check it
-        $this->assertInstanceOf(Group::class, $selectedSingle);
-        $this->assertEquals($testGroup[0]->getID(), $selectedSingle->getID());
-        $this->assertEquals($testGroup[0]->getName(), $selectedSingle->getName());
-        $this->assertEquals($testGroup[0]->getHidden(), $selectedSingle->getHidden());
+        $this->assertTrue(\is_array($selectedSingle));
+        $this->assertEquals(1, \count($selectedSingle));
+        $this->assertInstanceOf(Group::class, $selectedSingle[0]);
+        $this->assertEquals($testGroup[0]->getID(), $selectedSingle[0]->getID());
+        $this->assertEquals($testGroup[0]->getName(), $selectedSingle[0]->getName());
+        $this->assertEquals($testGroup[0]->getHidden(), $selectedSingle[0]->getHidden());
 
         // Now select multiple and check them
         $selectedMultiple = Group::select(array($testGroup[1]->getID(), $testGroup[2]->getID()));
