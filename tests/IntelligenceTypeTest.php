@@ -154,15 +154,117 @@ class IntelligenceTypeTest extends TestCase {
     }
 
     public function testSelectWithInput() {
-        //TODO: Implement
+        //Create a test intelligence type
+        $testIntelligenceType = [];
+        $testIntelligenceType[0] = new IntelligenceType();
+        $testIntelligenceType[0]->setName('testName');
+        $testIntelligenceType[0]->create();
+
+        $testIntelligenceType[1] = new IntelligenceType();
+        $testIntelligenceType[1]->setName('testName2');
+        $testIntelligenceType[1]->create();
+
+        $testIntelligenceType[2] = new IntelligenceType();
+        $testIntelligenceType[2]->setName('testName3');
+        $testIntelligenceType[2]->create();
+
+        // Get and check a single
+        $selectedSingle = IntelligenceType::select(array($testIntelligenceType[0]->getID()));
+
+        $this->assertTrue(\is_array($selectedSingle));
+        $this->assertEquals(1, \count($selectedSingle));
+        $this->assertInstanceOf(IntelligenceType::class, $selectedSingle[0]);
+        $this->assertEquals($testIntelligenceType[0]->getID(), $selectedSingle[0]->getID());
+        $this->assertEquals($testIntelligenceType[0]->getName(), $selectedSingle[0]->getName());
+
+        // Get and check multiple
+        $selectedMultiple = IntelligenceType::select(array($testIntelligenceType[1]->getID(), $testIntelligenceType[2]->getID()));
+
+        $this->assertTrue(\is_array($selectedMultiple));
+        $this->assertEquals(2, \count($selectedMultiple));
+        $this->assertInstanceOf(IntelligenceType::class, $selectedMultiple[0]);
+        $this->assertInstanceOf(IntelligenceType::class, $selectedMultiple[1]);
+
+        if($testIntelligenceType[1]->getID() == $selectedMultiple[0]->getID()) {
+            $i = 0;
+            $j = 1;
+        }
+        else {
+            $i = 1;
+            $j = 0;
+        }
+
+        $this->assertEquals($testIntelligenceType[1]->getID(), $selectedMultiple[$i]->getID());
+        $this->assertEquals($testIntelligenceType[1]->getName(), $selectedMultiple[$i]->getName());
+
+        $this->assertEquals($testIntelligenceType[2]->getID(), $selectedMultiple[$j]->getID());
+        $this->assertEquals($testIntelligenceType[2]->getName(), $selectedMultiple[$j]->getName());
+
+        // Clean up
+        foreach($testIntelligenceType as $intelligenceType) {
+            $intelligenceType->delete();
+        }
     }
 
     public function testSelectAll() {
-        //TODO: Implement
+        //Create a test intelligence type
+        $testIntelligenceType = [];
+        $testIntelligenceType[0] = new IntelligenceType();
+        $testIntelligenceType[0]->setName('testName');
+        $testIntelligenceType[0]->create();
+
+        $testIntelligenceType[1] = new IntelligenceType();
+        $testIntelligenceType[1]->setName('testName2');
+        $testIntelligenceType[1]->create();
+        // Get and check multiple
+        $selectedMultiple = IntelligenceType::select(array($testIntelligenceType[1]->getID(), $testIntelligenceType[2]->getID()));
+
+        $this->assertTrue(\is_array($selectedMultiple));
+        $this->assertEquals(2, \count($selectedMultiple));
+        $this->assertInstanceOf(IntelligenceType::class, $selectedMultiple[0]);
+        $this->assertInstanceOf(IntelligenceType::class, $selectedMultiple[1]);
+
+        if($testIntelligenceType[0]->getID() == $selectedMultiple[0]->getID()) {
+            $i = 0;
+            $j = 1;
+        }
+        else {
+            $i = 1;
+            $j = 0;
+        }
+
+        $this->assertEquals($testIntelligenceType[0]->getID(), $selectedMultiple[$i]->getID());
+        $this->assertEquals($testIntelligenceType[0]->getName(), $selectedMultiple[$i]->getName());
+
+        $this->assertEquals($testIntelligenceType[1]->getID(), $selectedMultiple[$j]->getID());
+        $this->assertEquals($testIntelligenceType[1]->getName(), $selectedMultiple[$j]->getName());
+
+        // Clean up
+        foreach($testIntelligenceType as $intelligenceType) {
+            $intelligenceType->delete();
+        }
     }
 
     public function testEql() {
-        //TODO: Implement
+        //Create a test intelligence type
+        $testIntelligenceType = [];
+        $testIntelligenceType[0] = new IntelligenceType();
+        $testIntelligenceType[0]->setName('testName');
+
+        $testIntelligenceType[1] = new IntelligenceType();
+        $testIntelligenceType[1]->setName('testName');
+
+        $testIntelligenceType[2] = new IntelligenceType();
+        $testIntelligenceType[2]->setName('testName2');
+
+        // Check same object is eql
+        $this->assertTrue($testIntelligenceType[0]->eql($testIntelligenceType[0]));
+
+        // Check same details are eql
+        $this->assertTrue($testIntelligenceType[0]->eql($testIntelligenceType[0]));
+
+        // Check different arent equal
+        $this->assertFalse($testIntelligenceType[0]->eql($testIntelligenceType[0]));
     }
 
 }
