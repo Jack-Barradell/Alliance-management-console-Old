@@ -9,10 +9,14 @@ require '../classes/Message.php';
 require '../classes/User.php';
 require '../classes/exceptions/BlankObjectException.php';
 
-use AMC\Classes\Message;
 use AMC\Classes\Database;
+use AMC\Classes\Group;
+use AMC\Classes\Message;
 use AMC\Classes\User;
+use AMC\Classes\UserMessage;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidGroupException;
+use AMC\Exceptions\InvalidUserException;
 use PHPUnit\Framework\TestCase;
 
 class MessageTest extends TestCase {
@@ -481,15 +485,223 @@ class MessageTest extends TestCase {
     }
 
     public function testSendToUser() {
-       //TODO: Implement
+        // Create a test sender
+        $testSender = new User();
+        $testSender->setUsername('testSender');
+        $testSender->create();
+
+        // Create a test receiver
+        $testReceiver = new User();
+        $testReceiver->setUsername('testReceiver');
+        $testReceiver->create();
+
+        // Build a test message
+        $testMessage = new Message();
+        $testMessage->setSenderID($testSender->getID());
+        $testMessage->setSubject('testTimestamp');
+        $testMessage->setBody('testBody');
+        $testMessage->setTimestamp(123);
+        $testMessage->setHideInSentBox(false);
+        $testMessage->sendToUser($testReceiver->getID());
+
+        // Now get and pull the user message
+        $userMessage = UserMessage::getByMessageID($testMessage->getID());
+
+        $this->assertTrue(\is_array($userMessage));
+        $this->assertEquals(1, \count($userMessage));
+        $this->assertInstanceOf(UserMessage::class, $userMessage[0]);
+        $this->assertEquals($testMessage->getID(), $userMessage[0]->getMessageID());
+        $this->assertEquals($testReceiver->getID(), $userMessage[0]->getUserID());
+        $this->assertFalse($userMessage[0]->getAcknowledged());
+
+        // Clean up
+        foreach($userMessage as $elem) {
+            $elem->delete();
+        }
+        $testMessage->delete();
+        $testReceiver->delete();
+        $testSender->delete();
     }
 
     public function testInvalidUserSendToUser() {
-        //TODO: Implement
+        // Create a test sender
+        $testSender = new User();
+        $testSender->setUsername('testSender');
+        $testSender->create();
+
+        // Now find the largest user id
+        $stmt = $this->_connection->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        $stmt->fetch();
+        $largestID = $userID;
+        $largestID++;
+
+        // Build the message
+        $testMessage = new Message();
+        $testMessage->setSenderID($testSender->getID());
+        $testMessage->setSubject('testSubject');
+        $testMessage->setBody('testBody');
+        $testMessage->setTimestamp(123);
+        $testMessage->setHideInSentBox(false);
+
+        // Set the expected exception
+        $this->expectException(InvalidUserException::class);
+
+        // Trigger it
+        try {
+            $testMessage->sendToUser($largestID);
+        } catch(InvalidUserException $e) {
+            $this->assertEquals('There is no user with id ' . $largestID, $e->getMessage());
+        } finally {
+            $testSender->delete();
+        }
+    }
+
+    public function testSendToGroup() {
+        // Create a test sender
+        $testSender = new User();
+        $testSender->setUsername('testSender');
+        $testSender->create();
+
+        // Create test group members
+        $testMembers = [];
+
+        $testMembers[0] = new User();
+        $testMembers[0]->setUsername('testMember');
+        $testMembers[0]->create();
+
+        $testMembers[1] = new User();
+        $testMembers[1]->setUsername('testMember2');
+        $testMembers[1]->create();
+
+        // Create a test group
+        $testGroup = new Group();
+        $testGroup->setName('testGroup');
+        $testGroup->setHidden(false);
+        $testGroup->create();
+
+        // Build the message
+        $testMessage = new Message();
+        $testMessage->setSenderID($testSender->getID());
+        $testMessage->setSubject('testSubject');
+        $testMessage->setBody('testBody');
+        $testMessage->setTimestamp(123);
+        $testMessage->setHideInSentBox(false);
+
+        // Add users to group
+        $testMembers[0]->addToGroup($testGroup->getID());
+        $testMembers[1]->addToGroup($testGroup->getID());
+
+        // Now check each user of the group has the message
+        $userMessages = UserMessage::getByMessageID($testMessage->getID());
+
+        $this->assertTrue(\is_array($userMessages));
+        $this->assertEquals(2, \count($userMessages));
+        $this->assertInstanceOf(UserMessage::class, $userMessages[0]);
+        $this->assertInstanceOf(UserMessage::class, $userMessages[1]);
+        $this->assertEquals($testMessage->getID(), $userMessages[0]->getMessageID());
+        $this->assertEquals($testMessage->getID(), $userMessages[1]->getMessageID());
+
+        if($testMembers[0]->getID() == $userMessages[0]->getID()) {
+            $i = 0;
+            $j = 1;
+        }
+        else {
+            $i = 1;
+            $j = 0;
+        }
+
+        $this->assertEquals($testMembers[0]->getID(), $userMessages[$i]->getUserID());
+        $this->assertEquals($testMembers[1]->getID(), $userMessages[$j]->getUserID());
+
+        foreach($userMessages as $userMessage) {
+            $userMessage->delete();
+        }
+        $testMessage->delete();
+        foreach($testMembers as $testMember) {
+            $testMember->removeFromGroup($testGroup->getID());
+            $testMember->delete();
+        }
+        $testSender->delete();
+        $testGroup->delete();
+    }
+
+    public function testInvalidGroupSendToGroup() {
+        // Create a test sender
+        $testSender = new User();
+        $testSender->setUsername('testSender');
+        $testSender->create();
+
+        // Now find the largest group id
+        $stmt = $this->_connection->prepare("SELECT `GroupID` FROM `Groups` ORDER BY `GroupID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($groupID);
+        $stmt->fetch();
+        $largestID = $groupID;
+        $largestID++;
+
+        // Build the message
+        $testMessage = new Message();
+        $testMessage->setSenderID($testSender->getID());
+        $testMessage->setSubject('testSubject');
+        $testMessage->setBody('testBody');
+        $testMessage->setTimestamp(123);
+        $testMessage->setHideInSentBox(false);
+
+        // Set expected exception
+        $this->expectException(InvalidGroupException::class);
+
+        // Trigger it
+        try {
+            $testMessage->sendToGroup($largestID);
+        } catch(InvalidGroupException $e) {
+            $this->assertEquals('There is no group with id ' . $largestID, $e->getMessage());
+        } finally {
+            $testSender->delete();
+        }
     }
 
     public function testDeleteFromSentBox() {
-        //TODO: Implement
+        // Create a test sender
+        $testSender = new User();
+        $testSender->setUsername('testSender');
+        $testSender->create();
+
+        // Build the message
+        $testMessage = new Message();
+        $testMessage->setSenderID($testSender->getID());
+        $testMessage->setSubject('testSubject');
+        $testMessage->setBody('testBody');
+        $testMessage->setTimestamp(123);
+        $testMessage->setHideInSentBox(false);
+        $testMessage->commit();
+
+        // Run the method
+        $testMessage->deleteFromSentBox();
+
+        // Check it
+        $this->assertTrue($testMessage->getHideInSentBox());
+
+        $stmt = $this->_connection->prepare("SELECT `HideInSentBox` FROM `Messages` WHERE `MessageID`=?");
+        $stmt->bind_param('i', $testMessage->getID());
+        $stmt->execute();
+        $stmt->bind_result($hideInSentBox);
+        $stmt->fetch();
+
+        if($hideInSentBox == 1) {
+            $hideInSentBox = true;
+        }
+        else {
+            $hideInSentBox = false;
+        }
+
+        $this->assertTrue($hideInSentBox);
+        $stmt->close();
+
+        // Clean up
+        $testMessage->delete();
+        $testSender->delete();
     }
 
 }

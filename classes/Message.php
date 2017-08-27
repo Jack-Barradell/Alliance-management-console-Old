@@ -2,6 +2,7 @@
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidGroupException;
 use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\QueryStatementException;
 
@@ -87,8 +88,11 @@ class Message implements DataObject {
 
     // Join table managers
 
-    public function sendToUser($userID) {
+    public function sendToUser($userID, $commit = true) {
         if(User::userExists($userID)) {
+            if($commit) {
+                $this->commit();
+            }
             $userMessage = new UserMessage();
             $userMessage->setUserID($userID);
             $userMessage->setMessageID($this->_id);
@@ -97,6 +101,19 @@ class Message implements DataObject {
         }
         else {
             throw new InvalidUserException('There is no user with id ' . $userID);
+        }
+    }
+
+    public function sendToGroup($groupID) {
+        if(Group::groupExists($groupID)) {
+            $this->commit();
+            $userGroups = UserGroup::getByGroupID($groupID);
+            foreach($userGroups as $userGroup) {
+                $this->sendToUser($userGroup->getUserID(), false);
+            }
+        }
+        else {
+            throw new InvalidGroupException('There is no group with id ' . $groupID);
         }
     }
 
