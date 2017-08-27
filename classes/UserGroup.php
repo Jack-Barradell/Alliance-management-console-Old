@@ -24,7 +24,7 @@ class UserGroup implements DataObject {
 
     public function create() {
         if($this->eql(new UserGroup())) {
-            throw new BlankObjectException("Cannot store a blank user group");
+            throw new BlankObjectException('Cannot store a blank User Group.');
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `User_Groups` (`UserID`,`GroupID`,`UserGroupAdmin`) VALUES (?,?,?)")) {
@@ -33,14 +33,14 @@ class UserGroup implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
 
     public function update() {
         if($this->eql(new UserGroup())) {
-            throw new BlankObjectException("Cannot store a blank user group");
+            throw new BlankObjectException('Cannot store a blank User Group.');
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `User_Groups` SET `UserID`=?,`GroupID`=?,`UserGroupAdmin`=? WHERE `UserGroupID`=?")) {
@@ -49,7 +49,7 @@ class UserGroup implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
@@ -62,7 +62,7 @@ class UserGroup implements DataObject {
             $this->_id = null;
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -152,7 +152,7 @@ class UserGroup implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else if(\is_array($id) && \count($id) == 0) {
@@ -177,7 +177,7 @@ class UserGroup implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else {
@@ -203,7 +203,7 @@ class UserGroup implements DataObject {
             }
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -225,7 +225,7 @@ class UserGroup implements DataObject {
             }
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 

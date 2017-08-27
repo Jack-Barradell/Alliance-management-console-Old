@@ -26,7 +26,7 @@ class Warning implements DataObject {
 
     public function create() {
         if($this->eql(new Warning())) {
-            throw new BlankObjectException("Cannot store a blank warning");
+            throw new BlankObjectException('Cannot store a blank Warning.');
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Warnings`(`UserID`,`AdminID`,`WarningReason`,`WarningTimestamp`) VALUES (?,?,?,?)")) {
@@ -35,14 +35,14 @@ class Warning implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
 
     public function update() {
         if($this->eql(new Warning())) {
-            throw new BlankObjectException("Cannot store a blank warning");
+            throw new BlankObjectException('Cannot store a blank Warning.');
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `Warnings` SET `UserID`=?,`AdminID`=?,`WarningReason`=?,`WarningTimestamp`=? WHERE `WarningID`=?")) {
@@ -51,7 +51,7 @@ class Warning implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
@@ -64,7 +64,7 @@ class Warning implements DataObject {
             $this->_id = null;
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -163,7 +163,7 @@ class Warning implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else if(\is_array($id) && \count($id) == 0) {
@@ -189,7 +189,7 @@ class Warning implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else {
@@ -214,7 +214,7 @@ class Warning implements DataObject {
             }
         }
         else {
-            throw new QueryStatementException('Failed to bind query');
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -235,7 +235,7 @@ class Warning implements DataObject {
             }
         }
         else {
-            throw new QueryStatementException('Failed to bind query');
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 

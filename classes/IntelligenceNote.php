@@ -26,6 +26,9 @@ class IntelligenceNote implements DataObject {
 
     public function create() {
         if($this->eql(new IntelligenceNote())) {
+            throw new BlankObjectException('Cannot store a blank Intelligence Note.');
+        }
+        else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Intelligence_Notes`(`IntelligenceID`,`UserID`,`IntelligenceNoteBody`,`IntelligenceNoteTimestamp`) VALUES (?,?,?,?)")) {
                 $stmt->bind_param('iisi', $this->_intelligenceID, $this->_userID, $this->_body, $this->_timestamp);
                 $stmt->execute();
@@ -35,13 +38,13 @@ class IntelligenceNote implements DataObject {
                 throw new QueryStatementException('Failed to bind query.');
             }
         }
-        else {
-            throw new BlankObjectException('Cannot store a blank Intelligence Note.');
-        }
     }
 
     public function update() {
         if($this->eql(new IntelligenceNote())) {
+            throw new BlankObjectException('Cannot store a blank Intelligence Note.');
+        }
+        else {
             if($stmt = $this->_connection->prepare("UPDATE `Intelligence_Notes` SET `IntelligenceID`=?,`UserID`=?,`IntelligenceNoteBody`=?,`IntelligenceNoteTimestamp`=? WHERE `IntelligenceNoteID`=?")) {
                 $stmt->bind_param('iisii', $this->_intelligenceID, $this->_userID, $this->_body, $this->_timestamp, $this->_id);
                 $stmt->execute();
@@ -50,9 +53,6 @@ class IntelligenceNote implements DataObject {
             else {
                 throw new QueryStatementException('Failed to bind query.');
             }
-        }
-        else {
-            throw new BlankObjectException('Cannot store a blank Intelligence Note.');
         }
     }
 

@@ -131,7 +131,11 @@ class UserTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $user->create();
+        try {
+            $user->create();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store blank User.', $e->getMessage());
+        }
     }
 
     public function testUpdate() {
@@ -225,7 +229,11 @@ class UserTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $user->update();
+        try {
+            $user->update();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store blank User.', $e->getMessage());
+        }
     }
 
     public function testDelete() {
@@ -506,127 +514,127 @@ class UserTest extends TestCase {
     }
 
     public function testBan() {
-
+        //TODO: Implement
     }
 
     public function testIncorrectTypeBan() {
-
+        //TODO: Implement
     }
 
     public function testInvalidUserBan() {
-
+        //TODO: Implement
     }
 
     public function testUnban() {
-
+        //TODO: Implement
     }
 
     public function testNullGetUnban() {
-
+        //TODO: Implement
     }
 
     public function testInvalidUserUnban() {
-
+        //TODO: Implement
     }
 
     public function testMissingPrerequisiteUnban() {
-
+        //TODO: Implement
     }
 
     public function testChangePassword() {
-
+        //TODO: Implement
     }
 
     public function testUserExists() {
-
+        //TODO: Implement
     }
 
     public function testIncorrectTypeUserExists() {
-
+        //TODO: Implement
     }
 
     public function testEmailExists() {
-
+        //TODO: Implement
     }
 
     public function testIncorrectTypeEmailExists() {
-
+        //TODO: Implement
     }
 
     public function testRegisterAccount() {
-
+        //TODO: Implement
     }
 
     public function testIncorrectTypeRegisterAccount() {
-
+        //TODO: Implement
     }
 
     public function testDuplicateEntryRegisterAccount() {
-
+        //TODO: Implement
     }
 
     public function testLogin() {
-
+        //TODO: Implement
     }
 
     public function testHasUserPrivilege() {
-
+        //TODO: Implement
     }
 
     public function testHasPrivilege() {
-
+        //TODO: Implement
     }
 
     public function testAddToGroup() {
-
+        //TODO: Implement
     }
 
     public function testRemoveFromGroup() {
-
+        //TODO: Implement
     }
 
     public function testIsInGroup() {
-
+        //TODO: Implement
     }
 
     public function testGetGroups() {
-
+        //TODO: Implement
     }
 
     public function testIssuePrivilege() {
-
+        //TODO: Implement
     }
 
     public function testRevokePrivilege() {
-
+        //TODO: Implement
     }
 
     public function testGetPrivileges() {
-
+        //TODO: Implement
     }
 
     public function testIssueRank() {
-
+        //TODO: Implement
     }
 
     public function testDuplicateEntryIssueRank() {
-
+        //TODO: Implement
     }
 
     public function testRevokeRank() {
-
+        //TODO: Implement
     }
 
     public function testMissingPrerequisiteRevokeRank() {
-
+        //TODO: Implement
     }
 
     public function testHasRank() {
-
+        //TODO: Implement
     }
 
     public function testGetRanks() {
-
+        //TODO: Implement
     }
 
 }

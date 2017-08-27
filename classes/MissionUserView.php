@@ -22,7 +22,7 @@ class MissionUserView implements DataObject {
 
     public function create() {
         if($this->eql(new MissionUserView())) {
-            throw new BlankObjectException("Cannot store a blank mission user view");
+            throw new BlankObjectException('Cannot store a blank Mission User View.');
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Mission_User_Views` (`UserID`,`MissionID`) VALUES (?,?)")) {
@@ -31,14 +31,14 @@ class MissionUserView implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
 
     public function update() {
         if($this->eql(new MissionUserView())) {
-            throw new BlankObjectException("Cannot store a blank mission user view");
+            throw new BlankObjectException('Cannot store a blank Mission User View.');
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `Mission_User_Views` SET `UserID`=?,`MissionID`=? WHERE `MissionUserViewID`=?")) {
@@ -47,7 +47,7 @@ class MissionUserView implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
@@ -60,7 +60,7 @@ class MissionUserView implements DataObject {
             $this->_id = null;
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -141,7 +141,7 @@ class MissionUserView implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else if(\is_array($id) && \count($id) == 0) {
@@ -165,7 +165,7 @@ class MissionUserView implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else {
@@ -190,7 +190,7 @@ class MissionUserView implements DataObject {
             }
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -211,7 +211,7 @@ class MissionUserView implements DataObject {
             }
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 

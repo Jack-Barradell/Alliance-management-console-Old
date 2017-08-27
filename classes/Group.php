@@ -26,7 +26,7 @@ class Group implements DataObject {
 
     public function create() {
         if($this->eql(new Group())) {
-            throw new BlankObjectException("Cannot store a blank group");
+            throw new BlankObjectException('Cannot store a blank Group.');
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Groups` (`GroupName`,`GroupHidden`) VALUES (?,?)")) {
@@ -35,14 +35,14 @@ class Group implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
 
     public function update() {
         if($this->eql(new Group())) {
-            throw new BlankObjectException("Cannot store a blank group");
+            throw new BlankObjectException('Cannot store a blank Group.');
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `Groups` SET `GroupName`=?,`GroupHidden`=? WHERE `GroupID`=?")) {
@@ -51,7 +51,7 @@ class Group implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
@@ -64,7 +64,7 @@ class Group implements DataObject {
             $this->_id = null;
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -114,7 +114,7 @@ class Group implements DataObject {
     public function hasGroupPrivilege($privilegeName) {
         $privilegeArray = Privilege::getByName($privilegeName);
         if(\is_null($privilegeArray)) {
-            throw new NullGetException("No privilege found with name " . $privilegeName);
+            throw new NullGetException('No privilege found with name ' . $privilegeName);
         }
         else {
             $privID = $privilegeArray[0]->getPrivilegeID();
@@ -205,7 +205,7 @@ class Group implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else if(\is_array($id) && \count($id) == 0){
@@ -229,7 +229,7 @@ class Group implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else {
@@ -258,7 +258,7 @@ class Group implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException('Failed to bind query');
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else if(\is_string($groupNameOrID)) {
@@ -281,7 +281,7 @@ class Group implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException('Failed to bind query');
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else {

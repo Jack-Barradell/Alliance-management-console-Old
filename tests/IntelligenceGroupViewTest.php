@@ -91,7 +91,11 @@ class IntelligenceGroupViewTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $testIntelligenceGroupView->create();
+        try {
+            $testIntelligenceGroupView->create();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Intelligence Group View.', $e->getMessage());
+        }
     }
 
     public function testUpdate() {
@@ -159,7 +163,11 @@ class IntelligenceGroupViewTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $testIntelligenceGroupView->update();
+        try {
+            $testIntelligenceGroupView->update();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Intelligence Group View.', $e->getMessage());
+        }
     }
 
     public function testDelete() {

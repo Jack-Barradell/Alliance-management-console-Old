@@ -76,7 +76,11 @@ class PrivilegeTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $privilege->create();
+        try {
+            $privilege->create();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Privilege.', $e->getMessage());
+        }
     }
 
     public function testUpdate() {
@@ -117,7 +121,11 @@ class PrivilegeTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $privilege->update();
+        try {
+            $privilege->update();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Privilege.', $e->getMessage());
+        }
     }
 
     public function testDelete() {

@@ -96,7 +96,11 @@ class MissionUserViewTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $missionUserView->create();
+        try {
+            $missionUserView->create();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Mission User View.', $e->getMessage());
+        }
     }
 
     public function testUpdate() {
@@ -166,7 +170,11 @@ class MissionUserViewTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $missionUserView->update();
+        try {
+            $missionUserView->update();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Mission User View.', $e->getMessage());
+        }
     }
 
     public function testDelete() {

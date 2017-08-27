@@ -106,7 +106,11 @@ class MeritTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $merit->create();
+        try {
+            $merit->create();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Merit.', $e->getMessage());
+        }
     }
 
     public function testUpdate() {
@@ -185,7 +189,11 @@ class MeritTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $merit->update();
+        try {
+            $merit->update();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Merit.', $e->getMessage());
+        }
     }
 
     public function testDelete() {

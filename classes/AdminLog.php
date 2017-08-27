@@ -24,7 +24,7 @@ class AdminLog implements DataObject {
 
     public function create() {
         if($this->eql(new AdminLog())) {
-            throw new BlankObjectException("Cannot store a blank admin log");
+            throw new BlankObjectException('Cannot store a blank Admin Log.');
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Admin_Log` (`AdminID`,`AdminLogEvent`,`AdminLogTimestamp`) VALUES (?,?,?)")) {
@@ -33,14 +33,14 @@ class AdminLog implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
 
     public function update() {
         if($this->eql(new AdminLog())) {
-            throw new BlankObjectException("Cannot store a blank admin log");
+            throw new BlankObjectException('Cannot store a blank Admin Log.');
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `Admin_Log` SET `AdminID`=?,`AdmingLogEvent`=?,`AdminLogTimestamp`=? WHERE `AdminLogID`=?")) {
@@ -49,7 +49,7 @@ class AdminLog implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
@@ -62,7 +62,7 @@ class AdminLog implements DataObject {
             $this->_id = null;
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -152,7 +152,7 @@ class AdminLog implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else if(\is_array($id) && \count($id) == 0 ) {
@@ -177,7 +177,7 @@ class AdminLog implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else {
@@ -203,7 +203,7 @@ class AdminLog implements DataObject {
             }
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 

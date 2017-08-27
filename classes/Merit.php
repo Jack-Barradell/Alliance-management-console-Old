@@ -28,7 +28,7 @@ class Merit implements DataObject {
 
     public function create() {
         if($this->eql(new Merit())) {
-            throw new BlankObjectException("Cannot store a blank merit");
+            throw new BlankObjectException('Cannot store a blank Merit.');
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Merits` (`UserID`,`AdminID`,`MeritValue`,`MeritReason`,`MeritTimestamp`) VALUES (?,?,?,?,?)")) {
@@ -37,14 +37,14 @@ class Merit implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
 
     public function update() {
         if($this->eql(new Merit())) {
-            throw new BlankObjectException("Cannot store a blank merit");
+            throw new BlankObjectException('Cannot store a blank Merit.');
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `Merits` SET `UserID`=?,`AdminID`=?,`MeritValue`=?,`MeritReason`=?,`MeritTimestamp`=? WHERE `MeritID`=? ")) {
@@ -53,7 +53,7 @@ class Merit implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
 
@@ -68,7 +68,7 @@ class Merit implements DataObject {
             $this->_id = null;
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -176,7 +176,7 @@ class Merit implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else if(\is_array($id) && \count($id) == 0) {
@@ -203,7 +203,7 @@ class Merit implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else {
@@ -230,7 +230,7 @@ class Merit implements DataObject {
 
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -253,7 +253,7 @@ class Merit implements DataObject {
 
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 }

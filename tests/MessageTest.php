@@ -108,7 +108,11 @@ class MessageTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $message->create();
+        try {
+            $message->create();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Message.', $e->getMessage());
+        }
     }
 
     public function testUpdate() {
@@ -182,7 +186,11 @@ class MessageTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $message->update();
+        try {
+            $message->update();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Message.', $e->getMessage());
+        }
     }
 
     public function testDelete() {

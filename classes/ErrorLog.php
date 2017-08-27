@@ -26,7 +26,7 @@ class ErrorLog implements DataObject {
 
     public function create() {
         if($this->eql(new ErrorLog())) {
-            throw new BlankObjectException("Cannot store a blank ErrorLog");
+            throw new BlankObjectException('Cannot store a blank Error Log.');
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Error_Log` (`ErrorLogType`,`ErrorLogMessage`,`ErrorLogSystemError`,`ErrorLogTimestamp`) VALUES (?,?,?,?)")) {
@@ -35,14 +35,14 @@ class ErrorLog implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
 
     public function update() {
         if($this->eql(new ErrorLog())) {
-            throw new BlankObjectException("Cannot store a blank ErrorLog");
+            throw new BlankObjectException('Cannot store a blank Error Log.');
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `Error_Log` SET `ErrorLogType`=?,`ErrorLogMessage`=?,`ErrorLogSystemError`=?,`ErrorLogTimestamp`=? WHERE `ErrorLogID`=?")) {
@@ -51,7 +51,7 @@ class ErrorLog implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
@@ -64,7 +64,7 @@ class ErrorLog implements DataObject {
             $this->_id = null;
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -163,7 +163,7 @@ class ErrorLog implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else if(\is_array($id) && \count($id) == 0) {
@@ -189,7 +189,7 @@ class ErrorLog implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else {

@@ -93,7 +93,11 @@ class GroupTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger the exception
-        $group->create();
+        try {
+            $group->create();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Group.', $e->getMessage());
+        }
     }
 
     public function testUpdate() {
@@ -144,7 +148,11 @@ class GroupTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger the exception
-        $group->update();
+        try {
+            $group->update();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Group.', $e->getMessage());
+        }
     }
 
     public function testDelete() {
@@ -330,7 +338,8 @@ class GroupTest extends TestCase {
         $testPrivilege->delete();
     }
 
-    public function testDuplicatedEntryIssuePrivilege() {// Create a test privilege
+    public function testDuplicatedEntryIssuePrivilege() {
+        // Create a test privilege
         $testPrivilege = new Privilege();
         $testPrivilege->setName('testPriv');
         $testPrivilege->commit();
@@ -347,12 +356,16 @@ class GroupTest extends TestCase {
         $this->expectException(DuplicateEntryException::class);
 
         // Trigger the exception
-        $testGroup->issuePrivilege($testPrivilege->getID());
-
-        // Clean up
-        $testGroup->revokePrivilege($testPrivilege->getID());
-        $testGroup->delete();
-        $testPrivilege->delete();
+        try {
+            $testGroup->issuePrivilege($testPrivilege->getID());
+        } catch(DuplicateEntryException $e) {
+            $this->assertEquals('Group with id ' . $testGroup->getID(). ' was issued privilege with id ' . $testPrivilege->getID() . ' but they already have it.', $e->getMessage());
+        } finally {
+            // Clean up
+            $testGroup->revokePrivilege($testPrivilege->getID());
+            $testGroup->delete();
+            $testPrivilege->delete();
+        }
     }
 
     public function testRevokePrivilege() {
@@ -397,11 +410,15 @@ class GroupTest extends TestCase {
         $this->expectException(MissingPrerequisiteException::class);
 
         // Trigger it
-        $testGroup->revokePrivilege($testPrivilege->getID());
-
-        // Clean up
-        $testGroup->delete();
-        $testPrivilege->delete();
+        try {
+            $testGroup->revokePrivilege($testPrivilege->getID());
+        } catch(MissingPrerequisiteException $e) {
+            $this->assertEquals('Tried to remove privilege with id ' . $testPrivilege->getID() . ' from group with id ' . $testGroup->getID() . ' but they did not have it.', $e->getMessage());
+        } finally {
+            // Clean up
+            $testGroup->delete();
+            $testPrivilege->delete();
+        }
     }
 
     public function testHasGroupPrivilege() {
@@ -481,10 +498,14 @@ class GroupTest extends TestCase {
         $stmt->close();
 
         // Trigger it
-        $testGroup->hasGroupPrivilege($privID + 1);
-
-        // Clean up
-        $testGroup->delete();
+        try {
+            $testGroup->hasGroupPrivilege($privID + 1);
+        } catch(NullGetException $e) {
+            $this->assertEquals('No privilege found with name ' . ($priv + 1), $e->getMessage());
+        } finally {
+            // Clean up
+            $testGroup->delete();
+        }
     }
 
     public function testGetPrivileges() {
@@ -586,9 +607,17 @@ class GroupTest extends TestCase {
         $this->expectException(IncorrectTypeException::class);
 
         // Trigger it
-        Group::groupExists(false);
-        Group::groupExists(array());
-        Group::groupExists(new Privilege());
+        try {
+            Group::groupExists(false);
+        } catch(IncorrectTypeException $e) {}
+
+        try {
+            Group::groupExists(array());
+        } catch(IncorrectTypeException $e) {}
+
+        try {
+            Group::groupExists(new Privilege());
+        } catch(IncorrectTypeException $e) {}
     }
 
 }

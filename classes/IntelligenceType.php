@@ -20,7 +20,7 @@ class IntelligenceType implements DataObject {
 
     public function create() {
         if($this->eql(new IntelligenceType())) {
-            throw new BlankObjectException('Cannot store a blank Intelligence type.');
+            throw new BlankObjectException('Cannot store a blank Intelligence Type.');
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Intelligence_Types`(`IntelligenceTypeName`) VALUES (?)")) {
@@ -45,7 +45,7 @@ class IntelligenceType implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException('Failed to bind query');
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }

@@ -24,7 +24,7 @@ class Award implements DataObject {
 
     public function create() {
         if($this->eql(new Award())) {
-            throw new BlankObjectException("Cannot store a blank award");
+            throw new BlankObjectException('Cannot store a blank Award.');
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Awards`(`AwardName`,`AwardDescription`,`AwardBadge`) VALUES (?,?,?)")) {
@@ -33,14 +33,14 @@ class Award implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
 
     public function update() {
         if($this->eql(new Award())) {
-            throw new BlankObjectException("Cannot store a blank object");
+            throw new BlankObjectException('Cannot store a blank Award.');
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `Awards` SET `AwardName`=?,`AwardDescription`=?,`AwardBadge`=? WHERE `AwardID`=?")) {
@@ -49,7 +49,7 @@ class Award implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
@@ -62,7 +62,7 @@ class Award implements DataObject {
             $this->_id = null;
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -152,7 +152,7 @@ class Award implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else if(\is_array($id) && \count($id) == 0) {
@@ -177,7 +177,7 @@ class Award implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else {

@@ -84,7 +84,11 @@ class RankTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $rank->create();
+        try {
+            $rank->create();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Rank.', $e->getMessage());
+        }
     }
 
     public function testUpdate() {
@@ -131,7 +135,11 @@ class RankTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $rank->update();
+        try {
+            $rank->update();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Rank.', $e->getMessage());
+        }
     }
 
     public function testDelete() {

@@ -22,7 +22,7 @@ class UserPrivilege implements DataObject {
 
     public function create() {
         if($this->eql(new UserPrivilege())) {
-            throw new BlankObjectException("Cannot store a blank user privilege");
+            throw new BlankObjectException('Cannot store a blank User Privilege.');
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `User_Privileges` (`UserID`,`PrivilegeID`) VALUES (?,?)")) {
@@ -31,14 +31,14 @@ class UserPrivilege implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
 
     public function update() {
         if($this->eql(new UserPrivilege())) {
-            throw new BlankObjectException("Cannot store a blank user privilege");
+            throw new BlankObjectException('Cannot store a blank User Privilege.');
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `User_Privileges` SET `UserID`=?,`PrivilegeID`=? WHERE `UserPrivilegeID`=?")) {
@@ -47,7 +47,7 @@ class UserPrivilege implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
@@ -60,7 +60,7 @@ class UserPrivilege implements DataObject {
             $this->_id = null;
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -141,7 +141,7 @@ class UserPrivilege implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else if(\is_array($id) && \count($id) == 0) {
@@ -165,7 +165,7 @@ class UserPrivilege implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else {
@@ -191,7 +191,7 @@ class UserPrivilege implements DataObject {
             }
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -213,7 +213,7 @@ class UserPrivilege implements DataObject {
             }
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 

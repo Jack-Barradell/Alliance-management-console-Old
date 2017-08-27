@@ -22,7 +22,7 @@ class UserRank implements DataObject {
 
     public function create() {
         if($this->eql(new UserRank())) {
-            throw new BlankObjectException("Cannot store a blank user rank");
+            throw new BlankObjectException('Cannot store a blank User Rank.');
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `User_Ranks` (`UserID`,`RankID`) VALUES (?,?)")) {
@@ -31,14 +31,14 @@ class UserRank implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
 
     public function update() {
         if($this->eql(new UserRank())) {
-            throw new BlankObjectException("Cannot store a blank user rank");
+            throw new BlankObjectException('Cannot store a blank User Rank.');
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `User_Ranks` SET `UserID`=?,`RankID`=? WHERE `UserRankID`=?")) {
@@ -47,7 +47,7 @@ class UserRank implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
@@ -60,7 +60,7 @@ class UserRank implements DataObject {
             $this->_id = null;
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -141,7 +141,7 @@ class UserRank implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else if(\is_array($id) && \count($id) == 0) {
@@ -165,7 +165,7 @@ class UserRank implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else {
@@ -191,7 +191,7 @@ class UserRank implements DataObject {
             }
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -213,7 +213,7 @@ class UserRank implements DataObject {
             }
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 

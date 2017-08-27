@@ -104,7 +104,11 @@ class MissionNoteTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $missionNote->create();
+        try {
+            $missionNote->create();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Mission Note.', $e->getMessage());
+        }
     }
 
     public function testUpdate() {
@@ -180,7 +184,11 @@ class MissionNoteTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $missionNote->update();
+        try {
+            $missionNote->update();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Mission Note.', $e->getMessage());
+        }
     }
 
     public function testDelete() {

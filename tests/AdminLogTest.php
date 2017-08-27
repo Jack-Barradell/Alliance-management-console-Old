@@ -89,13 +89,18 @@ class AdminLogTest extends TestCase {
     public function testBlankCreate() {
 
         // Create admin log
-        $adminLog  = new AdminLog();
+        $adminLog = new AdminLog();
 
         // Set the expected exception
         $this->expectException(BlankObjectException::class);
 
         // Trigger exception
-        $adminLog->create();
+        try {
+            $adminLog->create();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Admin Log.', $e->getMessage());
+        }
+
     }
 
 
@@ -155,7 +160,11 @@ class AdminLogTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger exception
-        $adminLog->update();
+        try {
+            $adminLog->update();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Admin Log.', $e->getMessage());
+        }
     }
 
     public function testDelete() {

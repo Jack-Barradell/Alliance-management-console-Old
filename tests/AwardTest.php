@@ -85,7 +85,11 @@ class AwardTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Now trigger it
-        $award->create();
+        try {
+            $award->create();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Award.', $e->getMessage());
+        }
     }
 
     public function testUpdate() {
@@ -132,7 +136,11 @@ class AwardTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Now trigger it
-        $award->update();
+        try {
+            $award->update();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Award.', $e->getMessage());
+        }
     }
 
     public function testDelete() {

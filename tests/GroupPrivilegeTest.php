@@ -95,7 +95,11 @@ class GroupPrivilegeTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Now trigger the exception
-        $groupPriv->create();
+        try {
+            $groupPriv->create();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Group Privilege.', $e->getMessage());
+        }
     }
 
     public function testUpdate() {
@@ -166,7 +170,11 @@ class GroupPrivilegeTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Now trigger the exception
-        $groupPriv->update();
+        try {
+            $groupPriv->create();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Group Privilege.', $e->getMessage());
+        }
     }
 
     public function testDelete() {

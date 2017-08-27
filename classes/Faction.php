@@ -22,7 +22,7 @@ class Faction implements DataObject {
 
     public function create() {
         if($this->eql(new Faction())) {
-            throw new BlankObjectException("Cannot store blank faction");
+            throw new BlankObjectException('Cannot store blank Faction.');
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Factions` (`FactionTypeID`, `FactionName`) VALUES (?,?)")) {
@@ -31,14 +31,14 @@ class Faction implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
 
     public function update() {
         if($this->eql(new Faction())) {
-            throw new BlankObjectException("Cannot store blank faction");
+            throw new BlankObjectException('Cannot store blank Faction.');
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `Factions` SET `FactionTypeID`=?,`FactionName`=? WHERE `FactionID`=?")) {
@@ -47,7 +47,7 @@ class Faction implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
@@ -60,7 +60,7 @@ class Faction implements DataObject {
             $this->_id = null;
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -141,7 +141,7 @@ class Faction implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else if(\is_array($id) && \count($id) == 0) {
@@ -165,7 +165,7 @@ class Faction implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else {
@@ -191,7 +191,7 @@ class Faction implements DataObject {
             }
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 

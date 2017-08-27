@@ -24,7 +24,7 @@ class Rank implements DataObject {
 
     public function create() {
         if($this->eql(new Rank())) {
-            throw new BlankObjectException("Cannot store a blank rank");
+            throw new BlankObjectException('Cannot store a blank Rank.');
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Ranks`(`RankName`,`RankSalary`,`RankImage`) VALUES (?,?,?)")) {
@@ -33,14 +33,14 @@ class Rank implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
 
     public function update() {
         if($this->eql(new Rank())) {
-            throw new BlankObjectException("Cannot store a blank rank");
+            throw new BlankObjectException('Cannot store a blank Rank.');
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `Ranks` SET `RankName`=?,`RankSalary`=?,`RankImage`=? WHERE `RankID`=?")) {
@@ -49,7 +49,7 @@ class Rank implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
@@ -62,7 +62,7 @@ class Rank implements DataObject {
             $this->_id = null;
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -152,7 +152,7 @@ class Rank implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else if(\is_array($id) && \count($id) == 0) {
@@ -176,7 +176,7 @@ class Rank implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else {

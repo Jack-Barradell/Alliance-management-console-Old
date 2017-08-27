@@ -102,7 +102,11 @@ class IntelligenceNoteTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $testIntelligenceNote->create();
+        try {
+            $testIntelligenceNote->create();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Intelligence Note.', $e->getMessage());
+        }
     }
 
     public function testUpdate() {
@@ -181,7 +185,11 @@ class IntelligenceNoteTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $testIntelligenceNote->update();
+        try {
+            $testIntelligenceNote->create();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Intelligence Note.', $e->getMessage());
+        }
     }
 
     public function testDelete() {

@@ -29,6 +29,9 @@ class Intelligence implements DataObject {
 
     public function create() {
         if($this->eql(new Intelligence())) {
+            throw new BlankObjectException('Cannot store blank Intelligence.');
+        }
+        else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Intelligence`(`AuthorID`,`IntelligenceTypeID`,`IntelligenceSubject`,`IntelligenceBody`,`IntelligenceTimestamp`,`IntelligencePublic`) VALUES (?,?,?,?,?,?)")) {
                 $stmt->bind_param('iissii', $this->_authorID, $this->_intelligenceTypeID, $this->_subject, $this->_body, $this->_timestamp, Database::toNumeric($this->_public));
                 $stmt->execute();
@@ -38,13 +41,13 @@ class Intelligence implements DataObject {
                 throw new QueryStatementException('Failed to bind query.');
             }
         }
-        else {
-            throw new BlankObjectException('Cannot store blank Intelligence.');
-        }
     }
 
     public function update() {
         if($this->eql(new Intelligence())) {
+            throw new BlankObjectException('Cannot store blank Intelligence.');
+        }
+        else {
             if($stmt = $this->_connection->prepare("UPDATE `Intelligence` SET `AuthorID`=?,`IntelligenceTypeID`=?,`IntelligenceSubject`=?,`IntelligenceBody`=?,`IntelligenceTimestamp`=?,`IntelligencePublic`=? WHERE `IntelligenceID`=?")) {
                 $stmt->bind_param('iissiii', $this->_authorID, $this->_intelligenceTypeID, $this->_subject, $this->_body, $this->_timestamp, Database::toNumeric($this->_public), $this->_id);
                 $stmt->exeucte();
@@ -54,10 +57,6 @@ class Intelligence implements DataObject {
                 throw new QueryStatementException('Failed to bind query.');
             }
         }
-        else {
-            throw new BlankObjectException('Cannot store blank Intelligence.');
-        }
-
     }
 
     public function delete() {

@@ -74,7 +74,11 @@ class FactionTypeTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $factionType->create();
+        try {
+            $factionType->create();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store blank Faction Type.', $e->getMessage());
+        }
     }
 
     public function testUpdate() {
@@ -115,7 +119,11 @@ class FactionTypeTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $factionType->update();
+        try {
+            $factionType->update();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store blank Faction Type.', $e->getMessage());
+        }
     }
 
     public function testDelete() {

@@ -81,7 +81,11 @@ class NotificationTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $notification->create();
+        try {
+            $notification->create();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store blank Notification.', $e->getMessage());
+        }
     }
 
     public function testUpdate() {
@@ -126,7 +130,11 @@ class NotificationTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $notification->update();
+        try {
+            $notification->update();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store blank Notification.', $e->getMessage());
+        }
     }
 
     public function testDelete() {

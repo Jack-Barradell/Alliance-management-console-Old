@@ -26,7 +26,7 @@ class UserAward implements DataObject {
 
     public function create() {
         if($this->eql(new UserAward())) {
-            throw new BlankObjectException("Cannot store blank user award");
+            throw new BlankObjectException('Cannot store blank User Award.');
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `User_Awards`(`UserID`,`IssuerID`,`AwardID`,`UserAwardTimestamp`) VALUES (?,?,?,?)")) {
@@ -35,14 +35,14 @@ class UserAward implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
 
     public function update() {
         if($this->eql(new UserAward())) {
-            throw new BlankObjectException("Cannot store a blank user object");
+            throw new BlankObjectException('Cannot store blank User Award.');
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `User_Awards` SET `UserID`=?,`IssuerID`=?,`AwardID`=?,`UserAwardTimestamp`=? WHERE `UserAwardID`=?")) {
@@ -51,7 +51,7 @@ class UserAward implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
@@ -64,7 +64,7 @@ class UserAward implements DataObject {
             $this->_id = null;
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -163,7 +163,7 @@ class UserAward implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed tp bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else if(\is_array($id) && \count($id) == 0) {
@@ -189,7 +189,7 @@ class UserAward implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed tp bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else {
@@ -215,7 +215,7 @@ class UserAward implements DataObject {
             }
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -237,7 +237,7 @@ class UserAward implements DataObject {
             }
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -259,7 +259,7 @@ class UserAward implements DataObject {
             }
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 }

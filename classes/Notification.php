@@ -24,7 +24,7 @@ class Notification implements DataObject {
 
     public function create() {
         if($this->eql(new Notification())) {
-            throw new BlankObjectException("Cannot store blank notification");
+            throw new BlankObjectException('Cannot store blank Notification.');
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Notifications` (`NotificationBody`,`NotificationTimestamp`) VALUES (?,?)")) {
@@ -33,14 +33,14 @@ class Notification implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
 
     public function update() {
         if($this->eql(new Notification())) {
-            throw new BlankObjectException("Cannot store blank notification");
+            throw new BlankObjectException('Cannot store blank Notification.');
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `Notifications` SET `NotificationBody`=?,`NotificationTimestamp`=? WHERE `NotificationID`=?")) {
@@ -49,7 +49,7 @@ class Notification implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
@@ -62,7 +62,7 @@ class Notification implements DataObject {
             $this->_id = null;
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -98,7 +98,7 @@ class Notification implements DataObject {
     }
 
     public function issueToGroup($groupID) {
-        if(Group::groupExists($groupID, true)) {
+        if(Group::groupExists($groupID)) {
             // Commit the notification
             $this->commit();
 
@@ -176,7 +176,7 @@ class Notification implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else if(\is_array($id) && \count($id) == 0) {
@@ -200,7 +200,7 @@ class Notification implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else {

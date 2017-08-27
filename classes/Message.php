@@ -29,7 +29,7 @@ class Message implements DataObject {
 
     public function create() {
         if($this->eql(new Message())) {
-            throw new BlankObjectException("Cannot store a blank message");
+            throw new BlankObjectException('Cannot store a blank Message.');
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Messages`(`SenderID`,`MessageSubject`,`MessageBody`,`MessageTimestamp`,`MessageHideInSentBox`) VALUES (?,?,?,?,?)")) {
@@ -38,14 +38,14 @@ class Message implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
 
     public function update() {
         if($this->eql(new Message())) {
-            throw new BlankObjectException("Cannot store a blank message");
+            throw new BlankObjectException('Cannot store a blank Message.');
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `Messages` SET `SenderID`=?,`MessageSubject`=?,`MessageBody`=?,`MessageTimestamp`=?,`MessageHideInSentBox`=? WHERE `MessageID`=?")) {
@@ -54,7 +54,7 @@ class Message implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
@@ -67,7 +67,7 @@ class Message implements DataObject {
             $this->_id = null;
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -195,7 +195,7 @@ class Message implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else if(\is_array($id) && \count($id) == 0) {
@@ -222,7 +222,7 @@ class Message implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else {
@@ -247,7 +247,7 @@ class Message implements DataObject {
             }
         }
         else {
-            throw new QueryStatementException("Failed to bind  query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 

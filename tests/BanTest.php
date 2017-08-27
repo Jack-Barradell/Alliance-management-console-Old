@@ -114,7 +114,11 @@ class BanTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger the exception
-        $ban->create();
+        try {
+            $ban->create();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Ban.', $e->getMessage());
+        }
     }
 
     public function testUpdate() {
@@ -202,7 +206,11 @@ class BanTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger the exception
-        $ban->update();
+        try {
+            $ban->update();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Ban.', $e->getMessage());
+        }
     }
 
     public function testDelete() {

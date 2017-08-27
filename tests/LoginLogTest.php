@@ -98,7 +98,11 @@ class LoginLogTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $loginLog->create();
+        try {
+            $loginLog->create();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store blank Login Log.', $e->getMessage());
+        }
     }
 
     public function testUpdate() {
@@ -162,7 +166,11 @@ class LoginLogTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $loginLog->update();
+        try {
+            $loginLog->update();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store blank Login Log.', $e->getMessage());
+        }
     }
 
     public function testDelete() {

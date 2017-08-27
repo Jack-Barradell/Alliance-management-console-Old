@@ -95,7 +95,11 @@ class MissionGroupViewTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $missionGroupView->create();
+        try {
+            $missionGroupView->create();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Mission Group View.', $e->getMessage());
+        }
     }
 
     public function testUpdate() {
@@ -165,7 +169,11 @@ class MissionGroupViewTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $missionGroupView->update();
+        try {
+            $missionGroupView->update();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Mission Group View.', $e->getMessage());
+        }
     }
 
     public function testDelete() {

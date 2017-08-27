@@ -87,7 +87,11 @@ class ErrorLogTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $errorLog->create();
+        try {
+            $errorLog->create();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Error Log.', $e->getMessage());
+        }
     }
 
     public function testUpdate() {
@@ -136,7 +140,11 @@ class ErrorLogTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $errorLog->update();
+        try {
+            $errorLog->update();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Error Log.', $e->getMessage());
+        }
     }
 
     public function testDelete() {

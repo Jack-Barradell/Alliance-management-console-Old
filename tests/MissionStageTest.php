@@ -98,7 +98,11 @@ class MissionStageTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $missionStage->create();
+        try {
+            $missionStage->create();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Mission Stage.', $e->getMessage());
+        }
     }
 
     public function testUpdate() {
@@ -161,7 +165,11 @@ class MissionStageTest extends TestCase {
         $this->expectException(BlankObjectException::class);
 
         // Trigger it
-        $missionStage->update();
+        try {
+            $missionStage->update();
+        } catch(BlankObjectException $e) {
+            $this->assertEquals('Cannot store a blank Mission Stage.', $e->getMessage());
+        }
     }
 
     public function testDelete() {

@@ -26,7 +26,7 @@ class MissionStage implements DataObject {
 
     public function create() {
         if($this->eql(new MissionStage())) {
-            throw new BlankObjectException("Cannot store a blank mission stage");
+            throw new BlankObjectException('Cannot store a blank Mission Stage.');
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Mission_Stages` (`MissionID`,`MissionStageName`,`MissionStageBody`,`MissionStageStatus`) VALUES (?,?,?,?)")) {
@@ -35,14 +35,14 @@ class MissionStage implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
 
     public function update() {
         if($this->eql(new MissionStage())) {
-            throw new BlankObjectException("Cannot store a blank mission stage");
+            throw new BlankObjectException('Cannot store a blank Mission Stage.');
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `Mission_Stages` SET `MissionID`=?,`MissionStageName`=?,`MissionStageBody`=?,`MissionStageStatus`=? WHERE `MissionStageID`=?")) {
@@ -51,7 +51,7 @@ class MissionStage implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
@@ -64,7 +64,7 @@ class MissionStage implements DataObject {
             $this->_id = null;
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -163,7 +163,7 @@ class MissionStage implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else if(\is_array($id) && \count($id) == 0) {
@@ -189,7 +189,7 @@ class MissionStage implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else {
@@ -214,7 +214,7 @@ class MissionStage implements DataObject {
             }
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 

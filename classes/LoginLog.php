@@ -26,7 +26,7 @@ class LoginLog implements DataObject {
 
     public function create() {
         if($this->eql(new LoginLog())) {
-            throw new BlankObjectException('Cannot store blank login log');
+            throw new BlankObjectException('Cannot store blank Login Log.');
         }
         else {
             if($stmt = $this->_connection->prepare("INSERT INTO `Login_Log` (`UserID`,`LoginLogResult`,`LoginLogIP`,`LoginLogTimestamp`) VALUES (?,?,?,?)")) {
@@ -34,12 +34,15 @@ class LoginLog implements DataObject {
                 $stmt->execute();
                 $stmt->close();
             }
+            else {
+                throw new QueryStatementException('Failed to bind query.');
+            }
         }
     }
 
     public function update() {
         if($this->eql(new LoginLog())) {
-            throw new BlankObjectException('Object store blank login log');
+            throw new BlankObjectException('Cannot store blank Login Log.');
         }
         else {
             if($stmt = $this->_connection->prepare("UPDATE `Login_Log` SET `UserID`=?,`LoginLogResult`=?,`LoginLogIP`=?,`LoginLogTimestamp`=? WHERE `LoginLogID`=?")) {
@@ -48,7 +51,7 @@ class LoginLog implements DataObject {
                 $stmt->close();
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
     }
@@ -61,7 +64,7 @@ class LoginLog implements DataObject {
             $this->_id = null;
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -160,7 +163,7 @@ class LoginLog implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else if(\is_array($id) && \count($id) == 0) {
@@ -185,7 +188,7 @@ class LoginLog implements DataObject {
                 }
             }
             else {
-                throw new QueryStatementException("Failed to bind query");
+                throw new QueryStatementException('Failed to bind query.');
             }
         }
         else {
@@ -211,7 +214,7 @@ class LoginLog implements DataObject {
             }
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -233,7 +236,7 @@ class LoginLog implements DataObject {
             }
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -255,7 +258,7 @@ class LoginLog implements DataObject {
             }
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
@@ -277,7 +280,7 @@ class LoginLog implements DataObject {
             }
         }
         else {
-            throw new QueryStatementException("Failed to bind query");
+            throw new QueryStatementException('Failed to bind query.');
         }
     }
 
