@@ -8,9 +8,18 @@ require '../classes/Database.php';
 require '../classes/Mission.php';
 require '../classes/exceptions/BlankObjectException.php';
 
-use AMC\Classes\Mission;
 use AMC\Classes\Database;
+use AMC\Classes\Group;
+use AMC\Classes\Mission;
+use AMC\Classes\MissionGroupView;
+use AMC\Classes\MissionUserView;
+use AMC\Classes\User;
+use AMC\Classes\UserMission;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\DuplicateEntryException;
+use AMC\Exceptions\InvalidGroupException;
+use AMC\Exceptions\InvalidUserException;
+use AMC\Exceptions\MissingPrerequisiteException;
 use PHPUnit\Framework\TestCase;
 
 class MissionTest extends TestCase {
@@ -345,64 +354,691 @@ class MissionTest extends TestCase {
     }
 
     public function testIssueToUser() {
-        //TODO: Implement
+        // Create a test user
+        $testUser = new User();
+        $testUser->setUsername('testUser');
+        $testUser->create();
+
+        // Create a mission
+        $testMission = new Mission();
+        $testMission->setTitle('test');
+        $testMission->setDescription('testDesc');
+        $testMission->setStatus('Started');
+        $testMission->create();
+
+        // Issue it to the user
+        $testMission->issueToUser($testUser->getID());
+
+        // Check
+        $userMissions = UserMission::getByMissionID($testMission->getID());
+
+        $this->assertTrue(\is_array($userMissions));
+        $this->assertEquals(1, \count($userMissions));
+        $this->assertInternalType(UserMission::class, $userMissions[0]);
+        $this->assertEquals($testUser->getID(), $userMissions[0]->getUserID());
+        $this->assertEquals($testMission->getID(), $userMissions[0]->getMissionID());
+
+        // Clean up
+        foreach($userMissions as $userMission) {
+            $userMission->delete();
+        }
+        $testMission->delete();
+        $testUser->delete();
     }
 
     public function testDuplicateEntryIssueToUser() {
-        //TODO: Implement
+        // Create a test user
+        $testUser = new User();
+        $testUser->setUsername('testUser');
+        $testUser->create();
+
+        // Create a mission
+        $testMission = new Mission();
+        $testMission->setTitle('test');
+        $testMission->setDescription('testDesc');
+        $testMission->setStatus('Started');
+        $testMission->create();
+
+        // Issue it to the user
+        $testMission->issueToUser($testUser->getID());
+
+        // Set expected exception
+        $this->expectException(DuplicateEntryException::class);
+
+        // Trigger it
+        try {
+            $testMission->issueToUser($testUser->getID());
+        } catch(DuplicateEntryException $e) {
+            $this->assertEquals('Attempted to assign user with id ' . $testUser->getID() . ' to mission mission with id ' . $testMission->getID() . ' but they were already issued.', $e->getMessage());
+        } finally {
+            $testMission->removeFromUser($testUser->getID());
+            $testMission->delete();
+            $testUser->delete();
+        }
+    }
+
+    public function testInvalidUserIssueToUser() {
+        // Find the largest user id
+        $stmt = $this->_connection->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        $stmt->fetch();
+        $largestID = $userID;
+        $largestID++;
+
+        // Create a mission
+        $testMission = new Mission();
+        $testMission->setTitle('test');
+        $testMission->setDescription('testDesc');
+        $testMission->setStatus('Started');
+        $testMission->create();
+
+        // Set the expected exception
+        $this->expectException(InvalidUserException::class);
+
+        // Trigger it
+        try {
+            $testMission->issueToUser($largestID);
+        } catch(InvalidUserException $e) {
+            $this->assertEquals('There is no user with user id ' . $largestID, $e->getMessage());
+        } finally {
+            $testMission->delete();
+        }
     }
 
     public function testRemoveFromUser() {
-        //TODO: Implement
+        // Create a test user
+        $testUser = new User();
+        $testUser->setUsername('testUser');
+        $testUser->create();
+
+        // Create a mission
+        $testMission = new Mission();
+        $testMission->setTitle('test');
+        $testMission->setDescription('testDesc');
+        $testMission->setStatus('Started');
+        $testMission->create();
+
+        // Issue it to the user
+        $testMission->issueToUser($testUser->getID());
+
+        // Check the user has the mission
+        $this->assertTrue($testMission->userIsAssigned($testUser->getID()));
+
+        // Now remove them
+        $testMission->removeFromUser($testUser->getID());
+
+        // Check they are no longer on the mission
+        $this->assertFalse($testMission->userIsAssigned($testUser->getID()));
+
+        $userMissions = UserMission::getByMissionID($testMission->getID());
+        $this->assertNull($userMissions);
+
+        // Clean up
+        $testMission->delete();
+        $testUser->delete();
     }
 
     public function testMissingPrerequisiteRemoveFromUser() {
-        //TODO: Implement
+        // Create a test user
+        $testUser = new User();
+        $testUser->setUsername('testUser');
+        $testUser->create();
+
+        // Create a mission
+        $testMission = new Mission();
+        $testMission->setTitle('test');
+        $testMission->setDescription('testDesc');
+        $testMission->setStatus('Started');
+        $testMission->create();
+
+        // Set the expected exception
+        $this->expectException(MissingPrerequisiteException::class);
+
+        // Trigger it
+        try {
+            $testMission->removeFromUser($testUser->getID());
+        } catch(MissingPrerequisiteException $e) {
+            $this->assertEquals('Tried to unassign user with id ' . $testUser->delete() . ' from mission with id ' . $testMission->delete() . ' but they were not assigned.', $e->getMessage());
+        } finally {
+            $testMission->delete();
+            $testUser->delete();
+        }
     }
 
     public function testUserIsAssigned() {
-        //TODO: Implement
+        // Create a test user
+        $testUser = new User();
+        $testUser->setUsername('testUser');
+        $testUser->create();
+
+        // Create a mission
+        $testMission = [];
+        $testMission[0] = new Mission();
+        $testMission[0]->setTitle('test');
+        $testMission[0]->setDescription('testDesc');
+        $testMission[0]->setStatus('Started');
+        $testMission[0]->create();
+
+        $testMission[1] = new Mission();
+        $testMission[1]->setTitle('test2');
+        $testMission[1]->setDescription('testDesc2');
+        $testMission[1]->setStatus('Started2');
+        $testMission[1]->create();
+
+        // Check when no missions are assigned it returns false
+        $this->assertFalse($testMission[0]->userIsAssigned($testUser->getID()));
+        $this->assertFalse($testMission[1]->userIsAssigned($testUser->getID()));
+
+        // Issue one mission to the user
+        $testMission[0]->issueToUser($testUser->getID());
+
+        // Check mission 0 now returns true and mission 1 returns false
+        $this->assertTrue($testMission[0]->userIsAssigned($testUser->getID()));
+        $this->assertFalse($testMission[1]->userIsAssigned($testUser->getID()));
+
+        // Issue the other mission
+        $this->assertTrue($testMission[0]->userIsAssigned($testUser->getID()));
+        $this->assertTrue($testMission[1]->userIsAssigned($testUser->getID()));
+
+        // Clean up
+        foreach($testMission as $mission) {
+            $mission->delete();
+        }
+        $testUser->delete();
     }
 
     public function testShowToUser() {
-        //TODO: Implement
+        // Create a test user
+        $testUser = new User();
+        $testUser->setUsername('testUser');
+        $testUser->create();
+
+        // Create a mission
+        $testMission = new Mission();
+        $testMission->setTitle('test');
+        $testMission->setDescription('testDesc');
+        $testMission->setStatus('Started');
+        $testMission->create();
+
+        // Issue it to the user
+        $testMission->showToUser($testUser->getID());
+
+        // Check
+        $missionUserViews = MissionUserView::getByMissionID($testMission->getID());
+
+        $this->assertTrue(\is_array($missionUserViews));
+        $this->assertEquals(1, \count($missionUserViews));
+        $this->assertInstanceOf(MissionUserView::class, $missionUserViews[0]);
+        $this->assertEquals($testUser->getID(), $missionUserViews[0]->getUserID());
+        $this->assertEquals($testMission->getID(), $missionUserViews[0]->getMissionID());
+
+        foreach($missionUserViews as $missionUserView) {
+            $missionUserView->delete();
+        }
+        $testMission->delete();
+        $testUser->delete();
+    }
+
+    public function testDuplicateEntryShowToUser() {
+        // Create a test user
+        $testUser = new User();
+        $testUser->setUsername('testUser');
+        $testUser->create();
+
+        // Create a mission
+        $testMission = new Mission();
+        $testMission->setTitle('test');
+        $testMission->setDescription('testDesc');
+        $testMission->setStatus('Started');
+        $testMission->create();
+
+        // Show the mission
+        $testMission->showToUser($testUser->getID());
+
+        // Set expected exception
+        $this->expectException(DuplicateEntryException::class);
+
+        // Trigger it
+        try {
+            $testMission->showToUser($testUser->getID());
+        } catch(DuplicateEntryException $e) {
+            $this->assertEquals('User with id ' . $testUser->getID() . ' was given access to mission with id ' . $testMission->getID() . ' when they already had it.', $e->getMessage());
+        } finally {
+            $testMission->hideFromUser($testUser->getID());
+            $testMission->delete();
+            $testUser->delete();
+        }
+    }
+
+    public function testInvalidUserShowToUser() {
+        // Find the largest user id
+        $stmt = $this->_connection->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        $stmt->fetch();
+        $largestID = $userID;
+        $largestID++;
+
+        // Create a mission
+        $testMission = new Mission();
+        $testMission->setTitle('test');
+        $testMission->setDescription('testDesc');
+        $testMission->setStatus('Started');
+        $testMission->create();
+
+        // Set the expected exception
+        $this->expectException(InvalidUserException::class);
+
+        // Trigger it
+        try {
+            $testMission->showToUser($largestID);
+        } catch(InvalidUserException $e) {
+            $this->assertEquals('There is no user with user id ' . $largestID, $e->getMessage());
+        } finally {
+            $testMission->delete();
+        }
     }
 
     public function testHideFromUser() {
-        //TODO: Implement
+        // Create a test user
+        $testUser = new User();
+        $testUser->setUsername('testUser');
+        $testUser->create();
+
+        // Create a mission
+        $testMission = new Mission();
+        $testMission->setTitle('test');
+        $testMission->setDescription('testDesc');
+        $testMission->setStatus('Started');
+        $testMission->create();
+
+        // Issue it to the user
+        $testMission->showToUser($testUser->getID());
+
+        // Check user now has it
+        $this->assertTrue($testMission->userCanSee($testUser->getID()));
+
+        // Now revoke it
+        $testMission->hideFromUser($testUser->getID());
+
+        // Now pull to check
+        $missionUserView = MissionUserView::getByMissionID($testMission->getID());
+        $this->assertNull($missionUserView);
+
+        // Clean up
+        $testMission->delete();
+        $testUser->delete();
     }
 
     public function testMissingPrerequisiteHideFromUser() {
-        //TODO: Implement
+        // Create a test user
+        $testUser = new User();
+        $testUser->setUsername('testUser');
+        $testUser->create();
+
+        // Create a mission
+        $testMission = new Mission();
+        $testMission->setTitle('test');
+        $testMission->setDescription('testDesc');
+        $testMission->setStatus('Started');
+        $testMission->create();
+
+        // Set expected exception
+        $this->expectException(MissingPrerequisiteException::class);
+
+        // Trigger it
+        try {
+            $testMission->hideFromUser($testUser->getID());
+        } catch(MissingPrerequisiteException $e) {
+            $this->assertEquals('User with id ' . $testUser->getID() . ' was removed from the access list of mission with id ' . $testMission->getID() . ' but they did not have access.', $e->getMessage());
+        } finally {
+            $testMission->delete();
+            $testUser->delete();
+        }
     }
 
     public function testUserCanSee() {
-        //TODO: Implement
+        // Create a test user
+        $testUser = new User();
+        $testUser->setUsername('testUser');
+        $testUser->create();
+
+        // Create a mission
+        $testMission = [];
+        $testMission[0] = new Mission();
+        $testMission[0]->setTitle('test');
+        $testMission[0]->setDescription('testDesc');
+        $testMission[0]->setStatus('Started');
+        $testMission[0]->create();
+
+        $testMission[1] = new Mission();
+        $testMission[1]->setTitle('test2');
+        $testMission[1]->setDescription('testDesc2');
+        $testMission[1]->setStatus('Started2');
+        $testMission[1]->create();
+
+        $testMission[2] = new Mission();
+        $testMission[2]->setTitle('test3');
+        $testMission[2]->setDescription('testDesc3');
+        $testMission[2]->setStatus('Started3');
+        $testMission[2]->create();
+
+        // Check the user cannot see either mission (so has no visible missions)
+        $this->assertFalse($testMission[0]->userCanSee($testUser->getID()));
+        $this->assertFalse($testMission[1]->userCanSee($testUser->getID()));
+        $this->assertFalse($testMission[2]->userCanSee($testUser->getID()));
+
+        // Let the user see mission 0
+        $testMission[0]->showToUser($testUser->getID());
+
+        // Check user can see mission 0
+        $this->assertTrue($testMission[0]->userCanSee($testUser->getID()));
+        $this->assertFalse($testMission[1]->userCanSee($testUser->getID()));
+        $this->assertFalse($testMission[2]->userCanSee($testUser->getID()));
+
+        // Let user see mission 1
+        $testMission[1]->showToUser($testUser->getID());
+
+        // Check it can see 2 missions
+        $this->assertTrue($testMission[0]->userCanSee($testUser->getID()));
+        $this->assertTrue($testMission[1]->userCanSee($testUser->getID()));
+        $this->assertFalse($testMission[2]->userCanSee($testUser->getID()));
+
+        // Check a user assigned to a mission can see it
+        $testMission[2]->issueToUser($testUser->getID());
+
+        // Check user can see all missions
+        $this->assertTrue($testMission[0]->userCanSee($testUser->getID()));
+        $this->assertTrue($testMission[1]->userCanSee($testUser->getID()));
+        $this->assertTrue($testMission[2]->userCanSee($testUser->getID()));
+
+        // Clean up
+        $testMission[0]->hideFromUser($testUser->getID());
+        $testMission[1]->hideFromUser($testUser->getID());
+        $testMission[2]->removeFromUser($testUser->getID());
+        foreach($testMission as $mission) {
+            $mission->delete();
+        }
+        $testUser->delete();
     }
 
     public function testShowToGroup() {
-        //TODO: Implement
+        // Create a mission
+        $testMission = new Mission();
+        $testMission->setTitle('test');
+        $testMission->setDescription('testDesc');
+        $testMission->setStatus('Started');
+        $testMission->create();
+
+        // Create a test group
+        $testGroup = new Group();
+        $testGroup->setName('testGroup');
+        $testGroup->setHidden(false);
+        $testGroup->create();
+
+        // Give the group access
+        $testMission->showToGroup($testGroup->getID());
+
+        // Pull the mission group view
+        $missionGroupView = MissionGroupView::getByMissionID($testMission->getID());
+
+        // Check it
+        $this->assertTrue(\is_array($missionGroupView));
+        $this->assertEquals(1, \count($missionGroupView));
+        $this->assertInstanceOf(MissionGroupView::class, $missionGroupView[0]);
+        $this->assertEquals($testMission->getID(), $missionGroupView[0]->getMissionID());
+        $this->assertEquals($testGroup->getID(), $missionGroupView[0]->getGroupID());
+
+        // Clean up
+        $testMission->hideFromGroup($testGroup->getID());
+        $testGroup->delete();
+        $testMission->delete();
     }
 
     public function testDuplicateEntryShowToGroup() {
-        //TODO: Implement
+        // Create a mission
+        $testMission = new Mission();
+        $testMission->setTitle('test');
+        $testMission->setDescription('testDesc');
+        $testMission->setStatus('Started');
+        $testMission->create();
+
+        // Create a test group
+        $testGroup = new Group();
+        $testGroup->setName('testGroup');
+        $testGroup->setHidden(false);
+        $testGroup->create();
+
+        // Give the group access
+        $testMission->showToGroup($testGroup->getID());
+
+        // Set expected exception
+        $this->expectException(DuplicateEntryException::class);
+
+        // Trigger it
+        try {
+            $testMission->showToGroup($testGroup->getID());
+        } catch(DuplicateEntryException $e) {
+            $this->assertEquals('Group with id ' . $testGroup->getID() . ' was given access to mission with id ' . $testMission->getID() . ' but they are already had it.', $e->getMessage());
+        } finally {
+            $testMission->hideFromGroup($testGroup->getID());
+            $testGroup->delete();
+            $testMission->delete();
+        }
+    }
+
+    public function testInvalidGroupShowToGroup() {
+        // Find the largest group id
+        $stmt = $this->_connection->prepare("SELECT `GroupID` FROM `Group` ORDER BY `GroupID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($groupID);
+        $stmt->fetch();
+        $largestID = $groupID;
+        $largestID++;
+
+        // Create a mission
+        $testMission = new Mission();
+        $testMission->setTitle('test');
+        $testMission->setDescription('testDesc');
+        $testMission->setStatus('Started');
+        $testMission->create();
+
+        // Set expected exception
+        $this->expectException(InvalidGroupException::class);
+
+        // Trigger it
+        try {
+            $testMission->showToGroup($largestID);
+        } catch(InvalidGroupException $e) {
+            $this->assertEquals('There is no group with group id ' . $largestID, $e->getMessage());
+        } finally {
+            $testMission->delete();
+        }
     }
 
     public function testHideFromGroup() {
-        //TODO: Implement
+        // Create a test group
+        $testGroup = new Group();
+        $testGroup->setName('testGroup');
+        $testGroup->setHidden(false);
+        $testGroup->create();
+
+        // Create a mission
+        $testMission = new Mission();
+        $testMission->setTitle('test');
+        $testMission->setDescription('testDesc');
+        $testMission->setStatus('Started');
+        $testMission->create();
+
+        // Issue it the group
+        $testMission->showToGroup($testGroup->getID());
+
+        // Check group now has it
+        $this->assertTrue($testMission->groupCanSee($testGroup->getID()));
+
+        // Now revoke it
+        $testMission->hideFromGroup($testGroup->getID());
+
+        // Now pull and check
+        $missionGroupView = MissionGroupView::getByMissionID($testGroup->getID());
+        $this->assertNull($missionGroupView);
+
+        // Clean up
+        $testMission->delete();
+        $testGroup->delete();
     }
 
     public function testMissingPrerequisiteHideFromGroup() {
-        //TODO: Implement
+        // Create a test group
+        $testGroup = new Group();
+        $testGroup->setName('testGroup');
+        $testGroup->setHidden(false);
+        $testGroup->create();
+
+        // Create a mission
+        $testMission = new Mission();
+        $testMission->setTitle('test');
+        $testMission->setDescription('testDesc');
+        $testMission->setStatus('Started');
+        $testMission->create();
+
+        // Set the expected exception
+        $this->expectException(MissingPrerequisiteException::class);
+
+        // Trigger it
+        try {
+            $testMission->hideFromGroup($testGroup->getID());
+        } catch(MissingPrerequisiteException $e) {
+            $this->assertEquals('Group with id ' . $testGroup->getID() . ' was removed from the access list of mission with id ' . $testMission->getID() . ' but they did not have access.', $e->getMessage());
+        } finally {
+            $testMission->delete();
+            $testGroup->delete();
+        }
     }
 
     public function testGroupCanSee() {
-        //TODO: Implement
+        // Create a test group
+        $testGroup = new Group();
+        $testGroup->setName('testGroup');
+        $testGroup->setHidden(false);
+        $testGroup->create();
+
+        // Create a mission
+        $testMission = [];
+        $testMission[0] = new Mission();
+        $testMission[0]->setTitle('test');
+        $testMission[0]->setDescription('testDesc');
+        $testMission[0]->setStatus('Started');
+        $testMission[0]->create();
+
+        $testMission[1] = new Mission();
+        $testMission[1]->setTitle('test2');
+        $testMission[1]->setDescription('testDesc2');
+        $testMission[1]->setStatus('Started2');
+        $testMission[1]->create();
+
+        // Check the group cannot see either mission (so has no visible missions)
+        $this->assertFalse($testMission[0]->groupCanSee($testGroup->getID()));
+        $this->assertFalse($testMission[1]->groupCanSee($testGroup->getID()));
+
+        // Let the group see mission 0
+        $testMission[0]->showToGroup($testGroup->getID());
+
+        // Check group can see mission 0
+        $this->assertTrue($testMission[0]->groupCanSee($testGroup->getID()));
+        $this->assertFalse($testMission[1]->groupCanSee($testGroup->getID()));
+
+        // Let user see mission 1
+        $testMission[1]->showToGroup($testGroup->getID());
+
+        // Check group can see both mission
+        $this->assertTrue($testMission[0]->groupCanSee($testGroup->getID()));
+        $this->assertTrue($testMission[1]->groupCanSee($testGroup->getID()));
+
+        // Clean up
+        $testMission[0]->hideFromGroup($testGroup->getID());
+        $testMission[1]->hideFromGroup($testGroup->getID());
+        foreach($testMission as $mission) {
+            $mission->delete();
+        }
+        $testGroup->delete();
     }
 
     public function testUserHasAccess() {
-        //TODO: Implement
-    }
+        // Create a test user
+        $testUser = new User();
+        $testUser->setUsername('testUser');
+        $testUser->create();
 
+        // Create a test group
+        $testGroup = new Group();
+        $testGroup->setName('testGroup');
+        $testGroup->setHidden(false);
+        $testGroup->create();
+
+        // Create a mission
+        $testMission = [];
+        $testMission[0] = new Mission();
+        $testMission[0]->setTitle('test');
+        $testMission[0]->setDescription('testDesc');
+        $testMission[0]->setStatus('Started');
+        $testMission[0]->create();
+
+        $testMission[1] = new Mission();
+        $testMission[1]->setTitle('test2');
+        $testMission[1]->setDescription('testDesc2');
+        $testMission[1]->setStatus('Started2');
+        $testMission[1]->create();
+
+        $testMission[2] = new Mission();
+        $testMission[2]->setTitle('test3');
+        $testMission[2]->setDescription('testDesc3');
+        $testMission[2]->setStatus('Started3');
+        $testMission[2]->create();
+
+        // Add the user to the group
+        $testUser->addToGroup($testGroup->getID());
+
+        // Check the user cannot access either mission
+        $this->assertFalse($testMission[0]->userHasAccess($testUser->getID()));
+        $this->assertFalse($testMission[1]->userHasAccess($testUser->getID()));
+        $this->assertFalse($testMission[2]->userHasAccess($testUser->getID()));
+
+        // Give the user access to mission 0
+        $testMission[0]->issueToUser($testUser->getID());
+
+        // Check the user can see mission 0
+        $this->assertTrue($testMission[0]->userHasAccess($testUser->getID()));
+        $this->assertFalse($testMission[1]->userHasAccess($testUser->getID()));
+        $this->assertFalse($testMission[2]->userHasAccess($testUser->getID()));
+
+        // Give the user access to mission
+        $testMission[1]->showToUser($testUser->getID());
+
+        // Check the user can see mission 1
+        $this->assertTrue($testMission[0]->userHasAccess($testUser->getID()));
+        $this->assertTrue($testMission[1]->userHasAccess($testUser->getID()));
+        $this->assertFalse($testMission[2]->userHasAccess($testUser->getID()));
+
+        // Give the group access to mission 2
+        $testMission[2]->showToGroup($testGroup->getID());
+
+        // Check the user can see mission 2
+        $this->assertTrue($testMission[0]->userHasAccess($testUser->getID()));
+        $this->assertTrue($testMission[1]->userHasAccess($testUser->getID()));
+        $this->assertTrue($testMission[2]->userHasAccess($testUser->getID()));
+
+        // Clean up
+        $testMission[0]->removeFromUser($testUser->getID());
+        $testMission[1]->hideFromUser($testUser->getID());
+        $testMission[2]->hideFromGroup($testGroup->getID());
+        $testUser->removeFromGroup($testGroup->getID());
+        foreach($testMission as $mission) {
+            $mission->delete();
+        }
+        $testGroup->delete();
+        $testUser->delete();
+    }
 
 }

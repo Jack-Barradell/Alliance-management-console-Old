@@ -3,6 +3,8 @@ namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
 use AMC\Exceptions\DuplicateEntryException;
+use AMC\Exceptions\InvalidGroupException;
+use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\MissingPrerequisiteException;
 use AMC\Exceptions\QueryStatementException;
 
@@ -84,13 +86,16 @@ class Mission implements DataObject {
 
     public function issueToUser($userID) {
         if($this->userIsAssigned($userID)) {
-            throw new DuplicateEntryException('Attempted to assign user with id ' . $userID . ' to mission mission with id ' . $this->_id . ' but they were already issued');
+            throw new DuplicateEntryException('Attempted to assign user with id ' . $userID . ' to mission mission with id ' . $this->_id . ' but they were already issued.');
         }
-        else {
+        else if(User::userExists($userID)) {
             $userMission = new UserMission();
             $userMission->setUserID($userID);
             $userMission->setMissionID($this->_id);
             $userMission->commit();
+        }
+        else {
+            throw new InvalidUserException('There is no user with user id ' . $userID);
         }
     }
 
@@ -128,11 +133,14 @@ class Mission implements DataObject {
         if($this->userCanSee($userID)) {
             throw new DuplicateEntryException('User with id ' . $userID . ' was given access to mission with id ' . $this->_id . ' when they already had it.');
         }
-        else {
+        else if(InvalidUserException::class) {
             $missionUserView = new MissionUserView();
             $missionUserView->setUserID($userID);
             $missionUserView->setMissionID($this->_id);
             $missionUserView->commit();
+        }
+        else {
+            throw new InvalidUserException('There is no user with user id ' . $userID);
         }
     }
 
@@ -152,6 +160,9 @@ class Mission implements DataObject {
     }
 
     public function userCanSee($userID) {
+        if($this->userIsAssigned($userID)) {
+            return true;
+        }
         $missionUserViews = MissionUserView::getByUserID($userID);
         if(\is_null($missionUserViews)) {
             return false;
@@ -170,11 +181,14 @@ class Mission implements DataObject {
         if($this->groupCanSee($groupID)) {
             throw new DuplicateEntryException('Group with id ' . $groupID . ' was given access to mission with id ' . $this->_id . ' but they are already had it.');
         }
-        else {
+        else if(InvalidGroupException::class) {
             $missionGroupView = new MissionGroupView();
             $missionGroupView->setGroupID($groupID);
             $missionGroupView->setMissionID($this->_id);
             $missionGroupView->commit();
+        }
+        else {
+            throw new InvalidGroupException('There is no group with group id ' . $groupID);
         }
     }
 
