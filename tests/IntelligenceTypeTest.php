@@ -24,7 +24,17 @@ class IntelligenceTypeTest extends TestCase {
     }
 
     public function testConstruct() {
-        //TODO: Implement
+        // Check null constructor
+        $intelligenceType = new IntelligenceType();
+
+        $this->assertNull($intelligenceType->getID());
+        $this->assertNull($intelligenceType->getName());
+
+        // Check non null constructor
+        $intelligenceType = new IntelligenceType(1, 'name');
+
+        $this->assertEquals(1, $intelligenceType->getID());
+        $this->assertEquals('name', $intelligenceType->getID());
     }
 
     public function testCreate() {
