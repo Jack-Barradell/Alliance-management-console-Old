@@ -82,8 +82,10 @@ class Notification implements DataObject {
 
     public function issueToUser($userID, $commit = true) {
         if(User::userExists($userID, true)) {
-            // Commit the notification
-            $this->commit();
+            if($commit) {
+                // Commit the notification
+                $this->commit();
+            }
 
             // Attach it to the user
             $userNotification = new UserNotification();
@@ -93,7 +95,7 @@ class Notification implements DataObject {
             $userNotification->commit();
         }
         else {
-            throw new InvalidUserException('User with id ' . $userID . ' does not exist');
+            throw new InvalidUserException('User with id ' . $userID . ' does not exist.');
         }
     }
 
