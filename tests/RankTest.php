@@ -283,7 +283,6 @@ class RankTest extends TestCase {
         foreach($testRank as $rank) {
             $rank->delete();
         }
-
     }
 
     public function testEql() {
