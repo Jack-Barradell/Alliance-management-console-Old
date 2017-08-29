@@ -28,7 +28,7 @@ class MissionTest extends TestCase {
 
     public function setUp() {
         parent::setUp();
-        Database::newConnection('jirbj.co.uk', 'testingDB', 'testingDB', 'testingdb');
+        Database::newConnection('', '', '', '');
         $this->_connection = Database::getConnection();
     }
 

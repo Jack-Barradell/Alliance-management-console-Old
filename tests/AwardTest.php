@@ -7,6 +7,7 @@ require '../classes/Storable.php';
 require '../classes/Database.php';
 require '../classes/Award.php';
 require '../classes/exceptions/BlankObjectException.php';
+require '../classes/exceptions/QueryStatementException.php';
 
 use AMC\Classes\Database;
 use AMC\Exceptions\BlankObjectException;
@@ -19,7 +20,7 @@ class AwardTest extends TestCase {
 
     public function setUp() {
         parent::setUp();
-        Database::newConnection('localhost', 'testingDB', 'testingDB', 'testingdb');
+        Database::newConnection('192.168.1.11', 'testingDB', 'password', 'testingdb');
         $this->_connection = Database::getConnection();
     }
 

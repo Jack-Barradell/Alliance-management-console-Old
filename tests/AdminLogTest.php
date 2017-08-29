@@ -22,7 +22,7 @@ class AdminLogTest extends TestCase {
 
     public function setUp() {
         parent::setUp();
-        Database::newConnection('localhost', 'testingDB', 'testingDB', 'testingdb');
+        Database::newConnection('', '', '', '');
         $this->_connection = Database::getConnection();
     }
 

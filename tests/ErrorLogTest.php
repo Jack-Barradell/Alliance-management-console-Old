@@ -7,6 +7,7 @@ require '../classes/Storable.php';
 require '../classes/Database.php';
 require '../classes/ErrorLog.php';
 require '../classes/exceptions/BlankObjectException.php';
+require '../classes/exceptions/QueryStatementException.php';
 
 use AMC\Classes\ErrorLog;
 use AMC\Classes\Database;
@@ -19,7 +20,7 @@ class ErrorLogTest extends TestCase {
 
     public function setUp() {
         parent::setUp();
-        Database::newConnection('jirbj.co.uk', 'testingDB', 'testingDB', 'testingdb');
+        Database::newConnection('', '', '', '');
         $this->_connection = Database::getConnection();
     }
 
