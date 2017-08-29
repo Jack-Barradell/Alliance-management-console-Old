@@ -99,19 +99,19 @@ class NewsTest extends TestCase {
         if($published == 1) {
             $published = true;
         }
-        else {
+        else if($published == 0) {
             $published = false;
         }
         if($membersOnly == 1) {
             $membersOnly = true;
         }
-        else {
+        else if($membersOnly == 0) {
             $membersOnly = false;
         }
         if($commentsAllowed == 1) {
             $commentsAllowed = true;
         }
-        else {
+        else if($commentsAllowed == 0) {
             $commentsAllowed = false;
         }
 
@@ -210,19 +210,19 @@ class NewsTest extends TestCase {
         if($published == 1) {
             $published = true;
         }
-        else {
+        else if($published == 0) {
             $published = false;
         }
         if($membersOnly == 1) {
             $membersOnly = true;
         }
-        else {
+        else if($membersOnly == 0) {
             $membersOnly = false;
         }
         if($commentsAllowed == 1) {
             $commentsAllowed = true;
         }
-        else {
+        else if($commentsAllowed == 0) {
             $commentsAllowed = false;
         }
 

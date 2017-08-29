@@ -89,7 +89,7 @@ class IntelligenceTest extends TestCase {
         if($public == 1) {
             $public = true;
         }
-        else {
+        else if($public == 0) {
             $public = false;
         }
 
@@ -178,7 +178,7 @@ class IntelligenceTest extends TestCase {
         if($public == 1) {
             $public = true;
         }
-        else {
+        else if($public == 0) {
             $public = false;
         }
 

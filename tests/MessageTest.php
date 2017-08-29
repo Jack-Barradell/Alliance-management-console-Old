@@ -85,7 +85,7 @@ class MessageTest extends TestCase {
         if($hideInSentBox == 1) {
             $hideInSentBox = true;
         }
-        else {
+        else if($hideInSentBox == 0){
             $hideInSentBox = false;
         }
 
@@ -161,7 +161,7 @@ class MessageTest extends TestCase {
         if($hideInSentBox == 1) {
             $hideInSentBox = true;
         }
-        else {
+        else if($hideInSentBox == 0) {
             $hideInSentBox = false;
         }
 

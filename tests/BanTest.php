@@ -88,6 +88,14 @@ class BanTest extends TestCase {
         $this->assertEquals(1, $stmt->num_rows);
 
         $stmt->fetch();
+
+        if($active == 1) {
+            $active = true;
+        }
+        else if($active == 0) {
+            $active = false;
+        }
+
         $this->assertEquals($testBan->getID(), $banID);
         $this->assertEquals($testBan->getUserID(), $userID);
         $this->assertEquals($testBan->getAdminID(), $adminID);
@@ -176,6 +184,14 @@ class BanTest extends TestCase {
         $this->assertEquals(1, $stmt->num_rows);
 
         $stmt->fetch();
+
+        if($active == 1) {
+            $active = true;
+        }
+        else if($active == 0) {
+            $active = false;
+        }
+
         $this->assertEquals($testBan->getID(), $banID);
         $this->assertEquals($testBan->getUserID(), $userID);
         $this->assertEquals($testBan->getAdminID(), $adminID);

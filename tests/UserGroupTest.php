@@ -79,7 +79,7 @@ class UserGroupTest extends TestCase {
         if($admin == 1) {
             $admin = true;
         }
-        else {
+        else if($admin == 0) {
             $admin = false;
         }
 
@@ -159,7 +159,7 @@ class UserGroupTest extends TestCase {
         if($admin == 1) {
             $admin = true;
         }
-        else {
+        else if($admin == 0) {
             $admin = false;
         }
 

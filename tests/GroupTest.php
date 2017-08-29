@@ -71,7 +71,7 @@ class GroupTest extends TestCase {
         if($hidden == 1) {
             $hidden = true;
         }
-        else {
+        else if($hidden == 0) {
             $hidden = false;
         }
 
@@ -126,7 +126,7 @@ class GroupTest extends TestCase {
         if($hidden == 1) {
             $hidden = true;
         }
-        else {
+        else if($hidden == 0) {
             $hidden = false;
         }
 
