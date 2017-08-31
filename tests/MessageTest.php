@@ -488,11 +488,13 @@ class MessageTest extends TestCase {
         // Create a test sender
         $testSender = new User();
         $testSender->setUsername('testSender');
+        $testSender->setActivated(true);
         $testSender->create();
 
         // Create a test receiver
         $testReceiver = new User();
         $testReceiver->setUsername('testReceiver');
+        $testReceiver->setActivated(true);
         $testReceiver->create();
 
         // Build a test message
@@ -527,6 +529,7 @@ class MessageTest extends TestCase {
         // Create a test sender
         $testSender = new User();
         $testSender->setUsername('testSender');
+        $testSender->setActivated(true);
         $testSender->create();
 
         // Now find the largest user id
@@ -562,6 +565,7 @@ class MessageTest extends TestCase {
         // Create a test sender
         $testSender = new User();
         $testSender->setUsername('testSender');
+        $testSender->setActivated(true);
         $testSender->create();
 
         // Create test group members
@@ -569,10 +573,12 @@ class MessageTest extends TestCase {
 
         $testMembers[0] = new User();
         $testMembers[0]->setUsername('testMember');
+        $testMembers[0]->setActivated(true);
         $testMembers[0]->create();
 
         $testMembers[1] = new User();
         $testMembers[1]->setUsername('testMember2');
+        $testMembers[1]->setActivated(true);
         $testMembers[1]->create();
 
         // Create a test group
@@ -631,6 +637,7 @@ class MessageTest extends TestCase {
         // Create a test sender
         $testSender = new User();
         $testSender->setUsername('testSender');
+        $testSender->setActivated(true);
         $testSender->create();
 
         // Now find the largest group id
@@ -666,6 +673,7 @@ class MessageTest extends TestCase {
         // Create a test sender
         $testSender = new User();
         $testSender->setUsername('testSender');
+        $testSender->setActivated(true);
         $testSender->create();
 
         // Build the message

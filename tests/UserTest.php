@@ -9,10 +9,17 @@ require '../classes/User.php';
 require '../classes/Faction.php';
 require '../classes/exceptions/BlankObjectException.php';
 
+use AMC\Classes\AdminLog;
+use AMC\Classes\Ban;
 use AMC\Classes\Faction;
+use AMC\Classes\Notification;
 use AMC\Classes\User;
 use AMC\Classes\Database;
+use AMC\Classes\UserNotification;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\IncorrectTypeException;
+use AMC\Exceptions\InvalidUserException;
+use AMC\Exceptions\MissingPrerequisiteException;
 use PHPUnit\Framework\TestCase;
 
 class UserTest extends TestCase {
@@ -514,39 +521,339 @@ class UserTest extends TestCase {
     }
 
     public function testBan() {
-        //TODO: Implement
+        // Create a test user to be banned
+        $testUser = User::registerAccount('testUser', 'testPassword', 'test@email.com');
+
+        // Create an admin to ban them
+        $testAdmin = new User();
+        $testAdmin->setUsername('testAdmin');
+        $testAdmin->setActivated(true);
+        $testAdmin->create();
+
+        // Check the user can login before being banned
+        $preBanLoginTest = User::login('testUser', 'testPassword');
+
+        $this->assertInstanceOf(User::class, $preBanLoginTest);
+        $this->assertEquals($testUser->getID(), $preBanLoginTest->getID());
+
+        // Now issue a ban
+        $timeOfBan = \time() + 1000;
+        $testUser->ban($testAdmin->getID(), 'reason', $timeOfBan);
+
+        // Check the user can no longer login
+        $this->assertNull(User::login('testUser', 'testPassword'));
+
+        // Check a ban was issued
+        $ban = Ban::getByUserID($testUser->getID());
+
+        $this->assertTrue(\is_array($ban));
+        $this->assertEquals(1, \count($ban));
+        $this->assertInstanceOf(Ban::class, $ban[0]);
+        $this->assertEquals($testUser->getID(), $ban[0]->getUserID());
+        $this->assertEquals($testAdmin->getID(), $ban[0]->getAdminID());
+        $this->assertEquals('reason', $ban[0]->getReason());
+        $this->assertTrue($ban[0]->getActive());
+
+        $this->assertTrue($testUser->getBanned());
+
+        // Check an admin log was created
+        $adminLog = AdminLog::getByAdminID($testAdmin->getID());
+
+        $this->assertTrue(\is_array($adminLog));
+        $this->assertEquals(1, \count($adminLog));
+        $this->assertInstanceOf(AdminLog::class, $adminLog[0]);
+        $this->assertEquals($testAdmin->getID(), $adminLog[0]->getID());
+        $this->assertEquals($testAdmin->getUsername() . ' banned user: ' . $testUser->getUsername() . ' with id: ' . $testUser->getID(), $adminLog[0]->getEvent());
+        // Note timestamp would not equal due to potential delay in execution time so is not checked here
+
+        // Check a user notification is issued
+        $userNotification = UserNotification::getByUserID($testUser->getID());
+
+        $this->assertTrue(\is_array($userNotification));
+        $this->assertEquals(1, \count($userNotification));
+        $this->assertInstanceOf(UserNotification::class, $userNotification[0]);
+        $this->assertEquals($testUser->getID(), $userNotification[0]->getUserID());
+
+        // Check the notification is issued
+        $notification = Notification::get($userNotification[0]->getNotificationID());
+
+        $this->assertInternalType(Notification::class, $notification);
+        $this->assertEquals($userNotification[0]->getNotificationID(), $notification->getID());
+        $this->assertEquals('You were banned by ' . $testAdmin->getUsername() . '. Reason: reason', $notification->getBody());
+
+        // Clean up
+        $notification->delete();
+        $userNotification[0]->delete();
+        $adminLog[0]->delete();
+        $ban->delete();
+        $testAdmin->delete();
+        $testUser->delete();
     }
 
     public function testIncorrectTypeBan() {
-        //TODO: Implement
+        // Create a test user to be banned
+        $testUser = User::registerAccount('testUser', 'testPassword', 'test@email.com');
+
+        // Create an admin to ban them
+        $testAdmin = new User();
+        $testAdmin->setUsername('testAdmin');
+        $testAdmin->create();
+
+        // Set expected exception
+        $this->expectException(IncorrectTypeException::class);
+
+        // Trigger it
+        try {
+            $testUser->ban($testAdmin->getID(), 'reason', 'now');
+        } catch(IncorrectTypeException $e) {
+            $this->assertEquals('Ban expiry must be an int was given now', $e->getMessage());
+        } finally {
+            $testUser->delete();
+            $testAdmin->delete();
+        }
     }
 
     public function testInvalidUserBan() {
-        //TODO: Implement
+        // Create a test user to be banned
+        $testUser = User::registerAccount('testUser', 'testPassword', 'test@email.com');
+
+        // Get largest id for a user
+        $stmt = $this->_connection->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        $largestID = $userID + 1;
+
+        // Set expected exception
+        $this->expectException(InvalidUserException::class);
+
+        // Trigger it
+        try {
+            $testUser->ban($largestID, 'reason', -1);
+        } catch(InvalidUserException $e) {
+            $this->assertEquals('No admin with ID' . $largestID, $e->getMessage());
+        } finally {
+            $testUser->delete();
+        }
     }
 
     public function testUnban() {
-        //TODO: Implement
-    }
+        // Create a test user to be banned
+        $testUser = User::registerAccount('testUser', 'testPassword', 'test@email.com');
 
-    public function testNullGetUnban() {
-        //TODO: Implement
+        // Create an admin to ban them
+        $testAdmin = new User();
+        $testAdmin->setUsername('testAdmin');
+        $testAdmin->setActivated(true);
+        $testAdmin->create();
+
+        // Check the user can login before being banned
+        $preBanLoginTest = User::login('testUser', 'testPassword');
+
+        $this->assertInstanceOf(User::class, $preBanLoginTest);
+        $this->assertEquals($testUser->getID(), $preBanLoginTest->getID());
+
+        // Now ban the user
+        $testUser->ban($testAdmin->getID(), 'reason', -1);
+
+        $this->assertNull(User::login('testUser', 'testPassword'));
+
+        // Now unban them
+        $testUser->unban($testAdmin->getID());
+
+        // Now check they can login
+        $postBanLoginTest = User::login('testUser', 'testPassword');
+
+        $this->assertInstanceOf(User::class, $postBanLoginTest);
+        $this->assertEquals($testUser->getID(), $postBanLoginTest->getID());
+
+        // Pull created objects
+        $adminLogs = AdminLog::getByAdminID($testAdmin->getID());
+        $bans = Ban::getByUserID($testUser->getID());
+        $userNotifications = UserNotification::getByUserID($testUser->getID());
+        $notificationIDs = array($userNotifications[0]->getNotificationID(), $userNotifications[1]->getNotificationID());
+        $notifications = Notification::get($notificationIDs);
+
+        // Check the ban is marked as inactive
+        $this->assertFalse($bans[0]->getActive());
+
+        // Check there are 2 admin logs
+        $this->assertEquals(2, \count($adminLogs));
+
+        // Check there are 2 notifications
+        $this->assertEquals(2, \count($notifications));
+
+        // Check there are 2 user notifications
+        $this->assertEquals(2, \count($userNotifications));
+
+        // Clean up
+        foreach($userNotifications as $userNotification) {
+            $userNotification->delete();
+        }
+        foreach($bans as $ban) {
+            $ban->delete();
+        }
+        foreach($notifications as $notification) {
+            $notification->delete();
+        }
+        foreach($adminLogs as $adminLog) {
+            $adminLog->delete();
+        }
+        $testAdmin->delete();
+        $testUser->delete();
     }
 
     public function testInvalidUserUnban() {
-        //TODO: Implement
+        // Create a test user to be banned
+        $testUser = User::registerAccount('testUser', 'testPassword', 'test@email.com');
+
+        // Create an admin to ban them
+        $testAdmin = new User();
+        $testAdmin->setUsername('testAdmin');
+        $testAdmin->setActivated(true);
+        $testAdmin->create();
+
+        // Get largest id for a user
+        $stmt = $this->_connection->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        $largestID = $userID + 1;
+
+        // Ban the user
+        $testUser->ban($testAdmin->getID(), 'reason', -1);
+
+        // Set expected exception
+        $this->expectException(InvalidUserException::class);
+
+        // Trigger it
+        try {
+            $testUser->unban($largestID);
+        } catch(InvalidUserException $e) {
+            $this->assertEquals('No admin with ID: ' . $largestID, $e->getMessage());
+        } finally {
+            // Clean up
+            $userNotifications = UserNotification::getByUserID($testUser);
+            $notificationIDs = [];
+            foreach($userNotifications as $userNotification) {
+                $notificationIDs[] = $userNotification->getNotificationID();
+                $userNotification->delete();
+            }
+            $notifications = Notification::get($notificationIDs);
+            foreach($notifications as $notification) {
+                $notification->delete();
+            }
+            $bans = Ban::getByUserID($testUser->getID());
+            foreach($bans as $ban) {
+                $ban->delete();
+            }
+            $adminLogs = AdminLog::getByAdminID($testAdmin->getID());
+            foreach($adminLogs as $adminLog) {
+                $adminLog->delete();
+            }
+            $testUser->delete();
+            $testAdmin->delete();
+        }
     }
 
     public function testMissingPrerequisiteUnban() {
-        //TODO: Implement
+        // Create a test user to be banned
+        $testUser = User::registerAccount('testUser', 'testPassword', 'test@email.com');
+
+        // Create an admin to ban them
+        $testAdmin = new User();
+        $testAdmin->setUsername('testAdmin');
+        $testAdmin->setActivated(true);
+        $testAdmin->create();
+
+        // Get largest id for a user
+        $stmt = $this->_connection->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        $largestID = $userID + 1;
+
+        // Set expected exception
+        $this->expectException(MissingPrerequisiteException::class);
+
+        // Trigger it
+        try {
+            $testUser->unban($largestID);
+        } catch(MissingPrerequisiteException $e) {
+            $this->assertEquals('Tried to unban a non-banned user with ID: ' . $testUser->getID(), $e->getMessage());
+        } finally {
+            // Clean up
+            $userNotifications = UserNotification::getByUserID($testUser);
+            $notificationIDs = [];
+            foreach($userNotifications as $userNotification) {
+                $notificationIDs[] = $userNotification->getNotificationID();
+                $userNotification->delete();
+            }
+            $notifications = Notification::get($notificationIDs);
+            foreach($notifications as $notification) {
+                $notification->delete();
+            }
+            $bans = Ban::getByUserID($testUser->getID());
+            foreach($bans as $ban) {
+                $ban->delete();
+            }
+            $adminLogs = AdminLog::getByAdminID($testAdmin->getID());
+            foreach($adminLogs as $adminLog) {
+                $adminLog->delete();
+            }
+            $testUser->delete();
+            $testAdmin->delete();
+        }
     }
 
     public function testChangePassword() {
-        //TODO: Implement
+        // Create a test user
+        $testUser = User::registerAccount('testUser', 'testPassword', 'test@email.com');
+
+        $oldHash = $testUser->getPasswordHash();
+
+        // Change the password
+        $testUser->changePassword('newPassword');
+
+        // Check the hash has changed
+        $this->assertNotEquals($oldHash, $testUser->getPasswordHash());
+
+        // Get the user notification
+        $userNotifications = UserNotification::getByUserID($testUser->getID());
+
+        $this->assertTrue(\is_array($userNotifications));
+        $this->assertEquals(1, \count($userNotifications));
+        $this->assertInstanceOf(UserNotification::class, $userNotifications[0]);
+        $this->assertEquals($testUser->getID(), $userNotifications[0]->getID());
+
+        // Get the notification
+        $notification = Notification::get($userNotifications[0]->getNotificationID());
+        $this->assertEquals('You changed your password.', $notification->getBody());
+
+        // Clean up
+        $userNotifications[0]->delete();
+        $notification->delete();
+        $testUser->delete();
     }
 
     public function testUserExists() {
-        //TODO: Implement
+        // Create a test user
+        $testUser = new User();
+        $testUser->setUsername('testUser');
+        $testUser->setActivated(true);
+        $testUser->create();
+
+        // TODO ############## FINISH THIS ###############
+
+        // Get largest id for a user
+        $stmt = $this->_connection->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        $largestID = $userID + 1;
+
+        // Check no user exists with an id out of range
+        $this->assertFalse(User::userExists($largestID, false, false));
+        $this->assertFalse(User::userExists($largestID, true, false));
+        $this->assertFalse(User::userExists($largestID, true, true));
+        $this->assertFalse(User::userExists($largestID, false, true));
+
     }
 
     public function testIncorrectTypeUserExists() {

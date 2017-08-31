@@ -126,7 +126,7 @@ class User implements DataObject {
                 $notification->issueToUser($this->_id);
             }
             else {
-                throw new IncorrectTypeException('AdminID must be an int was given ' . $adminID);
+                throw new IncorrectTypeException('Ban expiry must be an int was given ' . $adminID);
             }
         }
         else {
@@ -137,35 +137,31 @@ class User implements DataObject {
     public function unban($unbanAdminID, $reactivateAccount = true) {
         if($this->_banned) {
             if(self::userExists($unbanAdminID)) {
-                if(!\is_null($bans = Ban::getByUserID($this->_id))) {
-                    $time = \time();
-                    foreach($bans as $ban) {
-                        $ban->setActive(false);
-                        $ban->setUnbanTime($time);
-                        $ban->setUnbanAdminID($unbanAdminID);
-                        $ban->commit();
-                        $this->_banned = false;
-                        $this->_activated = $reactivateAccount;
-                        $this->commit();
-                    }
-
-                    // Create admin log
-                    $admin = User::get($unbanAdminID);
-                    $adminLog = new AdminLog();
-                    $adminLog->setAdminID($unbanAdminID);
-                    $adminLog->setEvent($admin->getUsername() . ' unbanned user: ' . $this->_username . ' with id: ' . $this->_id);
-                    $adminLog->setTimestamp($time);
-                    $adminLog->commit();
-
-                    // Create notification
-                    $notification = new Notification();
-                    $notification->setBody('You were unbanned by ' . $admin->getUsername());
-                    $notification->setTimestamp($time);
-                    $notification->issueToUser($this->_id);
+                $bans = Ban::getByUserID($this->_id);
+                $time = \time();
+                foreach($bans as $ban) {
+                    $ban->setActive(false);
+                    $ban->setUnbanTime($time);
+                    $ban->setUnbanAdminID($unbanAdminID);
+                    $ban->commit();
+                    $this->_banned = false;
+                    $this->_activated = $reactivateAccount;
+                    $this->commit();
                 }
-                else {
-                    throw new NullGetException('No bans found for userID: ' . $this->_id);
-                }
+
+                // Create admin log
+                $admin = User::get($unbanAdminID);
+                $adminLog = new AdminLog();
+                $adminLog->setAdminID($unbanAdminID);
+                $adminLog->setEvent($admin->getUsername() . ' unbanned user: ' . $this->_username . ' with id: ' . $this->_id);
+                $adminLog->setTimestamp($time);
+                $adminLog->commit();
+
+                // Create notification
+                $notification = new Notification();
+                $notification->setBody('You were unbanned by ' . $admin->getUsername());
+                $notification->setTimestamp($time);
+                $notification->issueToUser($this->_id);
             }
             else {
                 throw new InvalidUserException('No admin with ID: ' . $unbanAdminID);
@@ -722,6 +718,8 @@ class User implements DataObject {
         $notification->setBody('Account created.');
         $notification->setTimestamp(\time());
         $notification->issueToUser($user->getID());
+
+        return $user;
     }
 
     public static function login($username, $password) {

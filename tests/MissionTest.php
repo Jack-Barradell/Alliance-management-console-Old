@@ -357,6 +357,7 @@ class MissionTest extends TestCase {
         // Create a test user
         $testUser = new User();
         $testUser->setUsername('testUser');
+        $testUser->setActivated(true);
         $testUser->create();
 
         // Create a mission
@@ -390,6 +391,7 @@ class MissionTest extends TestCase {
         // Create a test user
         $testUser = new User();
         $testUser->setUsername('testUser');
+        $testUser->setActivated(true);
         $testUser->create();
 
         // Create a mission
@@ -450,6 +452,7 @@ class MissionTest extends TestCase {
         // Create a test user
         $testUser = new User();
         $testUser->setUsername('testUser');
+        $testUser->setActivated(true);
         $testUser->create();
 
         // Create a mission
@@ -483,6 +486,7 @@ class MissionTest extends TestCase {
         // Create a test user
         $testUser = new User();
         $testUser->setUsername('testUser');
+        $testUser->setActivated(true);
         $testUser->create();
 
         // Create a mission
@@ -510,6 +514,7 @@ class MissionTest extends TestCase {
         // Create a test user
         $testUser = new User();
         $testUser->setUsername('testUser');
+        $testUser->setActivated(true);
         $testUser->create();
 
         // Create a mission
@@ -552,6 +557,7 @@ class MissionTest extends TestCase {
         // Create a test user
         $testUser = new User();
         $testUser->setUsername('testUser');
+        $testUser->setActivated(true);
         $testUser->create();
 
         // Create a mission
@@ -584,6 +590,7 @@ class MissionTest extends TestCase {
         // Create a test user
         $testUser = new User();
         $testUser->setUsername('testUser');
+        $testUser->setActivated(true);
         $testUser->create();
 
         // Create a mission
@@ -644,6 +651,7 @@ class MissionTest extends TestCase {
         // Create a test user
         $testUser = new User();
         $testUser->setUsername('testUser');
+        $testUser->setActivated(true);
         $testUser->create();
 
         // Create a mission
@@ -675,6 +683,7 @@ class MissionTest extends TestCase {
         // Create a test user
         $testUser = new User();
         $testUser->setUsername('testUser');
+        $testUser->setActivated(true);
         $testUser->create();
 
         // Create a mission
@@ -702,6 +711,7 @@ class MissionTest extends TestCase {
         // Create a test user
         $testUser = new User();
         $testUser->setUsername('testUser');
+        $testUser->setActivated(true);
         $testUser->create();
 
         // Create a mission
@@ -969,6 +979,7 @@ class MissionTest extends TestCase {
         // Create a test user
         $testUser = new User();
         $testUser->setUsername('testUser');
+        $testUser->setActivated(true);
         $testUser->create();
 
         // Create a test group
