@@ -209,7 +209,7 @@ class Privilege implements DataObject {
             }
         }
         else {
-            throw new IncorrectTypeException('Privilege exists must be passed an int or string, was given ' . \gettype($privilegeID));
+            throw new IncorrectTypeException('Privilege exists must be passed an int, was given ' . \gettype($privilegeID));
         }
     }
 

@@ -270,4 +270,12 @@ class FactionTypeTest extends TestCase {
         // Check different arent equal
         $this->assertFalse($testFactionType[0]->eql($testFactionType[2]));
     }
+
+    public function testFactionTypeExists() {
+        //TODO: Implement
+    }
+
+    public function testIncorrectTypeFactionTypeExists() {
+        //TODO: Implement
+    }
 }

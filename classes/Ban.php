@@ -153,7 +153,7 @@ class Ban implements DataObject {
                 $this->_adminID = $adminID;
             }
             else {
-                throw new InvalidUserException('No user exists with id ' . $userID);
+                throw new InvalidUserException('No user exists with id ' . $adminID);
             }
         }
         else {
@@ -167,7 +167,7 @@ class Ban implements DataObject {
                 $this->_unbanAdminID = $unbanAdminID;
             }
             else {
-                throw new InvalidUserException('No user exists with id ' . $userID);
+                throw new InvalidUserException('No user exists with id ' . $unbanAdminID);
             }
         }
         else {

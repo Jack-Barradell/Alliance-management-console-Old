@@ -381,4 +381,12 @@ class FactionTest extends TestCase {
         }
     }
 
+    public function testSetFactionTypeID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidFactionTypeSetFactionTypeID() {
+        //TODO: Implement
+    }
+
 }

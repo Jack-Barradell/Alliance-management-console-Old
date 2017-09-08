@@ -3,6 +3,7 @@
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\IncorrectTypeException;
 use AMC\Exceptions\QueryStatementException;
 
 class FactionType implements DataObject {
@@ -159,6 +160,34 @@ class FactionType implements DataObject {
         }
         else {
             return null;
+        }
+    }
+
+    public static function factionTypeExists($factionTypeID, $returnID = false) {
+        if(\is_numeric($factionTypeID)) {
+            if($stmt = Database::getConnection()->prepare("SELECT `FactionTypeID` FROM `Faction_Types` WHERE `FactionTypeID`=?")) {
+                $stmt->bind_param('i', $factionTypeID);
+                $stmt->execute();
+                $stmt->bind_result($typeID);
+                if($stmt->num_rows == 1) {
+                    if($returnID) {
+                        return $typeID;
+                    }
+                    else {
+                        return true;
+                    }
+                }
+                else {
+                    $stmt->close();
+                    return false;
+                }
+            }
+            else {
+                throw new QueryStatementException('Failed to bind query.');
+            }
+        }
+        else {
+            throw new IncorrectTypeException('Faction type exists must be passed an int, was given ' . \gettype($factionTypeID));
         }
     }
 

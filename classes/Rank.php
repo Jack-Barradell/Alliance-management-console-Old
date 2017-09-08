@@ -211,7 +211,7 @@ class Rank implements DataObject {
             }
         }
         else {
-            throw new IncorrectTypeException('Rank exists must be passed an int or string, was given ' . \gettype($rankID));
+            throw new IncorrectTypeException('Rank exists must be passed an int, was given ' . \gettype($rankID));
         }
     }
 

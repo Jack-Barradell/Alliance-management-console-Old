@@ -2,6 +2,7 @@
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidFactionTypeException;
 use AMC\Exceptions\QueryStatementException;
 
 class Faction implements DataObject {
@@ -96,8 +97,18 @@ class Faction implements DataObject {
         $this->_id = $newID;
     }
 
-    public function setFactionTypeID($factionTypeID) {
-        $this->_factionTypeID = $factionTypeID;
+    public function setFactionTypeID($factionTypeID, $verify = false) {
+        if($verify) {
+            if(FactionType::factionTypeExists($factionTypeID)) {
+                $this->_factionTypeID = $factionTypeID;
+            }
+            else {
+                throw new InvalidFactionTypeException('No faction type with id ' . $factionTypeID);
+            }
+        }
+        else {
+            $this->_factionTypeID = $factionTypeID;
+        }
     }
 
     public function setName($name) {
