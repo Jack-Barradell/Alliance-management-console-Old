@@ -4,6 +4,7 @@ namespace AMC\Classes;
 use AMC\Exceptions\BlankObjectException;
 use AMC\Exceptions\DuplicateEntryException;
 use AMC\Exceptions\IncorrectTypeException;
+use AMC\Exceptions\InvalidPrivilegeException;
 use AMC\Exceptions\MissingPrerequisiteException;
 use AMC\Exceptions\QueryStatementException;
 use AMC\Exceptions\NullGetException;
@@ -85,46 +86,56 @@ class Group implements DataObject {
     // Join table controls
 
     public function issuePrivilege($privilegeID) {
-        if($this->hasGroupPrivilege($privilegeID)) {
-            throw new DuplicateEntryException('Group with id ' . $this->_id . ' was issued privilege with id ' . $privilegeID . ' but they already have it.');
+        if(Privilege::privilegeExists($privilegeID)) {
+            if ($this->hasGroupPrivilege($privilegeID)) {
+                throw new DuplicateEntryException('Group with id ' . $this->_id . ' was issued privilege with id ' . $privilegeID . ' but they already have it.');
+            } else {
+                $groupPrivilege = new GroupPrivilege();
+                $groupPrivilege->setGroupID($this->_id);
+                $groupPrivilege->setPrivilegeID($privilegeID);
+                $groupPrivilege->commit();
+            }
         }
         else {
-            $groupPrivilege = new GroupPrivilege();
-            $groupPrivilege->setGroupID($this->_id);
-            $groupPrivilege->setPrivilegeID($privilegeID);
-            $groupPrivilege->commit();
+            throw new InvalidPrivilegeException('No privilege with id ' . $privilegeID . ' exists.');
         }
     }
 
     public function revokePrivilege($privilegeID) {
-        $groupPrivileges = GroupPrivilege::getByGroupID($this->_id);
-        if(\is_null($groupPrivileges)) {
-            throw new MissingPrerequisiteException('Tried to remove privilege with id ' . $privilegeID . ' from group with id ' . $this->_id . ' but they did not have it.');
-        }
-        else {
-            foreach($groupPrivileges as $groupPrivilege) {
-                if($groupPrivilege->getPrivilegeID() == $privilegeID) {
-                    $groupPrivilege->toggleDelete();
-                    $groupPrivilege->commit();
+        if(Privilege::privilegeExists($privilegeID)) {
+            $groupPrivileges = GroupPrivilege::getByGroupID($this->_id);
+            if (\is_null($groupPrivileges)) {
+                throw new MissingPrerequisiteException('Tried to remove privilege with id ' . $privilegeID . ' from group with id ' . $this->_id . ' but they did not have it.');
+            } else {
+                foreach ($groupPrivileges as $groupPrivilege) {
+                    if ($groupPrivilege->getPrivilegeID() == $privilegeID) {
+                        $groupPrivilege->toggleDelete();
+                        $groupPrivilege->commit();
+                    }
                 }
             }
+        }
+        else {
+            throw new InvalidPrivilegeException('No privilege with id ' . $privilegeID . ' exists.');
         }
     }
 
-    public function hasGroupPrivilege($privilegeName) {
-        $privilegeArray = Privilege::getByName($privilegeName);
-        if(\is_null($privilegeArray)) {
-            throw new NullGetException('No privilege found with name ' . $privilegeName);
+    public function hasGroupPrivilege($privID) {
+        if(Privilege::privilegeExists($privID)) {
+            $groupPrivs = GroupPrivilege::getByGroupID($this->_id);
+            if (\is_null($groupPrivs)) {
+                return false;
+            } else {
+                foreach ($groupPrivs as $groupPriv) {
+                    if ($groupPriv->getPrivilegeID() == $privID) {
+                        return true;
+                    }
+                }
+                return false;
+            }
         }
         else {
-            $privID = $privilegeArray[0]->getPrivilegeID();
-            $groupPrivs = GroupPrivilege::getByGroupID($this->_id);
-            foreach($groupPrivs as $groupPriv) {
-                if($groupPriv->getPrivilegeID() == $privID) {
-                    return true;
-                }
-            }
-            return false;
+            throw new InvalidPrivilegeException('No privilege with id ' . $privID . ' exists.');
         }
     }
 
@@ -254,6 +265,7 @@ class Group implements DataObject {
                     }
                 }
                 else {
+                    $stmt->close();
                     return false;
                 }
             }
@@ -277,6 +289,7 @@ class Group implements DataObject {
                     }
                 }
                 else {
+                    $stmt->close();
                     return false;
                 }
             }
@@ -285,7 +298,7 @@ class Group implements DataObject {
             }
         }
         else {
-            throw new IncorrectTypeException('Group exists must be passed an int or string, was given ' . $groupNameOrID);
+            throw new IncorrectTypeException('Group exists must be passed an int or string, was given ' . \gettype($groupNameOrID));
         }
     }
 

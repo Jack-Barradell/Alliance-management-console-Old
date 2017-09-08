@@ -2,6 +2,7 @@
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\IncorrectTypeException;
 use AMC\Exceptions\QueryStatementException;
 
 class Rank implements DataObject {
@@ -181,6 +182,36 @@ class Rank implements DataObject {
         }
         else {
             return null;
+        }
+    }
+
+    public static function rankExists($rankID, $returnID = false) {
+        if(\is_numeric($returnID)) {
+            if($stmt = Database::getConnection()->prepare('SELECT `RankID` FROM `Ranks` WHERE `RankID`=?')) {
+                $stmt->bind_param('i', $rankID);
+                $stmt->execute();
+                $stmt->bind_result($rankID);
+                if($stmt->num_rows == 1) {
+                    $stmt->fetch();
+                    $stmt->close();
+                    if($returnID) {
+                        return $rankID;
+                    }
+                    else {
+                        return true;
+                    }
+                }
+                else {
+                    $stmt->close();
+                    return false;
+                }
+            }
+            else {
+                throw new QueryStatementException('Failed to bind query.');
+            }
+        }
+        else {
+            throw new IncorrectTypeException('Rank exists must be passed an int or string, was given ' . \gettype($rankID));
         }
     }
 

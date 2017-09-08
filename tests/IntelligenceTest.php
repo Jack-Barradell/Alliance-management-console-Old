@@ -1,4 +1,6 @@
 <?php
+//TODO: add invalid intelligence tests
+
 namespace AMC\Tests;
 
 require '../classes/DataObject.php';

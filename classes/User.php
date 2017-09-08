@@ -5,6 +5,8 @@ use AMC\Exceptions\BlankObjectException;
 use AMC\Exceptions\DuplicateEntryException;
 use AMC\Exceptions\IncorrectTypeException;
 use AMC\Exceptions\InvalidGroupException;
+use AMC\Exceptions\InvalidPrivilegeException;
+use AMC\Exceptions\InvalidRankException;
 use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\MissingPrerequisiteException;
 use AMC\Exceptions\NullGetException;
@@ -190,67 +192,79 @@ class User implements DataObject {
     // Join table controls
 
     public function issuePrivilege($privilegeID) {
-        if ($this->hasUserPrivilege($privilegeID)) {
-            throw new DuplicateEntryException('User with id ' . $this->_id . ' was issued Privilege with id ' . $privilegeID . ' when they already have it.');
+        if(Privilege::privilegeExists($privilegeID)) {
+            if ($this->hasUserPrivilege($privilegeID)) {
+                throw new DuplicateEntryException('User with id ' . $this->_id . ' was issued Privilege with id ' . $privilegeID . ' when they already have it.');
+            } else {
+                $userPrivilege = new UserPrivilege();
+                $userPrivilege->setUserID($this->_id);
+                $userPrivilege->setPrivilegeID($privilegeID);
+                $userPrivilege->commit();
+
+            }
         }
         else {
-            $userPrivilege = new UserPrivilege();
-            $userPrivilege->setUserID($this->_id);
-            $userPrivilege->setPrivilegeID($privilegeID);
-            $userPrivilege->commit();
-
+            throw new InvalidPrivilegeException('No privilege with id ' . $privilegeID . ' exists.');
         }
     }
     public function revokePrivilege($privilegeID) {
-        $userPrivileges = UserPrivilege::getByUserID($this->_id);
-        if(\is_null($userPrivileges)) {
-            throw new MissingPrerequisiteException('Tried to revoke privilege with id ' . $privilegeID . ' from user with id ' . $this->_id . ' when the user doesnt have it.');
-        }
-        else {
-            foreach($userPrivileges as $userPrivilege) {
-                if($userPrivilege->getPrivilegeID() == $privilegeID) {
-                    $userPrivilege->toggleDelete();
-                    $userPrivilege->commit();
+        if(Privilege::privilegeExists($privilegeID)) {
+            $userPrivileges = UserPrivilege::getByUserID($this->_id);
+            if (\is_null($userPrivileges)) {
+                throw new MissingPrerequisiteException('Tried to revoke privilege with id ' . $privilegeID . ' from user with id ' . $this->_id . ' when the user doesnt have it.');
+            } else {
+                foreach ($userPrivileges as $userPrivilege) {
+                    if ($userPrivilege->getPrivilegeID() == $privilegeID) {
+                        $userPrivilege->toggleDelete();
+                        $userPrivilege->commit();
+                    }
                 }
             }
+        }
+        else {
+            throw new InvalidPrivilegeException('No privilege with id ' . $privilegeID . ' exists.');
         }
     }
 
     // Checks if the user specifically has the priv
-    public function hasUserPrivilege($privilegeName) {
-        $privilegeArray = Privilege::getByName($privilegeName);
-        if(\is_null($privilegeArray)) {
-            throw new NullGetException("No privilege found with name " . $privilegeName);
+    public function hasUserPrivilege($privID) {
+        if(Privilege::privilegeExists($privID)) {
+            $userPrivileges = UserPrivilege::getByUserID($this->_id);
+            if (\is_null($userPrivileges)) {
+                return false;
+            } else {
+                foreach ($userPrivileges as $userPrivilege) {
+                    if ($userPrivilege->getPrivilegeID() == $privID) {
+                        return true;
+                    }
+                }
+                return false;
+            }
         }
         else {
-            $privID = $privilegeArray[0]->getID();
-            $userPrivs = UserPrivilege::getByUserID($this->_id);
-            foreach($userPrivs as $userPriv) {
-                // If there is a user priv for the user with matching id to selected priv, then the user has the priv
-                if($userPriv->getPrivilegeID() == $privID) {
-                    return true;
-                }
-            }
-            // If loop is exited without a return then the user did not have the priv
-            return false;
+            throw new InvalidPrivilegeException('No privilege with id ' . $privID . ' exists.');
         }
     }
 
     // Checks if the user has the priv, or if they inherit the priv from a group
-    public function hasPrivilege($privilegeName) {
-        if($this->hasUserPrivilege($privilegeName)) {
-            return true;
-        }
-        else {
-            $groups = $this->getGroups();
-            if(\is_array($groups)) {
-                foreach($groups as $group) {
-                    if($group->hasGroupPrivilege($privilegeName)) {
-                        return true;
+    public function hasPrivilege($privilegeID) {
+        if(Privilege::privilegeExists($privilegeID)) {
+            if ($this->hasUserPrivilege($privilegeID)) {
+                return true;
+            } else {
+                $groups = $this->getGroups();
+                if (\is_array($groups)) {
+                    foreach ($groups as $group) {
+                        if ($group->hasGroupPrivilege($privilegeID)) {
+                            return true;
+                        }
                     }
                 }
+                return false;
             }
-            return false;
+        }
+        else {
+            throw new InvalidPrivilegeException('No privilege with id ' . $privilegeID . ' exists.');
         }
     }
 
@@ -268,7 +282,7 @@ class User implements DataObject {
         }
     }
 
-    public function addToGroup($groupID) {
+    public function addToGroup($groupID, $asAdmin = false) {
         if(Group::groupExists($groupID)) {
             if($this->isInGroup($groupID)) {
                 throw new DuplicateEntryException('User with id ' . $this->_id . ' was added to Group with id ' . $groupID . ' but they were already a member.');
@@ -277,6 +291,7 @@ class User implements DataObject {
                 $userGroup = new UserGroup();
                 $userGroup->setUserID($this->_id);
                 $userGroup->setGroupID($groupID);
+                $userGroup->setAdmin($asAdmin);
                 $userGroup->commit();
             }
 
@@ -341,45 +356,57 @@ class User implements DataObject {
     }
 
     public function issueRank($rankID) {
-        if($this->hasRank($rankID)) {
-            throw new DuplicateEntryException('User with id ' . $this->_id . ' was assigned rank with id ' . $rankID . ' when they already had it.');
+        if(Rank::rankExists($rankID)) {
+            if ($this->hasRank($rankID)) {
+                throw new DuplicateEntryException('User with id ' . $this->_id . ' was assigned rank with id ' . $rankID . ' when they already had it.');
+            } else {
+                $userRank = new UserRank();
+                $userRank->setUserID($this->_id);
+                $userRank->setRankID($rankID);
+                $userRank->commit();
+            }
         }
         else {
-            $userRank = new UserRank();
-            $userRank->setUserID($this->_id);
-            $userRank->setRankID($rankID);
-            $userRank->commit();
+            throw new InvalidRankException('No rank found with id ' . $rankID);
         }
     }
 
     public function revokeRank($rankID) {
-        if($this->hasRank($rankID)) {
-            $userRanks = UserRank::getByUserID($this->_id);
-            foreach($userRanks as $userRank) {
-                if($userRank->getRankID() == $rankID) {
-                    $userRank->toggleDelete();
-                    $userRank->commit();
+        if(Rank::rankExists($rankID)) {
+            if ($this->hasRank($rankID)) {
+                $userRanks = UserRank::getByUserID($this->_id);
+                foreach ($userRanks as $userRank) {
+                    if ($userRank->getRankID() == $rankID) {
+                        $userRank->toggleDelete();
+                        $userRank->commit();
+                    }
                 }
+            } else {
+                throw new MissingPrerequisiteException('User with id ' . $this->_id . ' wsa revoked rank with id ' . $rankID . ' but they did not have it.');
             }
         }
         else {
-            throw new MissingPrerequisiteException('User with id ' . $this->_id . ' wsa revoked rank with id ' . $rankID . ' but they did not have it.');
+                throw new InvalidRankException('No rank found with id ' . $rankID);
         }
     }
 
     public function hasRank($rankID) {
-        $userRanks = UserRank::getByUserID($this->_id);
-        if(\is_null($userRanks)) {
-            return false;
+        if(Rank::rankExists($rankID)) {
+            $userRanks = UserRank::getByUserID($this->_id);
+            if (\is_null($userRanks)) {
+                return false;
+            } else {
+                foreach ($userRanks as $userRank) {
+                    if ($userRank->getRankID() == $rankID) {
+                        return true;
+                    }
+                }
+                return false;
+            }
         }
         else {
-            foreach($userRanks as $userRank) {
-                if($userRank->getRankID() == $rankID) {
-                    return true;
-                }
+                throw new InvalidRankException('No rank found with id ' . $rankID);
             }
-            return false;
-        }
     }
 
     public function getRanks() {
@@ -627,7 +654,7 @@ class User implements DataObject {
             }
         }
         else {
-            throw new IncorrectTypeException("Must provide id (int) or string for name was given " . $usernameOrID);
+            throw new IncorrectTypeException('Must provide id (int) or string for name was given ' . \gettype($usernameOrID));
         }
     }
 
@@ -670,7 +697,7 @@ class User implements DataObject {
             }
         }
         else {
-            throw new IncorrectTypeException('Email must be provided as string was given' . $email);
+            throw new IncorrectTypeException('Email must be provided as string was given' . \gettype($email));
         }
     }
 
@@ -679,25 +706,25 @@ class User implements DataObject {
         $password = \trim(Database::getConnection()->real_escape_string($password));
         $email = \trim(Database::getConnection()->real_escape_string($email));
         if(!\is_string($username) || $username == '') {
-            throw new IncorrectTypeException('Username must be a string and not be blank was given ' . $username);
+            throw new IncorrectTypeException('Username must be a string and not be blank was given ' . \gettype($username));
         }
         if(User::userExists($username, true)) {
             throw new DuplicateEntryException('User with username ' . $username . ' already exists');
         }
         if(!\is_string($password) || $password == '') {
-            throw new IncorrectTypeException('Password must be a string and not be blank was given ' . $password);
+            throw new IncorrectTypeException('Password must be a string and not be blank was given ' . \gettype($password));
         }
         if(!\is_string($email) || $email == '') {
-            throw new IncorrectTypeException('Email must be a string and not be blank was given ' . $email);
+            throw new IncorrectTypeException('Email must be a string and not be blank was given ' . \gettype($email));
         }
         if(User::emailExists($email, true)) {
             throw new DuplicateEntryException('User with email ' . $email . ' already exists');
         }
         if(!\is_bool($activated)) {
-            throw new IncorrectTypeException('Activated state must be a boolean was given ' . $activated);
+            throw new IncorrectTypeException('Activated state must be a boolean was given ' . \gettype($activated));
         }
         if(!\is_bool($systemAccount)) {
-            throw new IncorrectTypeException('System account state must be a boolean was given ' . $systemAccount);
+            throw new IncorrectTypeException('System account state must be a boolean was given ' . \gettype($systemAccount));
         }
         $options = [
             'cost' => 12,
@@ -742,7 +769,7 @@ class User implements DataObject {
             if(User::userExists($username, true)){
                 $uid = User::userExists($username, true, true);
                 $return = null;
-                $result = "Banned";
+                $result = "Banned/Inactive";
             }
             else {
                 return null;

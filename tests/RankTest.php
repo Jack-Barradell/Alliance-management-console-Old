@@ -313,4 +313,12 @@ class RankTest extends TestCase {
         $this->assertFalse($testRank[0]->eql($testRank[2]));
     }
 
+    public function testRankExists() {
+        //TODO: Implement
+    }
+
+    public function testIncorrectTypeRankExists() {
+        //TODO: Implement
+    }
+
 }

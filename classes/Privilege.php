@@ -2,6 +2,7 @@
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\IncorrectTypeException;
 use AMC\Exceptions\QueryStatementException;
 
 class Privilege implements DataObject {
@@ -179,6 +180,36 @@ class Privilege implements DataObject {
         }
         else {
             throw new QueryStatementException('Failed to bind query.');
+        }
+    }
+
+    public static function privilegeExists($privilegeID, $returnID = false) {
+        if(\is_numeric($privilegeID)) {
+            if($stmt = Database::getConnection()->prepare("SELECT `PrivilegeID` FROM `Privileges` WHERE `PrivilegeID`=?")) {
+                $stmt->bind_param('i', $privilegeID);
+                $stmt->execute();
+                $stmt->bind_result($privID);
+                if($stmt->num_rows == 1) {
+                    $stmt->fetch();
+                    $stmt->close();
+                    if($returnID) {
+                        return $privID;
+                    }
+                    else {
+                        return true;
+                    }
+                }
+                else {
+                    $stmt->close();
+                    return false;
+                }
+            }
+            else {
+                throw new QueryStatementException('Failed to bind query.');
+            }
+        }
+        else {
+            throw new IncorrectTypeException('Privilege exists must be passed an int or string, was given ' . \gettype($privilegeID));
         }
     }
 

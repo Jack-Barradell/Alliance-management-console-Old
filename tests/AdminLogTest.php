@@ -409,4 +409,12 @@ class AdminLogTest extends TestCase {
         }
     }
 
+    public function testSetAdminID() {
+        //TODO: implement
+    }
+
+    public function testInvalidUserSetAdminID() {
+        //TODO: implement
+    }
+
 }

@@ -299,4 +299,12 @@ class PrivilegeTest extends TestCase {
         }
     }
 
+    public function testPrivilegeExists() {
+        // TODO: Implement
+    }
+
+    public function testIncorrectTypePrivilegeExists() {
+        // TODO: Implement
+    }
+
 }

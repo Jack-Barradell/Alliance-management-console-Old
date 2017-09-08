@@ -1,4 +1,6 @@
 <?php
+//TODO: Add invalid intelligence exceptions
+
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
@@ -84,6 +86,10 @@ class Intelligence implements DataObject {
             return false;
         }
     }
+
+    //TODO: ########################################
+    //TODO: ###### MAKE THE SHOW/HIDE METHODS ######
+    //TODO: ########################################
 
     // Setters and getters
 

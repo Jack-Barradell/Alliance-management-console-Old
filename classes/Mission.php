@@ -1,4 +1,7 @@
 <?php
+
+//TODO: Add invalid mission exceptions
+
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;

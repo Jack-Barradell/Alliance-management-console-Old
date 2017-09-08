@@ -368,6 +368,10 @@ class GroupTest extends TestCase {
         }
     }
 
+    public function testInvalidPrivilegeIssuePrivilege() {
+        //TODO: Implement
+    }
+
     public function testRevokePrivilege() {
         $testPrivilege = new Privilege();
         $testPrivilege->setName('testPriv');
@@ -419,6 +423,10 @@ class GroupTest extends TestCase {
             $testGroup->delete();
             $testPrivilege->delete();
         }
+    }
+
+    public function testInvalidPrivilegeRevokePrivilege() {
+        //TODO: Implement
     }
 
     public function testHasGroupPrivilege() {
@@ -479,33 +487,8 @@ class GroupTest extends TestCase {
         }
     }
 
-    public function testNullGetHasGroupPrivilege() {
-        $testGroup = new Group();
-        $testGroup->setName('TestGroup');
-        $testGroup->setHidden(false);
-        $testGroup->create();
-
-        // Set expected exception
-        $this->expectException(NullGetException::class);
-
-        // Get highest id of a priv
-        $privID = 0;
-        $stmt = $this->_connection->prepare("SELECT `PrivilegeID` FROM `Privileges` DESC LIMIT 1");
-        $stmt->execute();
-        $stmt->bind_result($priv);
-        $stmt->fetch();
-        $privID = $priv;
-        $stmt->close();
-
-        // Trigger it
-        try {
-            $testGroup->hasGroupPrivilege($privID + 1);
-        } catch(NullGetException $e) {
-            $this->assertEquals('No privilege found with name ' . ($priv + 1), $e->getMessage());
-        } finally {
-            // Clean up
-            $testGroup->delete();
-        }
+    public function testInvalidPrivilegeHasGroupPrivilege() {
+        //TODO: Implement
     }
 
     public function testGetPrivileges() {
@@ -609,15 +592,9 @@ class GroupTest extends TestCase {
         // Trigger it
         try {
             Group::groupExists(false);
-        } catch(IncorrectTypeException $e) {}
-
-        try {
-            Group::groupExists(array());
-        } catch(IncorrectTypeException $e) {}
-
-        try {
-            Group::groupExists(new Privilege());
-        } catch(IncorrectTypeException $e) {}
+        } catch(IncorrectTypeException $e) {
+            $this->assertEquals('Group exists must be passed an int or string, was given boolean', $e->getMessage());
+        }
     }
 
 }

@@ -907,4 +907,29 @@ class BanTest extends TestCase {
             $user->delete();
         }
     }
+
+    public function testSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidUserSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testSetAdminID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidUserSetAdminID() {
+        //TODO: Implement
+    }
+
+    public function testSetUnbanAdminID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidUserSetUnbanAdminID() {
+        //TODO: Implement
+    }
+
 }
