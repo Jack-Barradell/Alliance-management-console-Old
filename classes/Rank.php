@@ -185,23 +185,15 @@ class Rank implements DataObject {
         }
     }
 
-    public static function rankExists($rankID, $returnID = false) {
-        if(\is_numeric($returnID)) {
+    public static function rankExists($rankID) {
+        if(\is_numeric($rankID)) {
             if($stmt = Database::getConnection()->prepare('SELECT `RankID` FROM `Ranks` WHERE `RankID`=?')) {
                 $stmt->bind_param('i', $rankID);
                 $stmt->execute();
-                $stmt->bind_result($rankID);
-                if($stmt->num_rows == 1) {
-                    $stmt->fetch();
+                if ($stmt->num_rows == 1) {
                     $stmt->close();
-                    if($returnID) {
-                        return $rankID;
-                    }
-                    else {
-                        return true;
-                    }
-                }
-                else {
+                    return true;
+                } else {
                     $stmt->close();
                     return false;
                 }

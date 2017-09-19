@@ -2,6 +2,7 @@
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\IncorrectTypeException;
 use AMC\Exceptions\QueryStatementException;
 
 class IntelligenceType implements DataObject {
@@ -158,6 +159,29 @@ class IntelligenceType implements DataObject {
         }
         else {
             return null;
+        }
+    }
+
+    public static function intelligenceTypeExists($intelligenceTypeID) {
+        if(\is_numeric($intelligenceTypeID)) {
+            if($stmt = Database::getConnection()->prepare("SELECT `IntelligenceTypeID` FROM `Intelligence_Types` WHERE `IntelligenceTypeID`=?")) {
+                $stmt->bind_param('i', $intelligenceTypeID);
+                $stmt->execute();
+                if($stmt->num_rows == 1) {
+                    $stmt->close();
+                    return true;
+                }
+                else {
+                    $stmt->close();
+                    return false;
+                }
+            }
+            else {
+                throw new QueryStatementException('Failed to bind query.');
+            }
+        }
+        else {
+            throw new IncorrectTypeException('Intelligence type exists must be passed an int, was given ' . \gettype($intelligenceTypeID));
         }
     }
 }

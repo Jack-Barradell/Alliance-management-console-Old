@@ -7,7 +7,6 @@ use AMC\Exceptions\IncorrectTypeException;
 use AMC\Exceptions\InvalidPrivilegeException;
 use AMC\Exceptions\MissingPrerequisiteException;
 use AMC\Exceptions\QueryStatementException;
-use AMC\Exceptions\NullGetException;
 
 class Group implements DataObject {
     use Getable;

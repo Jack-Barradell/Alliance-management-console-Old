@@ -13,6 +13,7 @@ use AMC\Classes\IntelligenceType;
 use AMC\Classes\Database;
 use AMC\Exceptions\BlankObjectException;
 use PHPUnit\Framework\TestCase;
+use Twig\Node\Expression\Unary\PosUnary;
 
 class IntelligenceTypeTest extends TestCase {
 
@@ -265,6 +266,14 @@ class IntelligenceTypeTest extends TestCase {
 
         // Check different arent equal
         $this->assertFalse($testIntelligenceType[0]->eql($testIntelligenceType[0]));
+    }
+
+    public function testIntelligenceTypeExists() {
+        //TODO: Implement
+    }
+
+    public function testIncorrectTypeIntelligenceTypeExists() {
+        //TODO: Implement
     }
 
 }

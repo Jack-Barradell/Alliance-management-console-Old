@@ -1,4 +1,7 @@
 <?php
+
+//TODO: Add verify GroupID
+//TODO: Add verify intelligence id
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;

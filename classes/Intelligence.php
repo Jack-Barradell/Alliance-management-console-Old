@@ -4,6 +4,8 @@
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidIntelligenceTypeException;
+use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\QueryStatementException;
 
 class Intelligence implements DataObject {
@@ -125,12 +127,33 @@ class Intelligence implements DataObject {
         $this->_id = $id;
     }
 
-    public function setAuthorID($authorID) {
-        $this->_authorID = $authorID;
+    public function setAuthorID($authorID, $verify = false) {
+        if($verify) {
+            if(User::userExists($authorID)) {
+                $this->_authorID = $authorID;
+            }
+            else {
+                throw new InvalidUserException('No user exists with id ' . $authorID);
+            }
+        }
+        else {
+            $this->_authorID = $authorID;
+        }
     }
 
-    public function setIntelligenceTypeID($intelligenceTypeID) {
-        $this->_intelligenceTypeID = $intelligenceTypeID;
+    public function setIntelligenceTypeID($intelligenceTypeID, $verify = false) {
+        if($verify) {
+            if(IntelligenceType::intelligenceTypeExists($intelligenceTypeID)) {
+                $this->_intelligenceTypeID = $intelligenceTypeID;
+            }
+            else {
+                throw new InvalidIntelligenceTypeException('No intelligence type exists with id ' . $intelligenceTypeID);
+            }
+        }
+        else {
+            $this->_intelligenceTypeID = $intelligenceTypeID;
+        }
+
     }
 
     public function setSubject($subject) {

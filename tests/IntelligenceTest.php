@@ -693,4 +693,20 @@ class IntelligenceTest extends TestCase {
         }
     }
 
+    public function testSetAuthorID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidUserSetAuthorID() {
+        //TODO: Implement
+    }
+
+    public function testSetIntelligenceTypeID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidIntelligenceTypeSetIntelligenceTypeID() {
+        //TODO: Implement
+    }
+
 }

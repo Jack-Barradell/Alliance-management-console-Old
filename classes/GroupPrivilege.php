@@ -2,6 +2,8 @@
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidGroupException;
+use AMC\Exceptions\InvalidPrivilegeException;
 use AMC\Exceptions\QueryStatementException;
 
 class GroupPrivilege implements DataObject {
@@ -96,12 +98,32 @@ class GroupPrivilege implements DataObject {
         $this->_id = $id;
     }
 
-    public function setGroupID($groupID) {
-        $this->_groupID = $groupID;
+    public function setGroupID($groupID, $verify = false) {
+        if($verify) {
+            if(Group::groupExists($groupID)) {
+                $this->_groupID = $groupID;
+            }
+            else {
+                throw new InvalidGroupException('No group exists with id ' . $groupID);
+            }
+        }
+        else {
+            $this->_groupID = $groupID;
+        }
     }
 
-    public function setPrivilegeID($privID) {
-        $this->_privilegeID = $privID;
+    public function setPrivilegeID($privID, $verify = false) {
+        if($verify) {
+            if(Privilege::privilegeExists($privID)) {
+                $this->_privilegeID = $privID;
+            }
+            else {
+                throw new InvalidPrivilegeException('No privilege exists with id ' . $privID);
+            }
+        }
+        else {
+            $this->_privilegeID = $privID;
+        }
     }
 
     // Statics

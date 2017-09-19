@@ -9,7 +9,6 @@ use AMC\Exceptions\InvalidPrivilegeException;
 use AMC\Exceptions\InvalidRankException;
 use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\MissingPrerequisiteException;
-use AMC\Exceptions\NullGetException;
 use AMC\Exceptions\QueryStatementException;
 
 class User implements DataObject {

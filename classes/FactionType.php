@@ -163,21 +163,15 @@ class FactionType implements DataObject {
         }
     }
 
-    public static function factionTypeExists($factionTypeID, $returnID = false) {
+    public static function factionTypeExists($factionTypeID) {
         if(\is_numeric($factionTypeID)) {
             if($stmt = Database::getConnection()->prepare("SELECT `FactionTypeID` FROM `Faction_Types` WHERE `FactionTypeID`=?")) {
                 $stmt->bind_param('i', $factionTypeID);
                 $stmt->execute();
-                $stmt->bind_result($typeID);
-                if($stmt->num_rows == 1) {
-                    if($returnID) {
-                        return $typeID;
-                    }
-                    else {
-                        return true;
-                    }
-                }
-                else {
+                if ($stmt->num_rows == 1) {
+                    $stmt->close();
+                    return true;
+                } else {
                     $stmt->close();
                     return false;
                 }

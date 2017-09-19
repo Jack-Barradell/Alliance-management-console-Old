@@ -1,4 +1,6 @@
 <?php
+//TODO: Add verify author id
+//TODO: add verify news category id
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
