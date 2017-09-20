@@ -4,6 +4,8 @@
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\IncorrectTypeException;
+use AMC\Exceptions\InvalidIntelligenceException;
 use AMC\Exceptions\InvalidIntelligenceTypeException;
 use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\QueryStatementException;
@@ -312,6 +314,29 @@ class Intelligence implements DataObject {
         }
         else {
             throw new QueryStatementException('Failed to bind query');
+        }
+    }
+
+    public static function intelligenceExists($intelligenceID) {
+        if(\is_numeric($intelligenceID)) {
+            if($stmt = Database::getConnection()->prepare("SELECT `IntelligenceID` FROM `Intelligence` WHERE `IntelligenceID`=?")) {
+                $stmt->bind_param('i', $intelligenceID);
+                $stmt->execute();
+                if($stmt->num_rows == 1) {
+                    $stmt->close();
+                    return true;
+                }
+                else {
+                    $stmt->close();
+                    return false;
+                }
+            }
+            else {
+                throw new QueryStatementException('Failed to bind query.');
+            }
+        }
+        else {
+            throw new IncorrectTypeException('Intelligence type exists must e passed an int was given a ' . \gettype($intelligenceID));
         }
     }
 

@@ -5,6 +5,7 @@
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\IncorrectTypeException;
 use AMC\Exceptions\QueryStatementException;
 
 class IntelligenceGroupView implements DataObject {
@@ -217,5 +218,4 @@ class IntelligenceGroupView implements DataObject {
             throw new QueryStatementException('Failed to bind query.');
         }
     }
-
 }
