@@ -1,11 +1,11 @@
 <?php
-//TODO: Add invalid intelligence exceptions
-
+//TODO: ########################################
+//TODO: ###### MAKE THE SHOW/HIDE METHODS ######
+//TODO: ########################################
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
 use AMC\Exceptions\IncorrectTypeException;
-use AMC\Exceptions\InvalidIntelligenceException;
 use AMC\Exceptions\InvalidIntelligenceTypeException;
 use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\QueryStatementException;

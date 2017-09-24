@@ -709,4 +709,12 @@ class IntelligenceTest extends TestCase {
         //TODO: Implement
     }
 
+    public function testIntelligenceExists() {
+        //TODO: Implement
+    }
+
+    public function testIncorrectTypeIntelligenceExists() {
+        //TODO: Implement
+    }
+
 }

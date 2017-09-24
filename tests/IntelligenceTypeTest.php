@@ -13,7 +13,6 @@ use AMC\Classes\IntelligenceType;
 use AMC\Classes\Database;
 use AMC\Exceptions\BlankObjectException;
 use PHPUnit\Framework\TestCase;
-use Twig\Node\Expression\Unary\PosUnary;
 
 class IntelligenceTypeTest extends TestCase {
 

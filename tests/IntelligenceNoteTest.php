@@ -572,4 +572,21 @@ class IntelligenceNoteTest extends TestCase {
         }
     }
 
+    public function testSetIntelligenceID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidIntelligenceSetIntelligenceID() {
+        //TODO: Implement
+    }
+
+    public function testSetUserID() {
+        //TODO: Implement
+    }
+
+
+    public function testInvalidUserSetUserID() {
+        //TODO: Implement
+    }
+
 }

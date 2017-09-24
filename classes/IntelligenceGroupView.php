@@ -1,11 +1,9 @@
 <?php
-
-//TODO: Add verify GroupID
-//TODO: Add verify intelligence id
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
-use AMC\Exceptions\IncorrectTypeException;
+use AMC\Exceptions\InvalidGroupException;
+use AMC\Exceptions\InvalidIntelligenceException;
 use AMC\Exceptions\QueryStatementException;
 
 class IntelligenceGroupView implements DataObject {
@@ -100,12 +98,32 @@ class IntelligenceGroupView implements DataObject {
         $this->_id = $id;
     }
 
-    public function setGroupID($groupID) {
-        $this->_groupID = $groupID;
+    public function setGroupID($groupID, $verify = false) {
+        if($verify) {
+            if(Group::groupExists($groupID)) {
+                $this->_groupID = $groupID;
+            }
+            else {
+                throw new InvalidGroupException('No group exists with id ' . $groupID);
+            }
+        }
+        else {
+            $this->_groupID = $groupID;
+        }
     }
 
-    public function setIntelligenceID($intelligenceID) {
-        $this->_intelligenceID = $intelligenceID;
+    public function setIntelligenceID($intelligenceID, $verify = false) {
+        if($verify) {
+            if(Intelligence::intelligenceExists($intelligenceID)) {
+                $this->_intelligenceID = $intelligenceID;
+            }
+            else {
+                throw new InvalidIntelligenceException('No intelligence exists with id ' . $intelligenceID);
+            }
+        }
+        else {
+            $this->_intelligenceID = $intelligenceID;
+        }
     }
 
     // Statics

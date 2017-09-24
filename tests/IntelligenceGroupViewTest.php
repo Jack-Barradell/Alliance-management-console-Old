@@ -499,4 +499,20 @@ class IntelligenceGroupViewTest extends TestCase {
         }
     }
 
+    public function testSetGroupID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidGroupSetGroupID() {
+        //TODO: Implement
+    }
+
+    public function testSetIntelligenceID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidIntelligenceSetIntelligenceID() {
+        //TODO: Implement
+    }
+
 }
