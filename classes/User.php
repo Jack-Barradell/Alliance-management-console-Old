@@ -4,6 +4,7 @@ namespace AMC\Classes;
 use AMC\Exceptions\BlankObjectException;
 use AMC\Exceptions\DuplicateEntryException;
 use AMC\Exceptions\IncorrectTypeException;
+use AMC\Exceptions\InvalidFactionException;
 use AMC\Exceptions\InvalidGroupException;
 use AMC\Exceptions\InvalidPrivilegeException;
 use AMC\Exceptions\InvalidRankException;
@@ -492,8 +493,18 @@ class User implements DataObject {
         $this->_systemAccount = $systemAccount;
     }
 
-    public function setFactionID($id) {
-        $this->_factionID = $id;
+    public function setFactionID($id, $verify = false) {
+        if($verify) {
+            if(Faction::factionExists($id)) {
+                $this->_factionID = $id;
+            }
+            else {
+                throw new InvalidFactionException('No faction exists with id ' . $id);
+            }
+        }
+        else {
+            $this->_factionID = $id;
+        }
     }
 
     // Statics

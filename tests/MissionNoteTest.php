@@ -574,4 +574,19 @@ class MissionNoteTest extends TestCase {
         }
     }
 
+    public function testSetMissionID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidMissionSetMissionID() {
+        //TODO: Implement
+    }
+
+    public function testSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidUserSetUserID() {
+        //TODO: Implement
+    }
 }

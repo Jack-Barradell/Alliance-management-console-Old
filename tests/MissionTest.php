@@ -1055,4 +1055,12 @@ class MissionTest extends TestCase {
         $testUser->delete();
     }
 
+    public function testMissionExists() {
+        //TODO: Implement
+    }
+
+    public function testIncorrectTypeMissionExists() {
+        //TODO: Implement
+    }
+
 }

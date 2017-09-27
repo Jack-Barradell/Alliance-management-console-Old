@@ -560,4 +560,20 @@ class NewsCommentTest extends TestCase {
         }
     }
 
+    public function testSetNewsID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidNewsSetNewsID() {
+        //TODO: Implement
+    }
+
+    public function testSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidUserSetUserID() {
+        //TODO: Implement
+    }
+
 }

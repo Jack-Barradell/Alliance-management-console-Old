@@ -1,8 +1,8 @@
 <?php
-//TODO: Add verify sender id
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\IncorrectTypeException;
 use AMC\Exceptions\InvalidGroupException;
 use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\QueryStatementException;
@@ -153,8 +153,18 @@ class Message implements DataObject {
         $this->_id = $id;
     }
 
-    public function setSenderID($senderID) {
-        $this->_senderID = $senderID;
+    public function setSenderID($senderID, $verify = false) {
+        if($verify) {
+            if(User::userExists($senderID)) {
+                $this->_senderID = $senderID;
+            }
+            else {
+                throw new InvalidUserException('There is no user with id ' . $senderID);
+            }
+        }
+        else {
+            $this->_senderID = $senderID;
+        }
     }
 
     public function setSubject($subject) {
@@ -266,6 +276,29 @@ class Message implements DataObject {
         }
         else {
             throw new QueryStatementException('Failed to bind query.');
+        }
+    }
+
+    public static function messageExists($messageID) {
+        if(\is_numeric($messageID)) {
+            if($stmt = Database::getConnection()->prepare("SELECT `MessageID` FROM `Messages` WHERE `MessageID`=?")) {
+                $stmt->bind_params('i', $messageID);
+                $stmt->execute();
+                if($stmt->num_rows == 1) {
+                    $stmt->close();
+                    return true;
+                }
+                else {
+                    $stmt->close();
+                    return false;
+                }
+            }
+            else {
+                throw new QueryStatementException('Failed to bind query.');
+            }
+        }
+        else {
+            throw new IncorrectTypeException('Message exists must be given an int, was given a ' . \gettype($messageID));
         }
     }
 

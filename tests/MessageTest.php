@@ -712,4 +712,19 @@ class MessageTest extends TestCase {
         $testSender->delete();
     }
 
+    public function testSetSenderID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidUserSetSenderID() {
+        //TODO: Implement
+    }
+
+    public function testMessageExists() {
+        //TODO: Implement
+    }
+
+    public function testIncorrectTypeMessageExists() {
+        //TODO: Implement
+    }
 }

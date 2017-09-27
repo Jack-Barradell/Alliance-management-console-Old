@@ -2,6 +2,7 @@
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\IncorrectTypeException;
 use AMC\Exceptions\QueryStatementException;
 
 class NewsCategory implements DataObject {
@@ -170,6 +171,29 @@ class NewsCategory implements DataObject {
         }
         else {
             return null;
+        }
+    }
+
+    public static function newsCategoryExists($newsCategoryID) {
+        if(\is_numeric($newsCategoryID)) {
+            if($stmt = Database::getConnection()->prepare("SELECT `NewsCategoryID` FROM `News_Categories` WHERE `NewsCategoryID`=?")) {
+                $stmt->bind_params('i', $newsCategoryID);
+                $stmt->execute();
+                if($stmt->num_rows == 1) {
+                    $stmt->close();
+                    return true;
+                }
+                else {
+                    $stmt->close();
+                    return false;
+                }
+            }
+            else {
+                throw new QueryStatementException('Failed to bind query.');
+            }
+        }
+        else {
+            throw new IncorrectTypeException('News category exists must be given an int, was given a ' . \gettype($newsCategoryID));
         }
     }
 }

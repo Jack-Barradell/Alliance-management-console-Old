@@ -1,9 +1,9 @@
 <?php
-//TODO: Add verify on editor id
-//TODO: Add verify on news id
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidNewsException;
+use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\QueryStatementException;
 
 class NewsEdit implements DataObject {
@@ -104,12 +104,32 @@ class NewsEdit implements DataObject {
         $this->_id = $id;
     }
 
-    public function setEditorID($editorID) {
-        $this->_editorID = $editorID;
+    public function setEditorID($editorID, $verify = false) {
+        if($verify) {
+            if(User::userExists($editorID)) {
+                $this->_editorID = $editorID;
+            }
+            else {
+                throw new InvalidUserException('No user exists with id ' . $editorID);
+            }
+        }
+        else {
+            $this->_editorID = $editorID;
+        }
     }
 
-    public function setNewsID($newsID) {
-        $this->_newsID = $newsID;
+    public function setNewsID($newsID, $verify = false) {
+        if($verify) {
+            if(News::newsExists($newsID)) {
+                $this->_newsID = $newsID;
+            }
+            else {
+                throw new InvalidNewsException('No news exists with id ' . $newsID);
+            }
+        }
+        else {
+            $this->_newsID = $newsID;
+        }
     }
 
     public function setTimestamp($timestamp) {

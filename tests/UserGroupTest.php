@@ -546,4 +546,20 @@ class UserGroupTest extends TestCase {
         }
     }
 
+    public function testSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidUserSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testSetGroupID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidGroupSetGroupID() {
+        //TODO: Implement
+    }
+
 }

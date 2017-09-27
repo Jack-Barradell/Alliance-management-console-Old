@@ -439,4 +439,12 @@ class MissionStageTest extends TestCase {
         }
     }
 
+    public function testSetMissionID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidMissioNSetMissionID() {
+        //TODO: Implement
+    }
+
 }

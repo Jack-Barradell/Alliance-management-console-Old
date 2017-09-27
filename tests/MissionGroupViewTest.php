@@ -488,4 +488,20 @@ class MissionGroupViewTest extends TestCase {
         $this->assertEquals($testMissionGroupView[0]->getMissionID(), $selectedSingle[0]->getMissionID());
     }
 
+    public function testSetGroupID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidGroupSetGroupID() {
+        //TODO: Implement
+    }
+
+    public function testSetMissionID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidMissionSetMissionID() {
+        //TODO: Implement
+    }
+
 }

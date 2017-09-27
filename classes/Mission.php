@@ -1,11 +1,9 @@
 <?php
-
-//TODO: Add invalid mission exceptions
-
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
 use AMC\Exceptions\DuplicateEntryException;
+use AMC\Exceptions\IncorrectTypeException;
 use AMC\Exceptions\InvalidGroupException;
 use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\MissingPrerequisiteException;
@@ -364,6 +362,29 @@ class Mission implements DataObject {
         }
         else {
             throw new QueryStatementException('Failed to bind query.');
+        }
+    }
+
+    public static function missionExists($missionID) {
+        if(\is_numeric($missionID)) {
+            if($stmt = Database::getConnection()->prepare("SELECT `MissionID` FROM `Missions` WHERE `MissionID`=?")) {
+                $stmt->bind_params('i', $missionID);
+                $stmt->execute();
+                if($stmt->num_rows == 1) {
+                    $stmt->close();
+                    return true;
+                }
+                else {
+                    $stmt->close();
+                    return false;
+                }
+            }
+            else {
+                throw new QueryStatementException('Failed to bind query.');
+            }
+        }
+        else {
+            throw new IncorrectTypeException('Mission exists must be passed an int, was given a ' . \gettype($missionID));
         }
     }
 

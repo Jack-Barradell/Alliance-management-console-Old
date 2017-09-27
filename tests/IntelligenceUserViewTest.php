@@ -503,4 +503,20 @@ class IntelligenceUserViewTest extends TestCase {
         }
     }
 
+    public function testSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidUserSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testSetIntelligenceID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidIntelligenceSetIntelligenceID() {
+        //TODO: Implement
+    }
+
 }

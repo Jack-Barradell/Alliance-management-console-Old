@@ -1,9 +1,9 @@
 <?php
-//TODO: Add news id verify
-//TODO: Add verify on user id
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidNewsException;
+use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\QueryStatementException;
 
 class NewsComment {
@@ -110,12 +110,32 @@ class NewsComment {
         $this->_id = $id;
     }
 
-    public function setNewsID($newsID) {
-        $this->_newsID = $newsID;
+    public function setNewsID($newsID, $verify = false) {
+        if($verify) {
+            if(News::newsExists($newsID)) {
+                $this->_newsID = $newsID;
+            }
+            else {
+                throw new InvalidNewsException('No news exists with id ' . $newsID);
+            }
+        }
+        else {
+            $this->_newsID = $newsID;
+        }
     }
 
-    public function setUserID($userID) {
-        $this->_userID = $userID;
+    public function setUserID($userID, $verify = false) {
+        if($verify) {
+            if(User::userExists($userID)) {
+                $this->_userID = $userID;
+            }
+            else {
+                throw new InvalidUserException('No user exists with id ' . $userID);
+            }
+        }
+        else {
+            $this->_userID = $userID;
+        }
     }
 
     public function setBody($body) {

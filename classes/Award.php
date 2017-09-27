@@ -2,6 +2,7 @@
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\IncorrectTypeException;
 use AMC\Exceptions\QueryStatementException;
 
 class Award implements DataObject {
@@ -182,6 +183,29 @@ class Award implements DataObject {
         }
         else {
             return null;
+        }
+    }
+
+    public static function awardExists($awardID) {
+        if(\is_numeric($awardID)) {
+            if($stmt = Database::getConnection()->prepare("SELECT `AwardID` FROM `Awards` WHERE `AwardID`=?")) {
+                $stmt->bind_params('i', $awardID);
+                $stmt->execute();
+                if($stmt->num_rows == 1) {
+                    $stmt->close();
+                    return true;
+                }
+                else {
+                    $stmt->close();
+                    return false;
+                }
+            }
+            else {
+                throw new QueryStatementException('Failed to bind query.');
+            }
+        }
+        else {
+            throw new IncorrectTypeException('Award exists must be given an int, was given a ' . \gettype($awardID));
         }
     }
 

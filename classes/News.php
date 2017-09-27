@@ -1,9 +1,10 @@
 <?php
-//TODO: Add verify author id
-//TODO: add verify news category id
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\IncorrectTypeException;
+use AMC\Exceptions\InvalidNewsCategoryException;
+use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\QueryStatementException;
 
 class News implements DataObject {
@@ -140,12 +141,32 @@ class News implements DataObject {
         $this->_id = $id;
     }
 
-    public function setAuthorID($authorID) {
-        $this->_authorID = $authorID;
+    public function setAuthorID($authorID, $verify = false) {
+        if($verify) {
+            if(User::userExists($authorID)) {
+                $this->_authorID = $authorID;
+            }
+            else {
+                throw new InvalidUserException('There is no user with id ' . $authorID);
+            }
+        }
+        else {
+            $this->_authorID = $authorID;
+        }
     }
 
-    public function setNewsCategoryID($newsCategoryID) {
-        $this->_newsCategoryID = $newsCategoryID;
+    public function setNewsCategoryID($newsCategoryID, $verify = false) {
+        if($verify) {
+            if(NewsCategory::newsCategoryExists($newsCategoryID)) {
+                $this->_newsCategoryID = $newsCategoryID;
+            }
+            else {
+                throw new InvalidNewsCategoryException('There is no news category with id ' . $newsCategoryID);
+            }
+        }
+        else {
+            $this->_newsCategoryID = $newsCategoryID;
+        }
     }
 
     public function setTitle($title) {
@@ -300,6 +321,29 @@ class News implements DataObject {
         }
         else {
             throw new QueryStatementException('Failed to bind query.');
+        }
+    }
+
+    public static function newsExists($newsID) {
+        if(\is_numeric($newsID)) {
+            if($stmt = Database::getConnection()->prepare("SELECT `NewsID` FROM `News` WHERE `NewsID`=?")) {
+                $stmt->bind_params('i', $newsID);
+                $stmt->execute();
+                if($stmt->num_rows == 1) {
+                    $stmt->close();
+                    return true;
+                }
+                else {
+                    $stmt->close();
+                    return false;
+                }
+            }
+            else {
+                throw new QueryStatementException('Failed to bind query.');
+            }
+        }
+        else {
+            throw new IncorrectTypeException('News exists must be given an int, was given ' . \gettype($newsID));
         }
     }
 

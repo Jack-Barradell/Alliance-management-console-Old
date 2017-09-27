@@ -1,9 +1,9 @@
 <?php
-//TODO: Add verify group id
-//TODO: Add verify admin id
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidGroupException;
+use AMC\Exceptions\InvalidMissionException;
 use AMC\Exceptions\QueryStatementException;
 
 class MissionGroupView implements DataObject {
@@ -98,12 +98,32 @@ class MissionGroupView implements DataObject {
         $this->_id = $id;
     }
 
-    public function setGroupID($groupID) {
-        $this->_groupID = $groupID;
+    public function setGroupID($groupID, $verify = false) {
+        if($verify) {
+            if(Group::groupExists($groupID)) {
+                $this->_groupID = $groupID;
+            }
+            else {
+                throw new InvalidGroupException('No group exists with id ' . $groupID);
+            }
+        }
+        else {
+            $this->_groupID = $groupID;
+        }
     }
 
-    public function setMissionID($missionID) {
-        $this->_missionID = $missionID;
+    public function setMissionID($missionID, $verify = false) {
+        if($verify) {
+            if(Mission::missionExists($missionID)) {
+                $this->_missionID = $missionID;
+            }
+            else {
+                throw new InvalidMissionException('There is no mission with id ' . $missionID);
+            }
+        }
+        else {
+            $this->_missionID = $missionID;
+        }
     }
 
     // Statics

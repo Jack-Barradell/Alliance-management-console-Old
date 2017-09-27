@@ -288,4 +288,12 @@ class NewsCategoryTest extends TestCase {
         $this->assertFalse($testNewsCategory[0]->eql($testNewsCategory[0]));
     }
 
+    public function testNewsCategoryExists() {
+        //TODO: Implement
+    }
+
+    public function testIncorrectTypeNewsCategoryExists() {
+        //TODO: Implement
+    }
+
 }

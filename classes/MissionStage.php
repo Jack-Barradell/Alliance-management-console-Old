@@ -1,8 +1,8 @@
 <?php
-//TODO: Add verify mission id
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidMissionException;
 use AMC\Exceptions\QueryStatementException;
 
 class MissionStage implements DataObject {
@@ -109,8 +109,18 @@ class MissionStage implements DataObject {
         $this->_id = $id;
     }
 
-    public function setMissionID($missionID) {
-        $this->_missionID = $missionID;
+    public function setMissionID($missionID, $verify = false) {
+        if($verify) {
+            if(Mission::missionExists($missionID)) {
+                $this->_missionID = $missionID;
+            }
+            else {
+                throw new InvalidMissionException('There is no mission with id ' . $missionID);
+            }
+        }
+        else {
+            $this->_missionID = $missionID;
+        }
     }
 
     public function setName($name) {

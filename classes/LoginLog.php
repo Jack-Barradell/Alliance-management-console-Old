@@ -1,7 +1,8 @@
 <?php
 namespace AMC\Classes;
-//TODO: Add verify user id
+
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\QueryStatementException;
 
 class LoginLog implements DataObject {
@@ -108,8 +109,18 @@ class LoginLog implements DataObject {
         $this->_id = $id;
     }
 
-    public function setUserID($userID) {
-        $this->_userID = $userID;
+    public function setUserID($userID, $verify = false) {
+        if($verify) {
+            if(User::userExists($userID)) {
+                $this->_userID = $userID;
+            }
+            else {
+                throw new InvalidUserException('No user exists with id ' . $userID);
+            }
+        }
+        else {
+            $this->_userID = $userID;
+        }
     }
 
     public function setResult($result) {

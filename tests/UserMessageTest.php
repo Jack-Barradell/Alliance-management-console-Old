@@ -585,4 +585,20 @@ class UserMessageTest extends TestCase {
         }
     }
 
+    public function testSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidUserSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testSetMessageID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidMessageSetMessageID() {
+        //TODO: Implement
+    }
+
 }

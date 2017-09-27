@@ -737,4 +737,20 @@ class NewsTest extends TestCase {
         }
     }
 
+    public function testSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidUserSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testSetNewsCategoryID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidNewsCategorySetNewsCategoryID() {
+        //TODO: Implement
+    }
+
 }

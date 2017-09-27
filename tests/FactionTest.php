@@ -389,4 +389,13 @@ class FactionTest extends TestCase {
         //TODO: Implement
     }
 
+    public function testFactionExists() {
+        //TODO: Implement
+    }
+
+    public function testIncorrectTypeFactionExists(){
+        //TODO: Implement
+    }
+
+
 }

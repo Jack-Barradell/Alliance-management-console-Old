@@ -588,4 +588,20 @@ class MeritTest extends TestCase {
             $admin->delete();
         }
     }
+
+    public function testSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidUserSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testSetAdminID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidUserSetAdminID() {
+        //TODO: Implement
+    }
 }

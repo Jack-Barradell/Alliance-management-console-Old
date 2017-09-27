@@ -1,9 +1,9 @@
 <?php
-//TODO: Add verify user id
-//TODO: Add verify message id
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidMessageException;
+use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\QueryStatementException;
 
 class UserMessage implements DataObject {
@@ -115,12 +115,33 @@ class UserMessage implements DataObject {
         $this->_id = $id;
     }
 
-    public function setUserID($userID) {
-        $this->_userID = $userID;
+    public function setUserID($userID, $verify = false) {
+        if($verify) {
+            if(User::userExists($userID)) {
+                $this->_userID = $userID;
+            }
+            else {
+                throw new InvalidUserException('No user exists with id ' . $userID);
+            }
+        }
+        else {
+            $this->_userID = $userID;
+        }
+
     }
 
-    public function setMessageID($messageID) {
-        $this->_messageID = $messageID;
+    public function setMessageID($messageID, $verify = false) {
+        if($verify) {
+            if(Message::messageExists($messageID)) {
+                $this->_messageID = $messageID;
+            }
+            else {
+                throw new InvalidMessageException('No message exists with id ' . $messageID);
+            }
+        }
+        else {
+            $this->_messageID = $messageID;
+        }
     }
 
     public function setAcknowledged($acknowledged) {

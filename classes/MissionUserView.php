@@ -1,9 +1,9 @@
 <?php
-//TODO: Add verify user id
-//TODO: Add verify mission id
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidMissionException;
+use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\QueryStatementException;
 
 class MissionUserView implements DataObject {
@@ -98,12 +98,32 @@ class MissionUserView implements DataObject {
         $this->_id = $id;
     }
 
-    public function setUserID($userID) {
-        $this->_userID = $userID;
+    public function setUserID($userID, $verify = false) {
+        if($verify) {
+            if(User::userExists($userID)) {
+                $this->_userID = $userID;
+            }
+            else {
+                throw new InvalidUserException('There is no user with id ' . $userID);
+            }
+        }
+        else {
+            $this->_userID = $userID;
+        }
     }
 
-    public function setMissionID($missionID) {
-        $this->_missionID = $missionID;
+    public function setMissionID($missionID, $verify = false) {
+        if($verify) {
+            if(Mission::missionExists($missionID)) {
+                $this->_missionID = $missionID;
+            }
+            else {
+                throw new InvalidMissionException('There is no mission with id ' . $missionID);
+            }
+        }
+        else {
+            $this->_missionID = $missionID;
+        }
     }
 
     // Statics

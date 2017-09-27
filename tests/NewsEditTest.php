@@ -534,4 +534,20 @@ class NewsEditTest extends TestCase {
         }
     }
 
+    public function testSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidUserSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testSetNewsID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidNewsSetNewsID() {
+        //TODO: Implement
+    }
+
 }

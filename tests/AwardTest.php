@@ -324,4 +324,12 @@ class AwardTest extends TestCase {
         $this->assertFalse($testAward[0]->eql($testAward[2]));
     }
 
+    public function testAwardExists() {
+        //TODO: Implement
+    }
+
+    public function testIncorrectTypeAwardExists() {
+        //TODO: Implement
+    }
+
 }

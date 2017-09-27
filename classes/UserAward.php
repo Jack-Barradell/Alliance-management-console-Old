@@ -1,10 +1,9 @@
 <?php
-//TODO: Add verify user id
-//TODO: Add verify issuer id
-//TODO: Add verify award id
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidAwardException;
+use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\QueryStatementException;
 
 class UserAward implements DataObject {
@@ -111,16 +110,46 @@ class UserAward implements DataObject {
         $this->_id = $id;
     }
 
-    public function setUserID($userID) {
-        $this->_userID = $userID;
+    public function setUserID($userID, $verify = false) {
+        if($verify) {
+            if(User::userExists($userID)) {
+                $this->_userID = $userID;
+            }
+            else {
+                throw new InvalidUserException('No user exists with id ' . $userID);
+            }
+        }
+        else {
+            $this->_userID = $userID;
+        }
     }
 
-    public function setIssuerID($issuerID) {
-        $this->_issuerID = $issuerID;
+    public function setIssuerID($issuerID, $verify = false) {
+        if($verify) {
+            if(User::userExists($issuerID)) {
+                $this->_issuerID = $issuerID;
+            }
+            else {
+                throw new InvalidUserException('No user exists with id ' . $issuerID);
+            }
+        }
+        else {
+            $this->_issuerID = $issuerID;
+        }
     }
 
-    public function setAwardID($awardID) {
-        $this->_awardID = $awardID;
+    public function setAwardID($awardID, $verify = false) {
+        if($verify) {
+            if(Award::awardExists($awardID)) {
+                $this->_awardID = $awardID;
+            }
+            else {
+                throw new InvalidAwardException('No award exists with id ' . $awardID);
+            }
+        }
+        else {
+            $this->_awardID = $awardID;
+        }
     }
 
     public function setTimestamp($timestamp) {

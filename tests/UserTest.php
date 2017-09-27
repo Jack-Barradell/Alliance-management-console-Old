@@ -1804,4 +1804,11 @@ class UserTest extends TestCase {
         //TODO: Implement
     }
 
+    public function testSetFactionID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidFactionSetFactionID() {
+        //TODO: Implement
+    }
 }

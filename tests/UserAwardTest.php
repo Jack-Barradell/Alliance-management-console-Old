@@ -706,4 +706,28 @@ class UserAwardTest extends TestCase {
         }
     }
 
+    public function testSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidUserSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testSetIssuerID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidUserSetIssuerID() {
+        //TODO: Implement
+    }
+
+    public function testSetAwardID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidAwardSetAwardID() {
+        //TODO: Implement
+    }
+
 }
