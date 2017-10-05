@@ -505,4 +505,19 @@ class UserMissionTest extends TestCase {
         }
     }
 
+    public function testSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidUserSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testSetMissionID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidMissionSetMissionID() {
+        //TODO: Implement
+    }
 }

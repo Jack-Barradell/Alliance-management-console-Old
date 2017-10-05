@@ -4,6 +4,8 @@
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidMissionException;
+use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\QueryStatementException;
 
 class UserMission implements DataObject {
@@ -98,12 +100,33 @@ class UserMission implements DataObject {
         $this->_id = $id;
     }
 
-    public function setUserID($userID) {
-        $this->_userID = $userID;
+    public function setUserID($userID, $verify = false) {
+        if($verify) {
+            if(User::userExists($userID)) {
+                $this->_userID = $userID;
+            }
+            else {
+                throw new InvalidUserException('No user exists with id ' . $userID);
+            }
+        }
+        else {
+            $this->_userID = $userID;
+        }
     }
 
-    public function setMissionID($missionID) {
-        $this->_missionID = $missionID;
+    public function setMissionID($missionID, $verify = false) {
+        if($verify) {
+            if(Mission::missionExists($missionID)) {
+                $this->_missionID = $missionID;
+            }
+            else {
+                throw new InvalidMissionException('No mission exists with id ' . $missionID);
+
+            }
+        }
+        else {
+            $this->_missionID = $missionID;
+        }
     }
 
     // Statics
