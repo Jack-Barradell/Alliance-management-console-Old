@@ -2,6 +2,7 @@
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\IncorrectTypeException;
 use AMC\Exceptions\InvalidGroupException;
 use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\QueryStatementException;
@@ -207,6 +208,29 @@ class Notification implements DataObject {
         }
         else {
             return null;
+        }
+    }
+
+    public static function notificationExists($notificationID) {
+        if(\is_numeric($notificationID)) {
+            if($stmt = Database::getConnection()->prepare("SELECT `NotificationID` FROM `Notifications` WHERE `NotificationID`=?")) {
+                $stmt->bind_param('i', $notificationID);
+                $stmt->execute();
+                if($stmt->num_rows == 1) {
+                    $stmt->close();
+                    return true;
+                }
+                else {
+                    $stmt->close();
+                    return false;
+                }
+            }
+            else {
+                throw new QueryStatementException('Failed to bind query.');
+            }
+        }
+        else {
+            throw new IncorrectTypeException('Notification exists must be given an int, was given a ' . \gettype($notificationID));
         }
     }
 

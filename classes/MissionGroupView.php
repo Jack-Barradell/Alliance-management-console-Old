@@ -127,7 +127,6 @@ class MissionGroupView implements DataObject {
     }
 
     // Statics
-
     public static function select($id) {
         if(\is_array($id) && \count($id) > 0) {
             $missionViewResult = [];

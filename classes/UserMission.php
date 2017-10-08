@@ -1,6 +1,4 @@
 <?php
-//TODO: add verify user id
-//TODO: add verify mission id
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;

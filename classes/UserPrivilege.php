@@ -1,9 +1,9 @@
 <?php
-//TODO: add verify user id
-//TODO: add verify privilege id
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidPrivilegeException;
+use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\QueryStatementException;
 
 class UserPrivilege implements DataObject {
@@ -98,12 +98,32 @@ class UserPrivilege implements DataObject {
         $this->_id = $id;
     }
 
-    public function setUserID($userID) {
-        $this->_userID = $userID;
+    public function setUserID($userID, $verify = false) {
+        if($verify) {
+            if(User::userExists($userID)) {
+                $this->_userID = $userID;
+            }
+            else {
+                throw new InvalidUserException('No user exists with id ' . $userID);
+            }
+        }
+        else {
+            $this->_userID = $userID;
+        }
     }
 
-    public function setPrivilegeID($privilegeID) {
-        $this->_privilegeID = $privilegeID;
+    public function setPrivilegeID($privilegeID, $verify = false) {
+        if($verify) {
+            if(Privilege::privilegeExists($privilegeID)) {
+                $this->_privilegeID = $privilegeID;
+            }
+            else {
+                throw new InvalidPrivilegeException('No privilege exists with id ' . $privilegeID);
+            }
+        }
+        else {
+            $this->_privilegeID = $privilegeID;
+        }
     }
 
     // Statics

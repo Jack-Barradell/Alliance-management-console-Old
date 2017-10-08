@@ -546,4 +546,20 @@ class UserNotificationTest extends TestCase {
         }
     }
 
+    public function testSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidUserSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testSetNotificationID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidNotificationSetNotificationID() {
+        //TODO: Implement
+    }
+
 }

@@ -1,9 +1,8 @@
 <?php
-//TODO: add verify user id
-//TODO: add verify admin id
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\QueryStatementException;
 
 class Warning implements DataObject {
@@ -110,12 +109,32 @@ class Warning implements DataObject {
         $this->_id = $id;
     }
 
-    public function setUserID($userID) {
-        $this->_userID = $userID;
+    public function setUserID($userID, $verify = false) {
+        if($verify) {
+            if(User::userExists($userID)) {
+                $this->_userID = $userID;
+            }
+            else {
+                throw new InvalidUserException('No user exists with id ' . $userID);
+            }
+        }
+        else {
+            $this->_userID = $userID;
+        }
     }
 
-    public function setAdminID($adminID) {
-        $this->_adminID = $adminID;
+    public function setAdminID($adminID, $verify = false) {
+        if($verify) {
+            if(User::userExists($adminID)) {
+                $this->_adminID = $adminID;
+            }
+            else {
+                throw new InvalidUserException('No user exists with id ' . $userID);
+            }
+        }
+        else {
+            $this->_adminID = $adminID;
+        }
     }
 
     public function setReason($reason) {

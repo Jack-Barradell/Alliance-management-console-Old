@@ -4,6 +4,8 @@
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidRankException;
+use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\QueryStatementException;
 
 class UserRank implements DataObject {
@@ -98,12 +100,32 @@ class UserRank implements DataObject {
         $this->_id = $id;
     }
 
-    public function setUserID($userID) {
-        $this->_userID = $userID;
+    public function setUserID($userID, $verify = false) {
+        if($verify) {
+            if(User::userExists($userID)) {
+                $this->_userID = $userID;
+            }
+            else {
+                throw new InvalidUserException('No user exists with id ' . $userID);
+            }
+        }
+        else {
+            $this->_userID = $userID;
+        }
     }
 
-    public function setRankID($rankID) {
-        $this->_rankID = $rankID;
+    public function setRankID($rankID, $verify = false) {
+        if($verify) {
+            if(Rank::rankExists($rankID)) {
+                $this->_rankID = $rankID;
+            }
+            else {
+                throw new InvalidRankException('No rank exists with id ' . $rankID);
+            }
+        }
+        else {
+            $this->_rankID = $rankID;
+        }
     }
 
     // Statics

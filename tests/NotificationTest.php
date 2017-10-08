@@ -473,4 +473,12 @@ class NotificationTest extends TestCase {
         }
     }
 
+    public function testNotificationExists() {
+        //TODO: Implement
+    }
+
+    public function testIncorrectTypeNotificationExists() {
+        //TODO: Implement
+    }
+
 }

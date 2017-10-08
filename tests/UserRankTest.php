@@ -503,4 +503,20 @@ class UserRankTest extends TestCase {
         }
     }
 
+    public function testSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidUserSetUserID() {
+        //TODO: Implement
+    }
+
+    public function testSetRankID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidRankSetRankID() {
+        //TODO: Implement
+    }
+
 }

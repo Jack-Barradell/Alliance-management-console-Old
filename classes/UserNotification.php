@@ -1,9 +1,9 @@
 <?php
-//TODO: add verify user id
-//TODO: add verify notification id
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidNotificationException;
+use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\QueryStatementException;
 
 class UserNotification implements DataObject {
@@ -104,12 +104,32 @@ class UserNotification implements DataObject {
         $this->_id = $id;
     }
 
-    public function setUserID($userID) {
-        $this->_userID = $userID;
+    public function setUserID($userID, $verify = false) {
+        if($verify) {
+            if(User::userExists($userID)) {
+                $this->_userID = $userID;
+            }
+            else {
+                throw new InvalidUserException('There is no user with id ' . $userID);
+            }
+        }
+        else {
+            $this->_userID = $userID;
+        }
     }
 
-    public function setNotificationID($notificationID) {
-        $this->_notificationID = $notificationID;
+    public function setNotificationID($notificationID, $verify = false) {
+        if($verify) {
+            if(Notification::notificationExists($notificationID)) {
+                $this->_notificationID = $notificationID;
+            }
+            else {
+                throw new InvalidNotificationException('No notification exists with id ' . $notificationID);
+            }
+        }
+        else {
+            $this->_notificationID = $notificationID;
+        }
     }
 
     public function setAcknowledged($acknowledged) {
