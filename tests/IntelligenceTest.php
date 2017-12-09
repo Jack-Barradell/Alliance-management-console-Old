@@ -1,6 +1,6 @@
 <?php
 //TODO: add invalid intelligence tests
-
+//TODO: ADD TESTS FOR SHOW AND HIDE METHODS
 namespace AMC\Tests;
 
 require '../classes/DataObject.php';

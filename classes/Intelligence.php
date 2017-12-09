@@ -5,6 +5,7 @@
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\DuplicateEntryException;
 use AMC\Exceptions\IncorrectTypeException;
 use AMC\Exceptions\InvalidIntelligenceTypeException;
 use AMC\Exceptions\InvalidUserException;
@@ -94,6 +95,45 @@ class Intelligence implements DataObject {
     //TODO: ########################################
     //TODO: ###### MAKE THE SHOW/HIDE METHODS ######
     //TODO: ########################################
+
+    public function showToUser($userID) {
+        if($this->userCanSee($userID)) {
+            throw new DuplicateEntryException("Attempted to show user with id " . $userID . " intelligence with id " . $this->_id . " but they already have access.");
+        }
+        else if(User::userExists($userID)){
+            $userIntelligenceView = new IntelligenceUserView();
+            $userIntelligenceView->setIntelligenceID($this->_id);
+            $userIntelligenceView->setUserID($userID);
+            $userIntelligenceView->commit();
+        }
+        else {
+            throw new InvalidUserException('There is no user with user id ' . $userID);
+        }
+    }
+
+    public function hideFromUser($userID) {
+        //TODO: Implement
+    }
+
+    public function userCanSee($userID) {
+        //TODO: Implement
+    }
+
+    public function showToGroup($groupID) {
+        //TODO: Implement
+    }
+
+    public function hideFromGroup($groupID) {
+        //TODO: Implement
+    }
+
+    public function groupCanSee($groupID) {
+        //TODO: Implement
+    }
+
+    public function userHasAccess($userID) {
+        //TODO: Implement
+    }
 
     // Setters and getters
 
