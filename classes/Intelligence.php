@@ -4,6 +4,7 @@ namespace AMC\Classes;
 use AMC\Exceptions\BlankObjectException;
 use AMC\Exceptions\DuplicateEntryException;
 use AMC\Exceptions\IncorrectTypeException;
+use AMC\Exceptions\InvalidGroupException;
 use AMC\Exceptions\InvalidIntelligenceTypeException;
 use AMC\Exceptions\InvalidUserException;
 use AMC\Exceptions\MissingPrerequisiteException;
@@ -92,7 +93,7 @@ class Intelligence implements DataObject {
 
     public function showToUser($userID) {
         if($this->userCanSee($userID)) {
-            throw new DuplicateEntryException("Attempted to show user with id " . $userID . " intelligence with id " . $this->_id . " but they already have access.");
+            throw new DuplicateEntryException('Attempted to show user with id ' . $userID . ' intelligence with id ' . $this->_id . ' but they already have access.');
         }
         else if(User::userExists($userID)){
             $userIntelligenceView = new IntelligenceUserView();
@@ -116,28 +117,87 @@ class Intelligence implements DataObject {
             }
         }
         else {
-            throw new MissingPrerequisiteException("Tried to hide intelligence with id " . $this->_id . " from user with id " . $userID . " but they did not have access.");
+            throw new MissingPrerequisiteException('Attempted to hide intelligence with id ' . $this->_id . 'from user with id ' . $userID . ' but they did not have access.');
         }
     }
 
     public function userCanSee($userID) {
-        //TODO: Implement
+        $userIntelligenceViews = IntelligenceUserView::getByUserID($userID);
+        if(\is_null($userIntelligenceViews)) {
+            return false;
+        }
+        else {
+            foreach($userIntelligenceViews as $userIntelligenceView) {
+                if($userIntelligenceView->getIntelligenceID() == $this->_id) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     public function showToGroup($groupID) {
-        //TODO: Implement
+        if($this->groupCanSee($groupID)) {
+            throw new DuplicateEntryException('Attempted to show group with id ' . $groupID . ' intelligence with id ' . $this->_id . ' but they already have access.');
+        }
+        else if(Group::groupExists($groupID)) {
+            $groupIntelligenceView = new IntelligenceGroupView();
+            $groupIntelligenceView->setIntelligenceID($this->_id);
+            $groupIntelligenceView->setGroupID($groupID);
+            $groupIntelligenceView->commit();
+        }
+        else {
+            throw new InvalidGroupException('There is no group with id ' . $groupID);
+        }
     }
 
     public function hideFromGroup($groupID) {
-        //TODO: Implement
+        if($this->groupCanSee($groupID)) {
+            $groupIntelligenceViews = IntelligenceGroupView::getByIntelligenceID($this->_id);
+            foreach($groupIntelligenceViews as $groupIntelligenceView) {
+                if($groupIntelligenceView->getGroupID() == $groupID) {
+                    $groupIntelligenceView->toggleDelete();
+                    $groupIntelligenceView->commit();
+                }
+            }
+        }
+        else {
+            throw new MissingPrerequisiteException('Attempted to hide intelligence with id ' . $this->_id . 'from group with id ' . $groupID . ' but they did not have access.');
+        }
     }
 
     public function groupCanSee($groupID) {
-        //TODO: Implement
+        $groupIntelligenceViews = IntelligenceGroupView::getByGroupID($groupID);
+        if(\is_null($groupIntelligenceViews)) {
+            return false;
+        }
+        else {
+            foreach($groupIntelligenceViews as $groupIntelligenceView) {
+                if($groupIntelligenceView->getGroupID() == $groupID) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     public function userHasAccess($userID) {
-        //TODO: Implement
+        if($this->userCanSee($userID)) {
+            return true;
+        }
+        $user = User::select($userID);
+        if(\is_null($userID)) {
+            throw new InvalidUserException('No user exists with id ' . $userID);
+        }
+        else {
+            $groups = $user->getGroups();
+            foreach($groups as $group) {
+                if($this->groupCanSee($group->getID())) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     // Setters and getters
