@@ -1,7 +1,4 @@
 <?php
-//TODO: ########################################
-//TODO: ###### MAKE THE SHOW/HIDE METHODS ######
-//TODO: ########################################
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
@@ -9,6 +6,7 @@ use AMC\Exceptions\DuplicateEntryException;
 use AMC\Exceptions\IncorrectTypeException;
 use AMC\Exceptions\InvalidIntelligenceTypeException;
 use AMC\Exceptions\InvalidUserException;
+use AMC\Exceptions\MissingPrerequisiteException;
 use AMC\Exceptions\QueryStatementException;
 
 class Intelligence implements DataObject {
@@ -92,10 +90,6 @@ class Intelligence implements DataObject {
         }
     }
 
-    //TODO: ########################################
-    //TODO: ###### MAKE THE SHOW/HIDE METHODS ######
-    //TODO: ########################################
-
     public function showToUser($userID) {
         if($this->userCanSee($userID)) {
             throw new DuplicateEntryException("Attempted to show user with id " . $userID . " intelligence with id " . $this->_id . " but they already have access.");
@@ -112,7 +106,18 @@ class Intelligence implements DataObject {
     }
 
     public function hideFromUser($userID) {
-        //TODO: Implement
+        if($this->userCanSee($userID)) {
+            $userIntelligenceViews = IntelligenceUserView::getByIntelligenceID($this->_id);
+            foreach($userIntelligenceViews as $userIntelligenceView) {
+                if($userIntelligenceView->getUserID() == $userID) {
+                    $userIntelligenceView->toggleDelete();
+                    $userIntelligenceView->commit();
+                }
+            }
+        }
+        else {
+            throw new MissingPrerequisiteException("Tried to hide intelligence with id " . $this->_id . " from user with id " . $userID . " but they did not have access.");
+        }
     }
 
     public function userCanSee($userID) {
