@@ -3,7 +3,6 @@ namespace AMC\Classes;
 
 use AMC\Exceptions\ArrayKeyNotSetException;
 use AMC\Exceptions\FileDoesntExistException;
-use phpDocumentor\Reflection\File;
 
 class Config {
 
