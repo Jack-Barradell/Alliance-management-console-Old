@@ -694,7 +694,18 @@ class IntelligenceTest extends TestCase {
     }
 
     public function testSetAuthorID() {
-        //TODO: Implement
+        // Make a test user
+        $testUser = new User();
+        $testUser->setUsername('testUser');
+        $testUser->create();
+
+        // Make Test intelligence
+        $testIntelligence = new Intelligence();
+        $testIntelligence->setAuthorID($testUser->getID(), true);
+        $this->assertEquals($testUser->getID(), $testIntelligence->getAuthorID());
+
+        // Clean up
+        $testUser->delete();
     }
 
     public function testInvalidUserSetAuthorID() {
