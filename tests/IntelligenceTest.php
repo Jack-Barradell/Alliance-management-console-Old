@@ -713,7 +713,18 @@ class IntelligenceTest extends TestCase {
     }
 
     public function testSetIntelligenceTypeID() {
-        //TODO: Implement
+        // Create a test intelligence type
+        $testIntelligenceType = new IntelligenceType();
+        $testIntelligenceType->setName('testIntelligenceType');
+        $testIntelligenceType->create();
+
+        // Make Test intelligence
+        $testIntelligence = new Intelligence();
+        $testIntelligence->setIntelligenceTypeID($testIntelligenceType->getID(), true);
+        $this->assertEquals($testIntelligenceType->getID(), $testIntelligence->getIntelligenceTypeID());
+
+        // Clean up
+        $testIntelligence->delete();
     }
 
     public function testInvalidIntelligenceTypeSetIntelligenceTypeID() {
