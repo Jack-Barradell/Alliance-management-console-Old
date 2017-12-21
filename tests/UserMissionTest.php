@@ -1,4 +1,5 @@
 <?php
+//TODO: Add role tests
 namespace AMC\Tests;
 
 require '../classes/DataObject.php';
