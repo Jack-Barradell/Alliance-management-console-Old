@@ -14,12 +14,14 @@ class UserMission implements DataObject {
     private $_id = null;
     private $_userID = null;
     private $_missionID = null;
+    private $_role = null;
     private $_connection = null;
 
-    public function __construct($id = null, $userID = null, $missionID = null) {
+    public function __construct($id = null, $userID = null, $missionID = null, $role = null) {
         $this->_id = $id;
         $this->_userID = $userID;
         $this->_missionID = $missionID;
+        $this->_role = $role;
         $this->_connection = Database::getConnection();
     }
 
@@ -28,8 +30,8 @@ class UserMission implements DataObject {
             throw new BlankObjectException('Cannot store a blank User Mission.');
         }
         else {
-            if($stmt = $this->_connection->prepare("INSERT INTO `User_Missions` (`UserID`,`MissionID`) VALUES (?,?)")) {
-                $stmt->bind_param('ii', $this->_userID, $this->_missionID);
+            if($stmt = $this->_connection->prepare("INSERT INTO `User_Missions` (`UserID`,`MissionID`,`Role`) VALUES (?,?,?)")) {
+                $stmt->bind_param('iis', $this->_userID, $this->_missionID, $this->_role);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -44,8 +46,8 @@ class UserMission implements DataObject {
             throw new BlankObjectException('Cannot store a blank User Mission.');
         }
         else {
-            if($stmt = $this->_connection->prepare("UPDATE `User_Missions` SET `UserID`=?,`MissionID`=? WHERE `UserMissionID`=?")) {
-                $stmt->bind_param('iii', $this->_userID, $this->_missionID, $this->_id);
+            if($stmt = $this->_connection->prepare("UPDATE `User_Missions` SET `UserID`=?,`MissionID`=?,`Role`=? WHERE `UserMissionID`=?")) {
+                $stmt->bind_param('iisi', $this->_userID, $this->_missionID, $this->_role, $this->_id);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -69,7 +71,7 @@ class UserMission implements DataObject {
 
     public function eql($anotherObject) {
         if(\get_class($this) == \get_class($anotherObject)) {
-            if($this->_id == $anotherObject->getID() && $this->_userID == $anotherObject->getUserID() && $this->_missionID == $anotherObject->getMissionID()) {
+            if($this->_id == $anotherObject->getID() && $this->_userID == $anotherObject->getUserID() && $this->_missionID == $anotherObject->getMissionID() && $this->_role == $anotherObject->getRole()) {
                 return true;
             }
             else {
@@ -95,8 +97,16 @@ class UserMission implements DataObject {
         return $this->_missionID;
     }
 
+    public function getRole() {
+        return $this->_role;
+    }
+
     public function setID($id) {
         $this->_id = $id;
+    }
+
+    public function setRole($role) {
+        $this->_role = $role;
     }
 
     public function setUserID($userID, $verify = false) {
@@ -145,15 +155,16 @@ class UserMission implements DataObject {
                 $questionString .= ',?';
             }
             $param = \array_merge($typeArray, $refs);
-            if($stmt = Database::getConnection()->prepare("SELECT `UserMissionID`,`UserID`,`MissionID` FROM `User_Missions` WHERE `UserMissionID` IN (" . $questionString . ")")) {
+            if($stmt = Database::getConnection()->prepare("SELECT `UserMissionID`,`UserID`,`MissionID`,`Role` FROM `User_Missions` WHERE `UserMissionID` IN (" . $questionString . ")")) {
                 \call_user_func_array(array($stmt, 'bind_param'), $param);
                 $stmt->execute();
-                $stmt->bind_result($userMissionID, $userID, $missionID);
+                $stmt->bind_result($userMissionID, $userID, $missionID, $role);
                 while($stmt->fetch()) {
                     $userMission = new UserMission();
                     $userMission->setID($userMissionID);
                     $userMission->setUserID($userID);
                     $userMission->setMissionID($missionID);
+                    $userMission->setRole($role);
                     $userMissionResult[] = $userMission;
                 }
                 $stmt->close();
@@ -170,14 +181,15 @@ class UserMission implements DataObject {
         }
         else if(\is_array($id) && \count($id) == 0) {
             $userMissionResult = [];
-            if($stmt = Database::getConnection()->prepare("SELECT `UserMissionID`,`UserID`,`MissionID` FROM `User_Missions`")) {
+            if($stmt = Database::getConnection()->prepare("SELECT `UserMissionID`,`UserID`,`MissionID`,`Role` FROM `User_Missions`")) {
                 $stmt->execute();
-                $stmt->bind_result($userMissionID, $userID, $missionID);
+                $stmt->bind_result($userMissionID, $userID, $missionID, $role);
                 while($stmt->fetch()) {
                     $userMission = new UserMission();
                     $userMission->setID($userMissionID);
                     $userMission->setUserID($userID);
                     $userMission->setMissionID($missionID);
+                    $userMission->setRole($role);
                     $userMissionResult[] = $userMission;
                 }
                 $stmt->close();
