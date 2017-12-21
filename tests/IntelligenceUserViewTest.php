@@ -504,7 +504,18 @@ class IntelligenceUserViewTest extends TestCase {
     }
 
     public function testSetUserID() {
-        //TODO: Implement
+        // Create test user
+        $testUser = new User();
+        $testUser->setUsername('testUser');
+        $testUser->create();
+
+        // Create test intelligence user view
+        $intelligenceUserView = new IntelligenceUserView();
+        $intelligenceUserView->setUserID($testUser->getID(), true);
+        $this->assertEquals($testUser->getID(), $intelligenceUserView->getUserID());
+
+        // Clean up
+        $testUser->delete();
     }
 
     public function testInvalidUserSetUserID() {
