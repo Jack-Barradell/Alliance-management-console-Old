@@ -1,5 +1,4 @@
 <?php
-//TODO: Add Role
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
@@ -14,12 +13,14 @@ class MissionUserView implements DataObject {
     private $_id = null;
     private $_userID = null;
     private $_missionID = null;
+    private $_role = null;
     private $_connection = null;
 
-    public function __construct($id = null, $userID = null, $missionID = null) {
+    public function __construct($id = null, $userID = null, $missionID = null, $role = null) {
         $this->_id = $id;
         $this->_userID = $userID;
         $this->_missionID = $missionID;
+        $this->_role = $role;
         $this->_connection = Database::getConnection();
     }
 
@@ -28,8 +29,8 @@ class MissionUserView implements DataObject {
             throw new BlankObjectException('Cannot store a blank Mission User View.');
         }
         else {
-            if($stmt = $this->_connection->prepare("INSERT INTO `Mission_User_Views` (`UserID`,`MissionID`) VALUES (?,?)")) {
-                $stmt->bind_param('ii', $this->_userID, $this->_missionID);
+            if($stmt = $this->_connection->prepare("INSERT INTO `Mission_User_Views` (`UserID`,`MissionID`,`Role`) VALUES (?,?,?)")) {
+                $stmt->bind_param('iis', $this->_userID, $this->_missionID, $this->_role);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -44,8 +45,8 @@ class MissionUserView implements DataObject {
             throw new BlankObjectException('Cannot store a blank Mission User View.');
         }
         else {
-            if($stmt = $this->_connection->prepare("UPDATE `Mission_User_Views` SET `UserID`=?,`MissionID`=? WHERE `MissionUserViewID`=?")) {
-                $stmt->bind_param('iii', $this->_userID, $this->_missionID, $this->_id);
+            if($stmt = $this->_connection->prepare("UPDATE `Mission_User_Views` SET `UserID`=?,`MissionID`=?,`Role`=? WHERE `MissionUserViewID`=?")) {
+                $stmt->bind_param('iisi', $this->_userID, $this->_missionID, $this->_role, $this->_id);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -69,7 +70,7 @@ class MissionUserView implements DataObject {
 
     public function eql($anotherObject) {
         if(\get_class($this) == \get_class($anotherObject)) {
-            if($this->_id == $anotherObject->getID() && $this->_userID == $anotherObject->getUserID() && $this->_missionID == $anotherObject->getMissionID()) {
+            if($this->_id == $anotherObject->getID() && $this->_userID == $anotherObject->getUserID() && $this->_missionID == $anotherObject->getMissionID() && $this->_role == $anotherObject->getRole()) {
                 return true;
             }
             else {
@@ -93,6 +94,10 @@ class MissionUserView implements DataObject {
 
     public function getMissionID() {
         return $this->_missionID;
+    }
+
+    public function getRole() {
+        return $this->_role;
     }
 
     public function setID($id) {
@@ -127,6 +132,10 @@ class MissionUserView implements DataObject {
         }
     }
 
+    public function setRole($role) {
+        $this->_role = $role;
+    }
+
     // Statics
 
     public static function select($id) {
@@ -144,15 +153,16 @@ class MissionUserView implements DataObject {
                 $questionString .= ',?';
             }
             $param = \array_merge($typeArray, $refs);
-            if($stmt = Database::getConnection()->prepare("SELECT `MissionUserViewID`,`UserID`,`MissionID` FROM `Mission_User_Views` WHERE `MissionUserViewID` IN (" . $questionString . ")")) {
+            if($stmt = Database::getConnection()->prepare("SELECT `MissionUserViewID`,`UserID`,`MissionID`,`Role` FROM `Mission_User_Views` WHERE `MissionUserViewID` IN (" . $questionString . ")")) {
                 \call_user_func_array(array($stmt, 'bind_param'), $param);
                 $stmt->execute();
-                $stmt->bind_result($missionUserViewID, $userID, $missionID);
+                $stmt->bind_result($missionUserViewID, $userID, $missionID, $role);
                 while($stmt->fetch()) {
                     $missionUserView = new MissionUserView();
                     $missionUserView->setID($missionUserViewID);
                     $missionUserView->setUserID($userID);
                     $missionUserView->setMissionID($missionID);
+                    $missionUserView->setRole($role);
                     $missionViewResult[] = $missionUserView;
                 }
                 $stmt->close();
@@ -169,7 +179,7 @@ class MissionUserView implements DataObject {
         }
         else if(\is_array($id) && \count($id) == 0) {
             $missionViewResult = [];
-            if($stmt = Database::getConnection()->prepare("SELECT `MissionUserViewID`,`UserID`,`MissionID` FROM `Mission_User_Views`")) {
+            if($stmt = Database::getConnection()->prepare("SELECT `MissionUserViewID`,`UserID`,`MissionID`,`Role` FROM `Mission_User_Views`")) {
                 $stmt->execute();
                 $stmt->bind_result($missionUserViewID, $userID, $missionID);
                 while($stmt->fetch()) {
@@ -177,6 +187,7 @@ class MissionUserView implements DataObject {
                     $missionUserView->setID($missionUserViewID);
                     $missionUserView->setUserID($userID);
                     $missionUserView->setMissionID($missionID);
+                    $missionUserView->setRole($role);
                     $missionViewResult[] = $missionUserView;
                 }
                 $stmt->close();
