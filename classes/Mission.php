@@ -1,5 +1,4 @@
 <?php
-//TODO: Add role to group and user views and user missions
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
@@ -101,7 +100,7 @@ class Mission implements DataObject {
         }
     }
 
-    public function issueToUser($userID) {
+    public function issueToUser($userID, $role = null) {
         if($this->userIsAssigned($userID)) {
             throw new DuplicateEntryException('Attempted to assign user with id ' . $userID . ' to mission mission with id ' . $this->_id . ' but they were already issued.');
         }
@@ -109,6 +108,7 @@ class Mission implements DataObject {
             $userMission = new UserMission();
             $userMission->setUserID($userID);
             $userMission->setMissionID($this->_id);
+            $userMission->setRole($role);
             $userMission->commit();
         }
         else {
@@ -146,7 +146,7 @@ class Mission implements DataObject {
         }
     }
 
-    public function showToUser($userID) {
+    public function showToUser($userID, $role = null) {
         if($this->userCanSee($userID)) {
             throw new DuplicateEntryException('User with id ' . $userID . ' was given access to mission with id ' . $this->_id . ' when they already had it.');
         }
@@ -154,6 +154,7 @@ class Mission implements DataObject {
             $missionUserView = new MissionUserView();
             $missionUserView->setUserID($userID);
             $missionUserView->setMissionID($this->_id);
+            $missionUserView->setRole($role);
             $missionUserView->commit();
         }
         else {
@@ -194,7 +195,7 @@ class Mission implements DataObject {
         }
     }
 
-    public function showToGroup($groupID) {
+    public function showToGroup($groupID, $role = null) {
         if($this->groupCanSee($groupID)) {
             throw new DuplicateEntryException('Group with id ' . $groupID . ' was given access to mission with id ' . $this->_id . ' but they are already had it.');
         }
@@ -202,6 +203,7 @@ class Mission implements DataObject {
             $missionGroupView = new MissionGroupView();
             $missionGroupView->setGroupID($groupID);
             $missionGroupView->setMissionID($this->_id);
+            $missionGroupView->setRole($role);
             $missionGroupView->commit();
         }
         else {
