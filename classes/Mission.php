@@ -1,4 +1,6 @@
 <?php
+//TODO: Add mission payment
+//TODO: Add role to group and user views
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
