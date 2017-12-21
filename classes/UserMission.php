@@ -1,5 +1,4 @@
 <?php
-// TODO: Add role
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
