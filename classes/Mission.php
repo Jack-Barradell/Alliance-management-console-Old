@@ -1,6 +1,5 @@
 <?php
-//TODO: Add mission payment
-//TODO: Add role to group and user views
+//TODO: Add role to group and user views and user missions
 namespace AMC\Classes;
 
 use AMC\Exceptions\BlankObjectException;
@@ -19,13 +18,28 @@ class Mission implements DataObject {
     private $_title = null;
     private $_description = null;
     private $_status = null;
+    private $_payment = null;
     private $_connection = null;
 
-    public function __construct($id = null, $title = null, $description = null, $status = null) {
+    // Mission status constants
+    const MISSION_UNASSIGNED = 0;
+    const MISSION_ASSIGNED = 1;
+    const MISSION_ABORTED = 2;
+    const MISSION_IN_PROGRESS = 3;
+    const MISSION_FAILED = 4;
+    const MISSION_COMPLETED_UNPAID = 5;
+    const MISSION_COMPLETED_PAID = 6;
+    const MISSION_AWAITING_UPDATE = 7;
+    const MISSION_UNDER_REVIEW = 8;
+
+
+
+    public function __construct($id = null, $title = null, $description = null, $status = null, $payment = null) {
         $this->_id = $id;
         $this->_title = $title;
         $this->_description = $description;
         $this->_status = $status;
+        $this->_payment = $payment;
         $this->_connection = Database::getConnection();
     }
 
@@ -34,8 +48,8 @@ class Mission implements DataObject {
             throw new BlankObjectException('Cannot store a blank Mission.');
         }
         else {
-            if($stmt = $this->_connection->prepare("INSERT INTO `Missions` (`MissionTitle`,`MissionDescription`,`MissionStatus`) VALUES (?,?,?)")) {
-                $stmt->bind_param('sss', $this->_title, $this->_description, $this->_status);
+            if($stmt = $this->_connection->prepare("INSERT INTO `Missions` (`MissionTitle`,`MissionDescription`,`MissionStatus`,`MissionPayment`) VALUES (?,?,?,?)")) {
+                $stmt->bind_param('ssii', $this->_title, $this->_description, $this->_status, $this->_payment);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -50,8 +64,8 @@ class Mission implements DataObject {
             throw new BlankObjectException('Cannot store a blank Mission.');
         }
         else {
-            if($stmt = $this->_connection->prepare("UPDATE `Missions` SET `MissionTitle`=?,`MissionDescription`=?,`MissionStatus`=? WHERE `MissionID`=?")) {
-                $stmt->bind_param('sssi', $this->_title, $this->_description, $this->_status, $this->_id);
+            if($stmt = $this->_connection->prepare("UPDATE `Missions` SET `MissionTitle`=?,`MissionDescription`=?,`MissionStatus`=?,`MissionPayment`=? WHERE `MissionID`=?")) {
+                $stmt->bind_param('ssiii', $this->_title, $this->_description, $this->_status, $this->_payment, $this->_id);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -75,7 +89,7 @@ class Mission implements DataObject {
 
     public function eql($anotherObject) {
         if(\get_class($this) == \get_class($anotherObject)) {
-            if($this->_id == $anotherObject->getID() && $this->_title == $anotherObject->getTitle() && $this->_description == $anotherObject->getDescription() && $this->_status == $anotherObject->getStatus()) {
+            if($this->_id == $anotherObject->getID() && $this->_title == $anotherObject->getTitle() && $this->_description == $anotherObject->getDescription() && $this->_status == $anotherObject->getStatus() && $this->_payment == $anotherObject->getPayment()) {
                 return true;
             }
             else {
@@ -259,6 +273,10 @@ class Mission implements DataObject {
         return $this->_status;
     }
 
+    public function getPayment() {
+        return $this->_payment;
+    }
+
     public function setID($id) {
         $this->_id = $id;
     }
@@ -273,6 +291,10 @@ class Mission implements DataObject {
 
     public function setStatus($status) {
         $this->_status = $status;
+    }
+
+    public function setPayment($newPayment) {
+        $this->_payment = $newPayment;
     }
 
     // Statics
@@ -292,16 +314,17 @@ class Mission implements DataObject {
                 $questionString .= ',?';
             }
             $param = \array_merge($typeArray, $refs);
-            if($stmt = Database::getConnection()->prepare("SELECT `MissionID`,`MissionTitle`,`MissionDescription`,`MissionStatus` FROM `Missions` WHERE `MissionID` IN (" . $questionString . ")")) {
+            if($stmt = Database::getConnection()->prepare("SELECT `MissionID`,`MissionTitle`,`MissionDescription`,`MissionStatus`,`MissionPayment` FROM `Missions` WHERE `MissionID` IN (" . $questionString . ")")) {
                 \call_user_func_array(array($stmt, 'bind_param'), $param);
                 $stmt->execute();
-                $stmt->bind_result($missionID, $title, $description, $status);
+                $stmt->bind_result($missionID, $title, $description, $status, $payment);
                 while($stmt->fetch()) {
                     $mission = new Mission();
                     $mission->setID($missionID);
                     $mission->setTitle($title);
                     $mission->setDescription($description);
                     $mission->setStatus($status);
+                    $mission->setPayment($payment);
                     $missionResult[] = $mission;
                 }
                 $stmt->close();
@@ -318,15 +341,16 @@ class Mission implements DataObject {
         }
         else if(\is_array($id) && \count($id) == 0) {
             $missionResult = [];
-            if($stmt = Database::getConnection()->prepare("SELECT `MissionID`,`MissionTitle`,`MissionDescription`,`MissionStatus` FROM `Missions`")) {
+            if($stmt = Database::getConnection()->prepare("SELECT `MissionID`,`MissionTitle`,`MissionDescription`,`MissionStatus`,`MissionPayment` FROM `Missions`")) {
                 $stmt->execute();
-                $stmt->bind_result($missionID, $title, $description, $status);
+                $stmt->bind_result($missionID, $title, $description, $status, $payment);
                 while($stmt->fetch()) {
                     $mission = new Mission();
                     $mission->setID($missionID);
                     $mission->setTitle($title);
                     $mission->setDescription($description);
                     $mission->setStatus($status);
+                    $mission->setPayment($payment);
                     $missionResult[] = $mission;
                 }
                 $stmt->close();
