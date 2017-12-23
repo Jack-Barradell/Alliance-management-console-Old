@@ -7,3 +7,5 @@ Null checks on everything
 * Add admin logs for events
 * Unit test notifications are sent
 * Unit test admin logs are created
+* Make controllers
+* Priv checks in controllers
