@@ -410,7 +410,23 @@ class AdminLogTest extends TestCase {
     }
 
     public function testSetAdminID() {
-        //TODO: implement
+        // Create a test admin
+        $testAdmin = new User();
+        $testAdmin->setUsername('testAdmin');
+        $testAdmin->create();
+
+        // Create a test admin log
+        $testAdminLog = new AdminLog();
+
+        // Check it can be set
+        try {
+            $this->assertEquals($testAdmin->getID(), $testAdminLog->getAdminID());
+            $testAdminLog->setAdminID($testAdmin->getID(), true);
+        } finally {
+
+            // Clean up
+            $testAdmin->delete();
+        }
     }
 
     public function testInvalidUserSetAdminID() {
