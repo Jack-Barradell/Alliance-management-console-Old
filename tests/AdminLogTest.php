@@ -14,6 +14,7 @@ use AMC\Classes\AdminLog;
 use AMC\Classes\Database;
 use AMC\Classes\User;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidUserException;
 use PHPUnit\Framework\TestCase;
 
 class AdminLogTest extends TestCase {
@@ -420,8 +421,8 @@ class AdminLogTest extends TestCase {
 
         // Check it can be set
         try {
-            $this->assertEquals($testAdmin->getID(), $testAdminLog->getAdminID());
             $testAdminLog->setAdminID($testAdmin->getID(), true);
+            $this->assertEquals($testAdmin->getID(), $testAdminLog->getAdminID());
         } finally {
 
             // Clean up
@@ -430,7 +431,29 @@ class AdminLogTest extends TestCase {
     }
 
     public function testInvalidUserSetAdminID() {
-        //TODO: implement
+        // Get max user id
+        $stmt = Database::getConnection()->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESCENDING LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        if($stmt->fetch()) {
+            $tryID = $userID+1;
+        }
+        else {
+            $tryID = 1;
+        }
+
+        // Create a test admin log
+        $testAdminLog = new AdminLog();
+
+        $this->expectException(InvalidUserException::class);
+
+        // Check it cant be set
+        try {
+            $testAdminLog->setAdminID($tryID, true);
+        } catch(InvalidUserException $e) {
+            $this->assertEquals('No user exists with id ' . $tryID, $e->getMessage());
+        }
+
     }
 
 }
