@@ -909,7 +909,21 @@ class BanTest extends TestCase {
     }
 
     public function testSetUserID() {
-        //TODO: Implement
+        // Create a test user
+        $testUser = new User();
+        $testUser->setUsername('test');
+        $testUser->create();
+
+        // Create a test ban
+        $testBan = new Ban();
+
+        // Attempt to set user id
+        try {
+            $testBan->setUserID($testUser->getID(), true);
+            $this->assertEquals($testUser->getID(), $testBan->getID());
+        } finally {
+            $testUser->delete();
+        }
     }
 
     public function testInvalidUserSetUserID() {
