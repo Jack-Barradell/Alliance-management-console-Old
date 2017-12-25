@@ -931,7 +931,21 @@ class BanTest extends TestCase {
     }
 
     public function testSetAdminID() {
-        //TODO: Implement
+        // Create a test admin
+        $testAdmin = new User();
+        $testAdmin->setUsername('test');
+        $testAdmin->create();
+
+        // Create a test ban
+        $testBan = new Ban();
+
+        // Attempt to set admin id
+        try {
+            $testBan->setAdminID($testAdmin->getID(), true);
+            $this->assertEquals($testAdmin->getID(), $testBan->getID());
+        } finally {
+            $testAdmin->delete();
+        }
     }
 
     public function testInvalidUserSetAdminID() {
