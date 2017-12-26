@@ -12,6 +12,7 @@ require '../classes/exceptions/QueryStatementException.php';
 use AMC\Classes\Database;
 use AMC\Exceptions\BlankObjectException;
 use AMC\Classes\Award;
+use AMC\Exceptions\IncorrectTypeException;
 use PHPUnit\Framework\TestCase;
 
 class AwardTest extends TestCase {
@@ -325,11 +326,30 @@ class AwardTest extends TestCase {
     }
 
     public function testAwardExists() {
-        //TODO: Implement
+        // Create an award
+        $testAward = new Award();
+        $testAward->setName('Test Award');
+        $testAward->create();
+
+        // Check newly created award exists
+        $this->assertTrue(Award::awardExists($testAward->getID()));
+
+        // Check award with higher id does not exist
+        $this->assertFalse(Award::awardExists($testAward->getID()+1));
+
+        // Clean up
+        $testAward->delete();
     }
 
     public function testIncorrectTypeAwardExists() {
-        //TODO: Implement
+        // Check exception is thrown when given non int
+        $this->expectException(IncorrectTypeException::class);
+
+        try {
+            Award::awardExists('string');
+        } catch(IncorrectTypeException $e) {
+            $this->assertEquals('Award exists must be given an int, was given a string', $e->getMessage());
+        }
     }
 
 }
