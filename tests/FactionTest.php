@@ -382,7 +382,21 @@ class FactionTest extends TestCase {
     }
 
     public function testSetFactionTypeID() {
-        //TODO: Implement
+        // Create a test faction type
+        $testFactionType = new FactionType();
+        $testFactionType->setName('trst');
+        $testFactionType->create();
+
+        // Create a test faction
+        $testFaction = new Faction();
+
+        // Try to set faction type id
+        try {
+            $testFaction->setFactionTypeID($testFactionType->getID());
+            $this->assertEquals($testFactionType->getID(), $testFaction->getID());
+        } finally {
+            $testFactionType->delete();
+        }
     }
 
     public function testInvalidFactionTypeSetFactionTypeID() {
