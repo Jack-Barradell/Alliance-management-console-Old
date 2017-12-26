@@ -13,6 +13,7 @@ use AMC\Classes\Ban;
 use AMC\Classes\Database;
 use AMC\Classes\User;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidUserException;
 use PHPUnit\Framework\TestCase;
 
 class BanTest extends TestCase {
@@ -927,7 +928,28 @@ class BanTest extends TestCase {
     }
 
     public function testInvalidUserSetUserID() {
-        //TODO: Implement
+        // Get max user id
+        $stmt = Database::getConnection()->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESCENDING LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        if($stmt->fetch()) {
+            $tryID = $userID+1;
+        }
+        else {
+            $tryID = 1;
+        }
+
+        // Create test ban
+        $testBan = new Ban();
+
+        // Set expected exception
+        $this->expectException(InvalidUserException::class);
+
+        try {
+            $testBan->setUserID($tryID, true);
+        } catch(InvalidUserException $e) {
+            $this->assertEquals('No user exists with id ' . $tryID, $e->getMessage());
+        }
     }
 
     public function testSetAdminID() {
@@ -949,15 +971,71 @@ class BanTest extends TestCase {
     }
 
     public function testInvalidUserSetAdminID() {
-        //TODO: Implement
+        // Get max user id
+        $stmt = Database::getConnection()->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESCENDING LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        if($stmt->fetch()) {
+            $tryID = $userID+1;
+        }
+        else {
+            $tryID = 1;
+        }
+
+        // Create test ban
+        $testBan = new Ban();
+
+        // Set expected exception
+        $this->expectException(InvalidUserException::class);
+
+        try {
+            $testBan->setAdminID($tryID, true);
+        } catch(InvalidUserException $e) {
+            $this->assertEquals('No user exists with id ' . $tryID, $e->getMessage());
+        }
     }
 
     public function testSetUnbanAdminID() {
-        //TODO: Implement
+        // Create a test admin
+        $testAdmin = new User();
+        $testAdmin->setUsername('test');
+        $testAdmin->create();
+
+        // Create a test ban
+        $testBan = new Ban();
+
+        // Attempt to set admin id
+        try {
+            $testBan->setUnbanAdminID($testAdmin->getID(), true);
+            $this->assertEquals($testAdmin->getID(), $testBan->getID());
+        } finally {
+            $testAdmin->delete();
+        }
     }
 
     public function testInvalidUserSetUnbanAdminID() {
-        //TODO: Implement
+        // Get max user id
+        $stmt = Database::getConnection()->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESCENDING LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        if($stmt->fetch()) {
+            $tryID = $userID+1;
+        }
+        else {
+            $tryID = 1;
+        }
+
+        // Create test ban
+        $testBan = new Ban();
+
+        // Set expected exception
+        $this->expectException(InvalidUserException::class);
+
+        try {
+            $testBan->setUnbanAdminID($tryID, true);
+        } catch(InvalidUserException $e) {
+            $this->assertEquals('No user exists with id ' . $tryID, $e->getMessage());
+        }
     }
 
 }
