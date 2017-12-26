@@ -13,6 +13,7 @@ use AMC\Classes\Faction;
 use AMC\Classes\Database;
 use AMC\Classes\FactionType;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidFactionTypeException;
 use PHPUnit\Framework\TestCase;
 
 class FactionTest extends TestCase {
@@ -384,7 +385,7 @@ class FactionTest extends TestCase {
     public function testSetFactionTypeID() {
         // Create a test faction type
         $testFactionType = new FactionType();
-        $testFactionType->setName('trst');
+        $testFactionType->setName('test');
         $testFactionType->create();
 
         // Create a test faction
@@ -392,7 +393,7 @@ class FactionTest extends TestCase {
 
         // Try to set faction type id
         try {
-            $testFaction->setFactionTypeID($testFactionType->getID());
+            $testFaction->setFactionTypeID($testFactionType->getID(), true);
             $this->assertEquals($testFactionType->getID(), $testFaction->getID());
         } finally {
             $testFactionType->delete();
@@ -400,7 +401,26 @@ class FactionTest extends TestCase {
     }
 
     public function testInvalidFactionTypeSetFactionTypeID() {
-        //TODO: Implement
+        // Find max id
+        $stmt = Database::getConnection()->prepare("SELECT `FactionTypeID` FROM `Faction_Types` ORDER BY `FactionTypeID` DESCENDING LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($factionTypeID);
+        if($stmt->fetch()) {
+            $tryID = $factionTypeID+1;
+        }
+        else {
+            $tryID = 1;
+        }
+
+        // Create a test faction
+        $testFaction = new Faction();
+
+        // Try to set id
+        try {
+            $testFaction->setFactionTypeID($tryID, true);
+        } catch(InvalidFactionTypeException $e) {
+            $this->assertEquals('No faction type with id ' . $tryID, $e->getMessage());
+        }
     }
 
     public function testFactionExists() {
