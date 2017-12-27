@@ -9,10 +9,12 @@ require '../classes/FactionType.php';
 require '../classes/Faction.php';
 require '../classes/exceptions/BlankObjectException.php';
 
+use AMC\Classes\Award;
 use AMC\Classes\Faction;
 use AMC\Classes\Database;
 use AMC\Classes\FactionType;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\IncorrectTypeException;
 use AMC\Exceptions\InvalidFactionTypeException;
 use PHPUnit\Framework\TestCase;
 
@@ -424,11 +426,31 @@ class FactionTest extends TestCase {
     }
 
     public function testFactionExists() {
-        //TODO: Implement
+        // Create a faction
+        $testFaction = new Faction();
+        $testFaction->setName('test');
+        $testFaction->create();
+
+        // Check newly created faction exists
+        $this->assertTrue(Faction::factionExists($testFaction->getID()));
+
+        // Check the next faction to be made doesnt exist
+        $this->assertFalse(Faction::factionExists($testFaction->getID()+1));
+
+        // Clean up
+        $testFaction->delete();
     }
 
     public function testIncorrectTypeFactionExists(){
-        //TODO: Implement
+        // Set expected exception
+        $this->expectException(IncorrectTypeException::class);
+
+        // Trigger it
+        try {
+            Award::awardExists('string');
+        } catch(IncorrectTypeException $e) {
+            $this->assertEquals('Faction exists must be given an int, was given a string', $e->getMessage());
+        }
     }
 
 
