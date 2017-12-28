@@ -11,6 +11,7 @@ require '../classes/exceptions/BlankObjectException.php';
 use AMC\Classes\FactionType;
 use AMC\Classes\Database;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\IncorrectTypeException;
 use PHPUnit\Framework\TestCase;
 
 class FactionTypeTest extends TestCase {
@@ -272,10 +273,30 @@ class FactionTypeTest extends TestCase {
     }
 
     public function testFactionTypeExists() {
-        //TODO: Implement
+        // Create a test faction type
+        $testFactionType = new FactionType();
+        $testFactionType->setName('test');
+        $testFactionType->create();
+
+        // Check newly created type exists
+        $this->assertTrue(FactionType::factionTypeExists($testFactionType->getID()));
+
+        // Check the next used id doesnt exist
+        $this->assertFalse(FactionType::factionTypeExists($testFactionType->getID()+1));
+
+        // Clean up
+        $testFactionType->delete();
     }
 
     public function testIncorrectTypeFactionTypeExists() {
-        //TODO: Implement
+        // Set expected exception
+        $this->expectException(IncorrectTypeException::class);
+
+        // Trigger the exception
+        try {
+            FactionType::factionTypeExists('string');
+        } catch(IncorrectTypeException $e) {
+            $this->assertEquals('Faction type exists must be passed an int, was given string', $e->getMessage());
+        }
     }
 }
