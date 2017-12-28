@@ -11,9 +11,11 @@ require '../classes/exceptions/BlankObjectException.php';
 use AMC\Classes\Group;
 use AMC\Classes\Database;
 use AMC\Classes\Privilege;
+use AMC\Classes\User;
 use AMC\Exceptions\BlankObjectException;
 use AMC\Exceptions\DuplicateEntryException;
 use AMC\Exceptions\IncorrectTypeException;
+use AMC\Exceptions\InvalidPrivilegeException;
 use AMC\Exceptions\MissingPrerequisiteException;
 use AMC\Exceptions\NullGetException;
 use PHPUnit\Framework\TestCase;
@@ -369,7 +371,30 @@ class GroupTest extends TestCase {
     }
 
     public function testInvalidPrivilegeIssuePrivilege() {
-        //TODO: Implement
+        // Find max privilege id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `PrivilegeID` FROM `Privileges` ORDER BY `PrivilegeID` DESCENDING LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($privID);
+        if($stmt->fetch()) {
+            $useID = $privID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Set expected exception
+        $this->expectException(InvalidPrivilegeException::class);
+
+        // Create a group to assign the priv
+        $testGroup = new Group();
+
+        // Trigger the exception
+        try {
+            $testGroup->issuePrivilege($useID);
+        } catch(InvalidPrivilegeException $e) {
+            $this->assertEquals('No privilege with id ' . $useID . ' exists.', $e->getMessage());
+        }
     }
 
     public function testRevokePrivilege() {
