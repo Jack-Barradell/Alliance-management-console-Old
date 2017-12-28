@@ -938,6 +938,7 @@ class BanTest extends TestCase {
         else {
             $tryID = 1;
         }
+        $stmt->close();
 
         // Create test ban
         $testBan = new Ban();
@@ -981,6 +982,7 @@ class BanTest extends TestCase {
         else {
             $tryID = 1;
         }
+        $stmt->close();
 
         // Create test ban
         $testBan = new Ban();
@@ -1024,6 +1026,7 @@ class BanTest extends TestCase {
         else {
             $tryID = 1;
         }
+        $stmt->close();
 
         // Create test ban
         $testBan = new Ban();

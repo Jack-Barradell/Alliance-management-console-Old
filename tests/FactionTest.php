@@ -413,6 +413,7 @@ class FactionTest extends TestCase {
         else {
             $tryID = 1;
         }
+        $stmt->close();
 
         // Create a test faction
         $testFaction = new Faction();

@@ -441,6 +441,7 @@ class AdminLogTest extends TestCase {
         else {
             $tryID = 1;
         }
+        $stmt->close();
 
         // Create a test admin log
         $testAdminLog = new AdminLog();
