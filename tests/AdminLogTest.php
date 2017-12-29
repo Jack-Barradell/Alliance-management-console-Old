@@ -432,7 +432,7 @@ class AdminLogTest extends TestCase {
 
     public function testInvalidUserSetAdminID() {
         // Get max user id
-        $stmt = Database::getConnection()->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESCENDING LIMIT 1");
+        $stmt = Database::getConnection()->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESC LIMIT 1");
         $stmt->execute();
         $stmt->bind_result($userID);
         if($stmt->fetch()) {

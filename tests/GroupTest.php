@@ -372,7 +372,7 @@ class GroupTest extends TestCase {
 
     public function testInvalidPrivilegeIssuePrivilege() {
         // Find max privilege id and add one to it
-        $stmt = Database::getConnection()->prepare("SELECT `PrivilegeID` FROM `Privileges` ORDER BY `PrivilegeID` DESCENDING LIMIT 1");
+        $stmt = Database::getConnection()->prepare("SELECT `PrivilegeID` FROM `Privileges` ORDER BY `PrivilegeID` DESC LIMIT 1");
         $stmt->execute();
         $stmt->bind_result($privID);
         if($stmt->fetch()) {
@@ -452,7 +452,7 @@ class GroupTest extends TestCase {
 
     public function testInvalidPrivilegeRevokePrivilege() {
         // Find max privilege id and add one to it
-        $stmt = Database::getConnection()->prepare("SELECT `PrivilegeID` FROM `Privileges` ORDER BY `PrivilegeID` DESCENDING LIMIT 1");
+        $stmt = Database::getConnection()->prepare("SELECT `PrivilegeID` FROM `Privileges` ORDER BY `PrivilegeID` DESC LIMIT 1");
         $stmt->execute();
         $stmt->bind_result($privID);
         if($stmt->fetch()) {
@@ -537,7 +537,7 @@ class GroupTest extends TestCase {
 
     public function testInvalidPrivilegeHasGroupPrivilege() {
         // Find max privilege id and add one to it
-        $stmt = Database::getConnection()->prepare("SELECT `PrivilegeID` FROM `Privileges` ORDER BY `PrivilegeID` DESCENDING LIMIT 1");
+        $stmt = Database::getConnection()->prepare("SELECT `PrivilegeID` FROM `Privileges` ORDER BY `PrivilegeID` DESC LIMIT 1");
         $stmt->execute();
         $stmt->bind_result($privID);
         if($stmt->fetch()) {

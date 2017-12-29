@@ -404,7 +404,7 @@ class FactionTest extends TestCase {
 
     public function testInvalidFactionTypeSetFactionTypeID() {
         // Find max id
-        $stmt = Database::getConnection()->prepare("SELECT `FactionTypeID` FROM `Faction_Types` ORDER BY `FactionTypeID` DESCENDING LIMIT 1");
+        $stmt = Database::getConnection()->prepare("SELECT `FactionTypeID` FROM `Faction_Types` ORDER BY `FactionTypeID` DESC LIMIT 1");
         $stmt->execute();
         $stmt->bind_result($factionTypeID);
         if($stmt->fetch()) {
