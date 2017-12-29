@@ -10,3 +10,4 @@ Null checks on everything
 * Make controllers
 * Priv checks in controllers
 * More tests
+* Test non ascii input
