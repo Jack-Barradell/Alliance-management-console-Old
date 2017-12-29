@@ -536,7 +536,30 @@ class GroupTest extends TestCase {
     }
 
     public function testInvalidPrivilegeHasGroupPrivilege() {
-        //TODO: Implement
+        // Find max privilege id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `PrivilegeID` FROM `Privileges` ORDER BY `PrivilegeID` DESCENDING LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($privID);
+        if($stmt->fetch()) {
+            $useID = $privID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Set expected exception
+        $this->expectException(InvalidPrivilegeException::class);
+
+        // Create a group to check the priv
+        $testGroup = new Group();
+
+        // Trigger the exception
+        try {
+            $testGroup->hasGroupPrivilege($useID);
+        } catch(InvalidPrivilegeException $e) {
+            $this->assertEquals('No privilege with id ' . $useID . ' exists.', $e->getMessage());
+        }
     }
 
     public function testGetPrivileges() {
@@ -643,22 +666,6 @@ class GroupTest extends TestCase {
         } catch(IncorrectTypeException $e) {
             $this->assertEquals('Group exists must be passed an int or string, was given boolean', $e->getMessage());
         }
-    }
-
-    public function testSetGroupID() {
-        //TODO: Implement
-    }
-
-    public function testInvalidGroupSetGroupID() {
-        //TODO: Implement
-    }
-
-    public function testSetPrivilegeID() {
-        //TODO: Implement
-    }
-
-    public function testInvalidPrivilegeSetPrivilegeID() {
-        //TODO: Implement
     }
 
 }

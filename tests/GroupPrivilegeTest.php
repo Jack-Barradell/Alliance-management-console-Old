@@ -521,4 +521,20 @@ class GroupPrivilegeTest extends TestCase {
         }
     }
 
+    public function testSetGroupID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidGroupSetGroupID() {
+        //TODO: Implement
+    }
+
+    public function testSetPrivilegeID() {
+        //TODO: Implement
+    }
+
+    public function testInvalidPrivilegeSetPrivilegeID() {
+        //TODO: Implement
+    }
+
 }
