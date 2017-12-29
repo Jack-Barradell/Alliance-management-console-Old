@@ -15,6 +15,8 @@ use AMC\Classes\GroupPrivilege;
 use AMC\Classes\Database;
 use AMC\Classes\Privilege;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidGroupException;
+use AMC\Exceptions\InvalidPrivilegeException;
 use PHPUnit\Framework\TestCase;
 
 class GroupPrivilegeTest extends TestCase {
@@ -522,11 +524,50 @@ class GroupPrivilegeTest extends TestCase {
     }
 
     public function testSetGroupID() {
-        //TODO: Implement
+        // Create a test group
+        $testGroup = new Group();
+        $testGroup->setName('test');
+        $testGroup->create();
+
+        // Create a test group privilege
+        $testGroupPriv = new GroupPrivilege();
+
+        // Try and set the id
+        try {
+            $testGroupPriv->setGroupID($testGroup->getID(), true);
+            $this->assertEquals($testGroup->getID(), $testGroupPriv->getGroupID());
+        } finally {
+            // Clean up
+            $testGroup->delete();
+        }
     }
 
     public function testInvalidGroupSetGroupID() {
-        //TODO: Implement
+        // Find max group id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `GroupID` FROM `Groups` ORDER BY `GroupID` DESC LIMIT 1 ");
+        $stmt->execute();
+        $stmt->bind_result($groupID);
+        if($stmt->fetch()) {
+            $useID = $groupID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Set expected exception
+        $this->expectException(InvalidGroupException::class);
+
+        // Create a test group priv
+        $testGroupPriv = new GroupPrivilege();
+
+        // Trigger it
+        try {
+            $testGroupPriv->setGroupID($useID, true);
+        } catch (InvalidGroupException $e) {
+            $this->assertEquals('No group exists with id ' . $useID, $e->getMessage());
+        }
+
     }
 
     public function testSetPrivilegeID() {
@@ -534,7 +575,30 @@ class GroupPrivilegeTest extends TestCase {
     }
 
     public function testInvalidPrivilegeSetPrivilegeID() {
-        //TODO: Implement
+        // Find max privilege id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `PrivilegeID` FROM `Privileges` ORDER BY `PrivilegeID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($privID);
+        if($stmt->fetch()) {
+            $useID = $privID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Set expected exception
+        $this->expectException(InvalidPrivilegeException::class);
+
+        // Create a test group priv
+        $testGroupPriv = new GroupPrivilege();
+
+        // Trigger it
+        try {
+            $testGroupPriv->setPrivilegeID($useID, true);
+        } catch (InvalidPrivilegeException $e) {
+            $this->assertEquals('No privilege exists with id ' . $useID, $e->getMessage());
+        }
     }
 
 }
