@@ -11,10 +11,13 @@ require '../classes/User.php';
 require '../classes/exceptions/BlankObjectException.php';
 
 use AMC\Classes\Group;
+use AMC\Classes\GroupPrivilege;
 use AMC\Classes\Intelligence;
 use AMC\Classes\IntelligenceGroupView;
 use AMC\Classes\Database;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidGroupException;
+use AMC\Exceptions\InvalidIntelligenceException;
 use PHPUnit\Framework\TestCase;
 
 class IntelligenceGroupViewTest extends TestCase {
@@ -500,19 +503,92 @@ class IntelligenceGroupViewTest extends TestCase {
     }
 
     public function testSetGroupID() {
-        //TODO: Implement
+        // Create a test group
+        $testGroup = new Group();
+        $testGroup->setName('test');
+        $testGroup->create();
+
+        // Create a test intelligence group view
+        $testIntelGroupView = new IntelligenceGroupView();
+
+        // Try and set group id
+        try {
+            $testIntelGroupView->setGroupID($testGroup->getID(), true);
+            $this->assertEquals($testGroup->getID(), $testIntelGroupView->getGroupID());
+        } finally {
+            $testGroup->delete();
+        }
     }
 
     public function testInvalidGroupSetGroupID() {
-        //TODO: Implement
+        // Get max id for a group and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `GroupID` FROM `Groups` ORDER BY `GroupID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($groupID);
+        if($stmt->fetch()) {
+            $useID = $groupID + 1;
+        } else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create a test intelligence group view
+        $testIntelGroupView = new IntelligenceGroupView();
+
+        // Set expected exception
+        $this->expectException(InvalidGroupException::class);
+
+        // Trigger it
+        try {
+            $testIntelGroupView->setGroupID($useID, true);
+        } catch (InvalidGroupException $e) {
+            $this->assertEquals('No group exists with id ' .  $useID, $e->getMessage());
+        }
     }
 
     public function testSetIntelligenceID() {
-        //TODO: Implement
+        // Create a test intelligence
+        $testIntelligence = new Intelligence();
+        $testIntelligence->setSubject('test');
+        $testIntelligence->create();
+
+        // Create a test Intel group view
+        $testIntelGroupView = new IntelligenceGroupView();
+
+        // Try and set the intel id
+        try {
+            $testIntelGroupView->setIntelligenceID($testIntelligence->getID(), true);
+            $this->assertEquals($testIntelligence->getID(), $testIntelGroupView->getIntelligenceID());
+        } finally {
+            $testIntelligence->delete();
+        }
     }
 
     public function testInvalidIntelligenceSetIntelligenceID() {
-        //TODO: Implement
+        // Find max intelligence id then add one
+        $stmt = Database::getConnection()->prepare("SELECT `IntelligenceID` FROM `Intelligence` ORDER BY `IntelligenceID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($intelligenceID);
+        if($stmt->fetch()) {
+            $useID = $intelligenceID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create a test intel group view
+        $testIntelGroupView = new IntelligenceGroupView();
+
+        // Set expected exception
+        $this->expectException(InvalidIntelligenceException::class);
+
+        // Trigger it
+        try {
+            $testIntelGroupView->setIntelligenceID($useID, true);
+        } catch (InvalidIntelligenceException $e) {
+            $this->assertEquals('No intelligence exists with id ' . $useID, $e->getMessage());
+        }
     }
 
 }
