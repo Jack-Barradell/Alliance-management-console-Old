@@ -743,4 +743,33 @@ class IntelligenceTest extends TestCase {
         //TODO: Implement
     }
 
+    public function testShowToUser() {
+        //TODO: Implement
+    }
+
+    public function testHideFromUser() {
+        //TODO: Implement
+    }
+
+    public function testUserCanSee() {
+        //TODO: Implement
+    }
+
+    public function testShowToGroup() {
+        //TODO: Implement
+    }
+
+    public function testHideFromGroup() {
+        //TODO: Implement
+    }
+
+    public function testGroupCanSee() {
+        //TODO: Implement
+    }
+
+    public function testUserHasAccess() {
+        //TODO: Implement
+    }
+
+
 }
