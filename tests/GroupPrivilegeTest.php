@@ -571,7 +571,21 @@ class GroupPrivilegeTest extends TestCase {
     }
 
     public function testSetPrivilegeID() {
-        //TODO: Implement
+        // Create a test privilege
+        $testPrivilege = new Privilege();
+        $testPrivilege->setName('test');
+        $testPrivilege->create();
+
+        // Create a test group
+        $testGroupPrivilege = new GroupPrivilege();
+
+        // Try and set it
+        try {
+            $testGroupPrivilege->setPrivilegeID($testPrivilege->getID(), true);
+            $this->assertEquals($testPrivilege->getID(), $testGroupPrivilege->getPrivilegeID());
+        } finally {
+            $testPrivilege->delete();
+        }
     }
 
     public function testInvalidPrivilegeSetPrivilegeID() {
