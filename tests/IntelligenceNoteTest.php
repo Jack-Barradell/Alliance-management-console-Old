@@ -15,6 +15,8 @@ use AMC\Classes\Database;
 use AMC\Classes\User;
 use AMC\Classes\Intelligence;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidIntelligenceException;
+use AMC\Exceptions\InvalidUserException;
 use PHPUnit\Framework\TestCase;
 
 class IntelligenceNoteTest extends TestCase {
@@ -573,20 +575,94 @@ class IntelligenceNoteTest extends TestCase {
     }
 
     public function testSetIntelligenceID() {
-        //TODO: Implement
+        // Create test intelligence
+        $testIntelligence = new Intelligence();
+        $testIntelligence->setSubject('test');
+        $testIntelligence->create();
+
+        // Create a test intelligence note
+        $testIntelligenceNote = new IntelligenceNote();
+
+        // Try and set the id
+        try {
+            $testIntelligenceNote->setIntelligenceID($testIntelligence->getID(), true);
+            $this->assertEquals($testIntelligence->getID(), $testIntelligenceNote->getIntelligenceID());
+        } finally {
+            $testIntelligence->delete();
+        }
     }
 
     public function testInvalidIntelligenceSetIntelligenceID() {
-        //TODO: Implement
+        // Get max intelligence id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `IntelligenceID` FROM `Intelligence` ORDER BY `IntelligenceID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($intelligenceID);
+        if($stmt->fetch()) {
+            $useID = $intelligenceID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create test intelligence note
+        $testIntelNote = new IntelligenceNote();
+
+        // Set expected exception
+        $this->expectException(InvalidIntelligenceException::class);
+
+        // Trigger it
+        try {
+            $testIntelNote->setIntelligenceID($useID, true);
+        } catch (InvalidIntelligenceException $e) {
+            $this->assertEquals('There is no intelligence with id ' . $useID, $e->getMessage());
+        }
     }
 
     public function testSetUserID() {
-        //TODO: Implement
+        // Create a test user
+        $testUser = new User();
+        $testUser->setUsername('test');
+        $testUser->create();
+
+        // Create a test intel note
+        $testIntelNote = new IntelligenceNote();
+
+        // Try and set the id
+        try {
+            $testIntelNote->setUserID($testUser->getID(), true);
+            $this->assertEquals($testUser->getID(), $testIntelNote->getID());
+        } finally {
+            $testUser->delete();
+        }
     }
 
 
     public function testInvalidUserSetUserID() {
-        //TODO: Implement
+        // Find max user id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        if($stmt->fetch()) {
+            $useID = $userID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create intel note
+        $testIntelNote = new IntelligenceNote();
+
+        // Set expected exception
+        $this->expectException(InvalidUserException::class);
+
+        // Trigger it
+        try {
+            $testIntelNote->setUserID($useID, true);
+        } catch (InvalidUserException $e) {
+            $this->assertEquals('No user exists with id ' .  $useID, $e->getMessage());
+        }
     }
 
 }
