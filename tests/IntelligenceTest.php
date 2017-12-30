@@ -1,6 +1,4 @@
 <?php
-//TODO: add invalid intelligence tests
-//TODO: ADD TESTS FOR SHOW AND HIDE METHODS
 namespace AMC\Tests;
 
 require '../classes/DataObject.php';
@@ -17,6 +15,8 @@ use AMC\Classes\Database;
 use AMC\Classes\IntelligenceType;
 use AMC\Classes\User;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidIntelligenceTypeException;
+use AMC\Exceptions\InvalidUserException;
 use PHPUnit\Framework\TestCase;
 
 class IntelligenceTest extends TestCase {
@@ -701,15 +701,42 @@ class IntelligenceTest extends TestCase {
 
         // Make Test intelligence
         $testIntelligence = new Intelligence();
-        $testIntelligence->setAuthorID($testUser->getID(), true);
-        $this->assertEquals($testUser->getID(), $testIntelligence->getAuthorID());
 
-        // Clean up
-        $testUser->delete();
+        // Try and set the id
+        try {
+            $testIntelligence->setAuthorID($testUser->getID(), true);
+            $this->assertEquals($testUser->getID(), $testIntelligence->getAuthorID());
+        } finally {
+            // Clean up
+            $testUser->delete();
+        }
     }
 
     public function testInvalidUserSetAuthorID() {
-        //TODO: Implement
+        // Get largest user id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        if($stmt->fetch()) {
+            $useID = $userID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create the test intelligence
+        $testIntelligence = new Intelligence();
+
+        // Set expected exception
+        $this->expectException(InvalidUserException::class);
+
+        // Trigger it
+        try {
+            $testIntelligence->setAuthorID($useID, true);
+        } catch (InvalidUserException $e) {
+            $this->assertEquals('No user exists with id ' . $useID, $e->getMessage());
+        }
     }
 
     public function testSetIntelligenceTypeID() {
@@ -732,7 +759,30 @@ class IntelligenceTest extends TestCase {
     }
 
     public function testInvalidIntelligenceTypeSetIntelligenceTypeID() {
-        //TODO: Implement
+        // Get max intelligence type id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `IntelligenceTypeID` FROM `Intelligence_Types` ORDER BY `IntelligenceTypeID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($intelligenceTypeID);
+        if($stmt->fetch()) {
+            $useID = $intelligenceTypeID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create intelligence
+        $testIntel = new Intelligence();
+
+        // Set expected exception
+        $this->expectException(InvalidIntelligenceTypeException::class);
+
+        // Trigger it
+        try {
+            $testIntel->setIntelligenceTypeID($useID, true);
+        } catch (InvalidIntelligenceTypeException $e) {
+            $this->assertEquals('No intelligence type exists with id ' .  $useID, $e->getMessage());
+        }
     }
 
     public function testIntelligenceExists() {
