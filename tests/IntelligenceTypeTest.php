@@ -12,6 +12,7 @@ require '../classes/exceptions/BlankObjectException.php';
 use AMC\Classes\IntelligenceType;
 use AMC\Classes\Database;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\IncorrectTypeException;
 use PHPUnit\Framework\TestCase;
 
 class IntelligenceTypeTest extends TestCase {
@@ -268,11 +269,31 @@ class IntelligenceTypeTest extends TestCase {
     }
 
     public function testIntelligenceTypeExists() {
-        //TODO: Implement
+        // Create test intelligence type
+        $testIntelligenceType = new IntelligenceType();
+        $testIntelligenceType->setName('test');
+        $testIntelligenceType->create();
+
+        // Check newly created intelligence type exists
+        $this->assertTrue(IntelligenceType::intelligenceTypeExists($testIntelligenceType->getID()));
+
+        // Check next used id doesnt exist
+        $this->assertFalse(IntelligenceType::intelligenceTypeExists($testIntelligenceType->getID()+1));
+
+        // Clean up
+        $testIntelligenceType->delete();
     }
 
     public function testIncorrectTypeIntelligenceTypeExists() {
-        //TODO: Implement
+        // Set expected exception
+        $this->expectException(IncorrectTypeException::class);
+
+        // Trigger it
+        try {
+            IntelligenceType::intelligenceTypeExists('string');
+        } catch (IncorrectTypeException $e) {
+            $this->assertEquals('Intelligence type exists must be passed an int, was given string', $e->getMessage());
+        }
     }
 
 }
