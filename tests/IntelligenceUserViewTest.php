@@ -15,6 +15,8 @@ use AMC\Classes\Intelligence;
 use AMC\Classes\IntelligenceUserView;
 use AMC\Classes\User;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidIntelligenceException;
+use AMC\Exceptions\InvalidUserException;
 use PHPUnit\Framework\TestCase;
 
 class IntelligenceUserViewTest extends TestCase {
@@ -523,15 +525,75 @@ class IntelligenceUserViewTest extends TestCase {
     }
 
     public function testInvalidUserSetUserID() {
-        //TODO: Implement
+        // get max user id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        if($stmt->fetch()) {
+            $useID = $userID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create an intelligence user view
+        $testIntelView = new IntelligenceUserView();
+
+        // Set expected exception
+        $this->expectException(InvalidUserException::class);
+
+        // Trigger it
+        try {
+            $testIntelView->setUserID($useID, true);
+        } catch (InvalidUserException $e) {
+            $this->assertEquals('No user exists with id ' . $useID, $e->getMessage());
+        }
     }
 
     public function testSetIntelligenceID() {
-        //TODO: Implement
+        // Create a test intelligence
+        $testIntelligence = new Intelligence();
+        $testIntelligence->setSubject('test');
+        $testIntelligence->create();
+
+        // Create a test intelligence user view
+        $testIntelligenceUserView = new IntelligenceUserView();
+
+        // Try and set id
+        try {
+            $testIntelligenceUserView->setIntelligenceID($testIntelligence->getID(), true);
+            $this->assertEquals($testIntelligence->getID(), $testIntelligenceUserView->getIntelligenceID());
+        } finally {
+            $testIntelligence->delete();
+        }
     }
 
     public function testInvalidIntelligenceSetIntelligenceID() {
-        //TODO: Implement
+        // Get max intelligence id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `IntelligenceID` FROM `Intelligence` ORDER BY `IntelligenceID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($intelID);
+        if($stmt->fetch()) {
+            $useID = $intelID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // FCreate test intel user view
+        $testIntelView = new IntelligenceUserView();
+
+        // Set expected exception
+        $this->expectException(InvalidIntelligenceException::class);
+
+        // Trigger it
+        try {
+            $testIntelView->setIntelligenceID($useID, true);
+        } catch (InvalidIntelligenceException $e) {
+            $this->assertEquals('No intelligence exists with id ' . $useID, $e->getMessage());
+        }
     }
 
 }
