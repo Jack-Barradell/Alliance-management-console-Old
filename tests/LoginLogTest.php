@@ -13,6 +13,7 @@ use AMC\Classes\LoginLog;
 use AMC\Classes\Database;
 use AMC\Classes\User;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidUserException;
 use PHPUnit\Framework\TestCase;
 
 class LoginLogTest extends TestCase {
@@ -610,11 +611,48 @@ class LoginLogTest extends TestCase {
     }
 
     public function testSetUserID() {
-        //TODO: Implement
+        // Create a test user
+        $testUser = new User();
+        $testUser->setUsername('test');
+        $testUser->create();
+
+        // Create test login log
+        $testLoginLog = new LoginLog();
+
+        // Set user id
+        try {
+            $testLoginLog->setUserID($testUser->getID(), true);
+            $this->assertEquals($testUser->getID(), $testLoginLog->getUserID());
+        } finally {
+            $testUser->delete();
+        }
     }
 
     public function testInvalidUserSetUserID() {
-        //TODO: Implement
+        // Get max user id and add one
+        $stmt = Database::getConnection()->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        if($stmt->fetch()) {
+            $useID = $userID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create test login log
+        $testLoginLog = new LoginLog();
+
+        // Set expected exception
+        $this->expectException(InvalidUserException::class);
+
+        // Trigger the exception
+        try {
+            $testLoginLog->setUserID($useID, true);
+        } catch (InvalidUserException $e) {
+            $this->assertEquals('No user exists with id ' . $useID, $e->getMessage());
+        }
     }
 
 }
