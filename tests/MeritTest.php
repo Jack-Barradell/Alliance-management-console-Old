@@ -13,6 +13,7 @@ use AMC\Classes\Merit;
 use AMC\Classes\Database;
 use AMC\Classes\User;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidUserException;
 use PHPUnit\Framework\TestCase;
 
 class MeritTest extends TestCase {
@@ -590,18 +591,92 @@ class MeritTest extends TestCase {
     }
 
     public function testSetUserID() {
-        //TODO: Implement
+        // Create a test user
+        $testUser = new User();
+        $testUser->setUsername('test');
+        $testUser->create();
+
+        // Create a test merit
+        $testMerit = new Merit();
+
+        // Try and set the user id
+        try {
+            $testMerit->setUserID($testUser->getID(), true);
+            $this->assertEquals($testUser->getID(), $testMerit->getUserID());
+        } finally {
+            $testUser->delete();
+        }
     }
 
     public function testInvalidUserSetUserID() {
-        //TODO: Implement
+        // Get max user id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        if($stmt->fetch()) {
+            $useID = $userID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Set expected exception
+        $this->expectException(InvalidUserException::class);
+
+        // Create test merit
+        $testMerit = new Merit();
+
+        // Trigger it
+        try {
+            $testMerit->setUserID($useID, true);
+        } catch(InvalidUserException $e) {
+            $this->assertEquals('No user exists with id ' . $useID, $e->getMessage());
+        }
     }
 
     public function testSetAdminID() {
-        //TODO: Implement
+        // Create a test admin
+        $testAdmin = new User();
+        $testAdmin->setUsername('test');
+        $testAdmin->create();
+
+        // Create a test merit
+        $testMerit = new Merit();
+
+        // Try and set the admin id
+        try {
+            $testMerit->setAdminID($testAdmin->getID(), true);
+            $this->assertEquals($testAdmin->getID(), $testMerit->getAdminID());
+        } finally {
+            $testAdmin->delete();
+        }
     }
 
     public function testInvalidUserSetAdminID() {
-        //TODO: Implement
+        // Get max user id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        if($stmt->fetch()) {
+            $useID = $userID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Set expected exception
+        $this->expectException(InvalidUserException::class);
+
+        // Create test merit
+        $testMerit = new Merit();
+
+        // Trigger it
+        try {
+            $testMerit->setAdminID($useID, true);
+        } catch(InvalidUserException $e) {
+            $this->assertEquals('No user exists with id ' . $useID, $e->getMessage());
+        }
     }
 }
