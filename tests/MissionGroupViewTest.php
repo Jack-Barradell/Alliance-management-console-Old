@@ -16,6 +16,8 @@ use AMC\Classes\Mission;
 use AMC\Classes\MissionGroupView;
 use AMC\Classes\Database;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidGroupException;
+use AMC\Exceptions\InvalidMissionException;
 use PHPUnit\Framework\TestCase;
 
 class MissionGroupViewTest extends TestCase {
@@ -490,19 +492,94 @@ class MissionGroupViewTest extends TestCase {
     }
 
     public function testSetGroupID() {
-        //TODO: Implement
+        // Create a test group
+        $testGroup = new Group();
+        $testGroup->setName('test');
+        $testGroup->create();
+
+        // Create a test mission group view
+        $testMissionGroupView = new MissionGroupView();
+
+        // Set the id
+        try {
+            $testMissionGroupView->setGroupID($testGroup->getID(), true);
+            $this->assertEquals($testGroup->getID(), $testMissionGroupView->getGroupID());
+        } finally {
+            $testGroup->delete();
+        }
+
     }
 
     public function testInvalidGroupSetGroupID() {
-        //TODO: Implement
+        // Get max group id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `GroupID` FROM `Groups` ORDER BY `GroupID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($groupID);
+        if($stmt->fetch()) {
+            $useID = $groupID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create test mission group view
+        $testMissionGroupView = new MissionGroupView();
+
+        // Set expected exception
+        $this->expectException(InvalidGroupException::class);
+
+        // Trigger it
+        try {
+            $testMissionGroupView->setGroupID($useID, true);
+        } catch (InvalidGroupException $e) {
+            $this->assertEquals('No group exists with id ' . $useID, $e->getMessage());
+        }
     }
 
     public function testSetMissionID() {
-        //TODO: Implement
+        // Create a test mission
+        $testMission = new Mission();
+        $testMission->setTitle('test');
+        $testMission->create();
+
+        // Create test mission group view
+        $testMissionGroupView = new MissionGroupView();
+
+        // Set the id
+        try {
+            $testMissionGroupView->setMissionID($testMission->getID(), true);
+            $this->assertEquals($testMission->getID(), $testMissionGroupView->getMissionID());
+        } finally {
+            $testMission->delete();
+        }
     }
 
     public function testInvalidMissionSetMissionID() {
-        //TODO: Implement
+        // Get max mission id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `MissionID` FROM `Missions` ORDER BY `MissionID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($missionID);
+        if($stmt->fetch()) {
+            $useID = $missionID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create test mission group view
+        $testMissionGroupView = new MissionGroupView();
+
+        // Set expected exception
+        $this->expectException(InvalidMissionException::class);
+
+        // Trigger it
+        try {
+            $testMissionGroupView->setMissionID($useID, true);
+        } catch (InvalidMissionException $e) {
+            $this->assertEquals('There is no mission with id ' . $useID, $e->getMessage());
+        }
     }
 
 }
