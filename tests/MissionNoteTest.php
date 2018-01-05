@@ -11,10 +11,13 @@ require '../classes/User.php';
 require '../classes/exceptions/BlankObjectException.php';
 
 use AMC\Classes\Mission;
+use AMC\Classes\MissionGroupView;
 use AMC\Classes\MissionNote;
 use AMC\Classes\Database;
 use AMC\Classes\User;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidMissionException;
+use AMC\Exceptions\InvalidUserException;
 use PHPUnit\Framework\TestCase;
 
 class MissionNoteTest extends TestCase {
@@ -575,18 +578,92 @@ class MissionNoteTest extends TestCase {
     }
 
     public function testSetMissionID() {
-        //TODO: Implement
+        // Create a test mission
+        $testMission = new Mission();
+        $testMission->setTitle('test');
+        $testMission->create();
+
+        // Create a test mission note
+        $testMissionNote = new MissionNote();
+
+        // Set the id
+        try {
+            $testMissionNote->setMissionID($testMission->getID(), true);
+            $this->assertEquals($testMission->getID(), $testMissionNote->getMissionID());
+        } finally {
+            $testMission->delete();
+        }
     }
 
     public function testInvalidMissionSetMissionID() {
-        //TODO: Implement
+        // Get max mission id and add one
+        $stmt = Database::getConnection()->prepare("SELECT `MissionID` FROM `Mission` ORDER BY `MissionID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($missionID);
+        if($stmt->fetch()) {
+            $useID = $missionID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create test mission note
+        $testMissionNote = new MissionNote();
+
+        // Set expected exception
+        $this->expectException(InvalidMissionException::class);
+
+        // Trigger it
+        try {
+            $testMissionNote->setMissionID($useID, true);
+        } catch (InvalidMissionException $e) {
+            $this->assertEquals('There is no mission with id ' . $useID, $e->getMessage());
+        }
     }
 
     public function testSetUserID() {
-        //TODO: Implement
+        // Create a test user
+        $testUser = new User();
+        $testUser->setUsername('test');
+        $testUser->create();
+
+        // Create a test mission note
+        $testMissionNote = new MissionNote();
+
+        // Try and set id
+        try {
+            $testMissionNote->setUserID($testUser->getID(), true);
+            $this->assertEquals($testUser->getID(), $testMissionNote->getUserID());
+        } finally {
+            $testUser->delete();
+        }
     }
 
     public function testInvalidUserSetUserID() {
-        //TODO: Implement
+        // Get max user id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        if($stmt->fetch()) {
+            $useID = $userID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create test mission note
+        $testMissionNote = new MissionNote();
+
+        // Set expected exception
+        $this->expectException(InvalidUserException::class);
+
+        // Trigger it
+        try {
+            $testMissionNote->setUserID($useID, true);
+        } catch(InvalidUserException $e) {
+            $this->assertEquals('There is no user with id ' . $useID, $e->getMessage());
+        }
     }
 }
