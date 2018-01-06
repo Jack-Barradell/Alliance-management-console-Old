@@ -13,6 +13,7 @@ use AMC\Classes\Mission;
 use AMC\Classes\MissionStage;
 use AMC\Classes\Database;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidMissionException;
 use PHPUnit\Framework\TestCase;
 
 class MissionStageTest extends TestCase {
@@ -440,11 +441,48 @@ class MissionStageTest extends TestCase {
     }
 
     public function testSetMissionID() {
-        //TODO: Implement
+        // Create a test mission
+        $testMission = new Mission();
+        $testMission->setTitle('test');
+        $testMission->create();
+
+        // Create a test mission stage
+        $testMissionStage = new MissionStage();
+
+        // Try and set the id
+        try {
+            $testMissionStage->setMissionID($testMission->getID(), true);
+            $this->assertEquals($testMission->getID(), $testMissionStage->getMissionID());
+        } finally {
+            $testMission->delete();
+        }
     }
 
-    public function testInvalidMissioNSetMissionID() {
-        //TODO: Implement
+    public function testInvalidMissionSetMissionID() {
+        // Get max mission id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `MissionID` FROM `Mission` ORDER BY `MissionID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($missionID);
+        if($stmt->fetch()) {
+            $useID = $missionID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create a test mission stage
+        $testMissionStage = new MissionStage();
+
+        // Set expected exception
+        $this->expectException(InvalidMissionException::class);
+
+        // Trigger it
+        try {
+            $testMissionStage->setMissionID($useID, true);
+        } catch (InvalidMissionException $e) {
+            $this->assertEquals('There is no mission with id ' . $useID, $e->getMessage());
+        }
     }
 
 }
