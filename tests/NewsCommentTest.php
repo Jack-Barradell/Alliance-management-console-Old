@@ -15,6 +15,8 @@ use AMC\Classes\News;
 use AMC\Classes\NewsComment;
 use AMC\Classes\User;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidNewsException;
+use AMC\Exceptions\InvalidUserException;
 use PHPUnit\Framework\TestCase;
 
 class NewsCommentTest extends TestCase {
@@ -561,19 +563,90 @@ class NewsCommentTest extends TestCase {
     }
 
     public function testSetNewsID() {
-        //TODO: Implement
+        // Create a test news
+        $testNews = new News();
+        $testNews->setTitle('test');
+        $testNews->create();
+
+        // Create test news comment
+        $testNewsComment = new NewsComment();
+
+        // Set news id
+        try {
+            $testNewsComment->setNewsID($testNews->getID(), true);
+            $this->assertEquals($testNews->getID(), $testNewsComment->getNewsID());
+        } finally {
+            $testNews->delete();
+        }
     }
 
     public function testInvalidNewsSetNewsID() {
-        //TODO: Implement
+        // Get max news id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `NewsID` FROM `News` ORDER BY `NewsID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($newsID);
+        if($stmt->fetch()) {
+            $useID = $newsID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create test news comment
+        $testNewsComment = new NewsComment();
+
+        // Set expected exception
+        $this->expectException(InvalidNewsException::class);
+
+        // Trigger it
+        try {
+            $testNewsComment->setNewsID($useID, true);
+        } catch (InvalidNewsException $e) {
+            $this->assertEquals('No news exists with id ' . $useID, $e->getMessage());
+        }
     }
 
     public function testSetUserID() {
-        //TODO: Implement
+        // Create test user
+        $testUser = new User();
+        $testUser->setUsername('test');
+        $testUser->create();
+
+        // Create test news comment
+        $testComment = new NewsComment();
+
+        // Set the id
+        try {
+            $testComment->setUserID($testUser->getID(), true);
+            $this->assertEquals($testUser->getID(), $testComment->getUserID());
+        } finally {
+            $testUser->delete();
+        }
     }
 
     public function testInvalidUserSetUserID() {
-        //TODO: Implement
+        // Get max user id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        if($stmt->fetch()) {
+            $useID = $userID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create test news comment
+        $testNewsComment = new NewsComment();
+
+        // Trigger it
+        try {
+            $testNewsComment->setUserID($useID, true);
+        } catch (InvalidUserException $e) {
+            $this->assertEquals('No user exists with id ' . $useID, $e->getMessage());
+        }
     }
 
 }
