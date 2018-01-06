@@ -641,6 +641,9 @@ class NewsCommentTest extends TestCase {
         // Create test news comment
         $testNewsComment = new NewsComment();
 
+        // Set expected exception
+        $this->expectException(InvalidUserException::class);
+
         // Trigger it
         try {
             $testNewsComment->setUserID($useID, true);
