@@ -15,6 +15,8 @@ use AMC\Classes\News;
 use AMC\Classes\NewsCategory;
 use AMC\Classes\User;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidNewsCategoryException;
+use AMC\Exceptions\InvalidUserException;
 use PHPUnit\Framework\TestCase;
 
 class NewsTest extends TestCase {
@@ -737,20 +739,94 @@ class NewsTest extends TestCase {
         }
     }
 
-    public function testSetUserID() {
-        //TODO: Implement
+    public function testSetAuthorID() {
+        // Create a test user
+        $testUser = new User();
+        $testUser->setUsername('test');
+        $testUser->create();
+
+        // Create test news
+        $testNews = new News();
+
+        // Try and set id
+        try {
+            $testNews->setAuthorID($testUser->getID(), true);
+            $this->assertEquals($testUser->getID(), $testNews->getAuthorID());
+        } finally {
+            $testUser->delete();
+        }
     }
 
-    public function testInvalidUserSetUserID() {
-        //TODO: Implement
+    public function testInvalidUserSetAuthorID() {
+        // Get max user id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        if($stmt->fetch()) {
+            $useID = $userID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create test news
+        $testNews = new News();
+
+        // Set expected exception
+        $this->expectException(InvalidUserException::class);
+
+        // Trigger it
+        try {
+            $testNews->setAuthorID($useID, true);
+        } catch (InvalidUserException $e) {
+            $this->assertEquals('There is no user with id ' . $useID, $e->getMessage());
+        }
     }
 
     public function testSetNewsCategoryID() {
-        //TODO: Implement
+        // Create a test news category
+        $testNewsCategory = new NewsCategory();
+        $testNewsCategory->setName('test');
+        $testNewsCategory->create();
+
+        // Create test news
+        $testNews = new News();
+
+        // Set id
+        try {
+            $testNews->setNewsCategoryID($testNewsCategory->getID(), true);
+            $this->assertEquals($testNewsCategory->getID(), $testNews->getNewsCategoryID());
+        } finally {
+            $testNewsCategory->delete();
+        }
     }
 
     public function testInvalidNewsCategorySetNewsCategoryID() {
-        //TODO: Implement
+        // Get max news category id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `NewsCategoryID` FROM `News_Categories` ORDER BY `NewsCategoryID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($newsCategoryID);
+        if($stmt->fetch()) {
+            $useID = $newsCategoryID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->fetch();
+
+        // Create test news
+        $testNews = new News();
+
+        // Set expected exception
+        $this->expectException(InvalidNewsCategoryException::class);
+
+        // Trigger it
+        try {
+            $testNews->setNewsCategoryID($useID, true);
+        } catch(InvalidNewsCategoryException $e) {
+            $this->assertEquals('There is no news category with id ' . $useID, $e->getMessage());
+        }
     }
 
 }
