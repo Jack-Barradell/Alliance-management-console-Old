@@ -14,6 +14,8 @@ use AMC\Classes\User;
 use AMC\Classes\UserAward;
 use AMC\Classes\Database;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidAwardException;
+use AMC\Exceptions\InvalidUserException;
 use PHPUnit\Framework\TestCase;
 
 class UserAwardTest extends TestCase {
@@ -707,27 +709,138 @@ class UserAwardTest extends TestCase {
     }
 
     public function testSetUserID() {
-        //TODO: Implement
+        // Create a test user
+        $testUser = new User();
+        $testUser->setUsername('test');
+        $testUser->create();
+
+        // Create a test user award
+        $testUserAward = new UserAward();
+
+        // Try and set the id
+        try {
+            $testUserAward->setUserID($testUser->getID(), true);
+            $this->assertEquals($testUser->getID(), $testUserAward->getUserID());
+        } finally {
+            $testUser->delete();
+        }
     }
 
     public function testInvalidUserSetUserID() {
-        //TODO: Implement
+        // Get max user id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        if($stmt->fetch()) {
+            $useID = $userID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->fetch();
+
+        // Create test user award
+        $testUserAward = new UserAward();
+
+        // Set set expected exception
+        $this->expectException(InvalidUserException::class);
+
+        // Trigger it
+        try {
+            $testUserAward->setUserID($useID);
+        } catch(InvalidUserException $e) {
+            $this->assertEquals('No user exists with id ' . $useID, $e->getMessage());
+        }
     }
 
     public function testSetIssuerID() {
-        //TODO: Implement
+        // Create a test user
+        $testUser = new User();
+        $testUser->setUsername('test');
+        $testUser->create();
+
+        // Create a test user award
+        $testUserAward = new UserAward();
+
+        // Try and set id
+        try {
+            $testUserAward->setIssuerID($testUser->getID(), true);
+            $this->assertEquals($testUser->getID(), $testUserAward->getIssuerID());
+        } finally {
+            $testUser->delete();
+        }
     }
 
     public function testInvalidUserSetIssuerID() {
-        //TODO: Implement
+        // Get max user id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        if($stmt->fetch()) {
+            $useID = $userID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->fetch();
+
+        // Create test user award
+        $testUserAward = new UserAward();
+
+        // Set expected exception
+        $this->expectException(InvalidUserException::class);
+
+        // Trigger the exception
+        try {
+            $testUserAward->setIssuerID($useID, true);
+        } catch(InvalidUserException $e) {
+            $this->assertEquals('No user exists with id ' . $useID, $e->getMessage());
+        }
     }
 
     public function testSetAwardID() {
-        //TODO: Implement
+        // Create a test award
+        $testAward = new Award();
+        $testAward->setName('test');
+        $testAward->create();
+
+        // Create a test award
+        $testUserAward = new UserAward();
+
+        // Try and set the id
+        try {
+            $testUserAward->setAwardID($testAward->getID(), true);
+            $this->assertEquals($testAward->getID(), $testUserAward->getAwardID());
+        } finally {
+            $testAward->delete();
+        }
     }
 
     public function testInvalidAwardSetAwardID() {
-        //TODO: Implement
+        // Get max award id and add one
+        $stmt = Database::getConnection()->prepare("SELECT `AwardID` FROM `Awards` ORDER BY `AwardID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($awardID);
+        if($stmt->fetch()) {
+            $useID = $awardID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create test user award
+        $testUserAward = new UserAward();
+
+        // Set expected exception
+        $this->expectException(InvalidAwardException::class);
+
+        // Trigger it
+        try {
+            $testUserAward->setAwardID($useID, true);
+        } catch(InvalidAwardException $e) {
+            $this->assertEquals('No award exists with id ' . $useID, $e->getMessage());
+        }
     }
 
 }
