@@ -14,6 +14,8 @@ use AMC\Classes\User;
 use AMC\Classes\UserGroup;
 use AMC\Classes\Database;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidGroupException;
+use AMC\Exceptions\InvalidUserException;
 use PHPUnit\Framework\TestCase;
 
 class UserGroupTest extends TestCase {
@@ -547,19 +549,94 @@ class UserGroupTest extends TestCase {
     }
 
     public function testSetUserID() {
-        //TODO: Implement
+        // Create a test user
+        $testUser = new User();
+        $testUser->setUsername('test');
+        $testUser->create();
+
+        // Create a test user group
+        $testUserGroup = new UserGroup();
+
+        // Set user groups user id
+        try {
+            $testUserGroup->setUserID($testUser->getID(), true);
+            $this->assertEquals($testUser->getID(), $testUserGroup->getUserID());
+        } finally {
+            $testUser->delete();
+        }
     }
 
     public function testInvalidUserSetUserID() {
-        //TODO: Implement
+        // Get max user id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        if($stmt->fetch()) {
+            $useID = $userID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create a test user group
+        $testUserGroup = new UserGroup();
+
+        // Set the expected exception
+        $this->expectException(InvalidUserException::class);
+
+        // Trigger it
+        try {
+            $testUserGroup->setUserID($useID, true);
+        } catch (InvalidUserException $e) {
+            $this->assertEquals('No user exists with id ' . $useID, $e->getMessage());
+        }
     }
 
     public function testSetGroupID() {
-        //TODO: Implement
+        // Create a test group
+        $testGroup = new Group();
+        $testGroup->setName('test');
+        $testGroup->create();
+
+        // Create a test user group
+        $testUserGroup = new UserGroup();
+
+        // Set the group id
+        try {
+            $testUserGroup->setGroupID($testGroup->getID(), true);
+            $this->assertEquals($testGroup->getID(), $testUserGroup->getGroupID());
+        } finally {
+            $testGroup->delete();
+        }
+
     }
 
     public function testInvalidGroupSetGroupID() {
-        //TODO: Implement
+        // Get max group id and add one
+        $stmt = Database::getConnection()->prepare("SELECT `GroupID` FROM `Groups` ORDER BY `GroupID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($groupID);
+        if($stmt->fetch()) {
+            $useID = $groupID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create test user group
+        $testUserGroup = new UserGroup();
+
+        // Create expected exception
+        $this->expectException(InvalidGroupException::class);
+
+        // Trigger the exception
+        try {
+            $testUserGroup->setGroupID($useID, true);
+        } catch (InvalidGroupException $e) {
+            $this->assertEquals('No group exists with id ' . $useID, $e->getMessage());
+        }
     }
 
 }
