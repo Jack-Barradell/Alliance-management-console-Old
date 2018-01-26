@@ -14,6 +14,8 @@ use AMC\Classes\User;
 use AMC\Classes\UserNotification;
 use AMC\Classes\Database;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidNotificationException;
+use AMC\Exceptions\InvalidUserException;
 use PHPUnit\Framework\TestCase;
 
 class UserNotificationTest extends TestCase {
@@ -547,19 +549,94 @@ class UserNotificationTest extends TestCase {
     }
 
     public function testSetUserID() {
-        //TODO: Implement
+        // Create a test user
+        $testUser = new User();
+        $testUser->setID('test');
+        $testUser->create();
+
+        // Create a test user notification
+        $testUserNotification = new UserNotification();
+
+        // Set the id
+         try {
+             $testUserNotification->setID($testUser->getID(), true);
+             $this->assertEquals($testUser->getID(), $testUserNotification->getUserID());
+         } finally {
+             $testUser->delete();
+         }
     }
 
     public function testInvalidUserSetUserID() {
-        //TODO: Implement
+        // Get max user id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        if($stmt->fetch()) {
+            $useID = $userID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create a test user notification
+        $testUserNotification = new UserNotification();
+
+        // Set expected exception
+        $this->expectException(InvalidUserException::class);
+
+        // Trigger the exception
+        try {
+            $testUserNotification->setUserID($useID, true);
+        } catch(InvalidUserException $e) {
+            $this->assertEquals('There is no user with id ' . $useID, $e->getMessage());
+        }
     }
 
     public function testSetNotificationID() {
-        //TODO: Implement
+        // Create a test notification
+        $testNotification = new Notification();
+        $testNotification->setBody('test');
+        $testNotification->create();
+
+        // Create a test user notification
+        $testUserNotification = new UserNotification();
+
+        // Set the id
+        try {
+            $testUserNotification->setNotificationID($testNotification->getID(), true);
+            $this->assertEquals($testNotification->getID(), $testUserNotification->getNotificationID());
+        } finally {
+            $testNotification->delete();
+        }
     }
 
     public function testInvalidNotificationSetNotificationID() {
-        //TODO: Implement
+        // get max notification id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `NotificationID` FROM `Notifications` ORDER BY `NotificationID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($notificationID);
+        if($stmt->fetch()) {
+            $useID = $notificationID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create test user notification
+        $testUserNotification = new UserNotification();
+
+
+        // Set expected exception
+        $this->expectException(InvalidNotificationException::class);
+
+        // Trigger it
+        try {
+            $testUserNotification->setNotificationID($useID, true);
+        } catch(InvalidNotificationException $e) {
+            $this->assertEquals('No notification exists with id ' . $useID, $e->getMessage());
+        }
     }
 
 }
