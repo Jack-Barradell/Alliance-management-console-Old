@@ -14,6 +14,8 @@ use AMC\Classes\User;
 use AMC\Classes\UserPrivilege;
 use AMC\Classes\Database;
 use AMC\Exceptions\BlankObjectException;
+use AMC\Exceptions\InvalidPrivilegeException;
+use AMC\Exceptions\InvalidUserException;
 use PHPUnit\Framework\TestCase;
 
 class UserPrivilegeTest extends TestCase {
@@ -506,19 +508,93 @@ class UserPrivilegeTest extends TestCase {
     }
 
     public function testSetUserID() {
-        //TODO: Implement
+        // Create a test user
+        $testUser = new User();
+        $testUser->setUsername('test');
+        $testUser->create();
+
+        // Create a test user privilege
+        $testUserPriv = new UserPrivilege();
+
+        // Set the id
+        try {
+            $testUserPriv->setUserID($testUser->getID(), true);
+            $this->assertEquals($testUser->getID(), $testUserPriv->getUserID());
+        } finally {
+            $testUser->delete();
+        }
     }
 
     public function testInvalidUserSetUserID() {
-        //TODO: Implement
+        // Get max user id and add one
+        $stmt = Database::getConnection()->prepare("SELECT `UserID` FROM `Users` ORDER BY `UserID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($userID);
+        if($stmt->fetch()) {
+            $useID = $userID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create a test user priv
+        $testUserPriv = new UserPrivilege();
+
+        // Set expected exception
+        $this->expectException(InvalidUserException::class);
+
+        // Trigger it
+        try {
+            $testUserPriv->setUserID($useID, true);
+        } catch(InvalidUserException $e) {
+            $this->assertEquals('No user exists with id ' . $useID, $e->getMessage());
+        }
     }
 
     public function testSetPrivilegeID() {
-        //TODO: Implement
+        // Create a test privilege
+        $testPriv = new Privilege();
+        $testPriv->setName('test');
+        $testPriv->create();
+
+        // Create test user priv
+        $testUserPriv = new UserPrivilege();
+
+        // Set the priv id
+        try {
+            $testUserPriv->setPrivilegeID($testPriv->getID(), true);
+            $this->assertEquals($testPriv->getID(), $testUserPriv->getPrivilegeID());
+        } finally {
+            $testPriv->delete();
+        }
     }
 
     public function testInvalidPrivilegeSetPrivilegeID() {
-        //TODO: Implement
+        // Get max priv id and add one to it
+        $stmt = Database::getConnection()->prepare("SELECT `PrivilegeID` FROM `Privileges` ORDER BY `PrivilegeID` DESC LIMIT 1");
+        $stmt->execute();
+        $stmt->bind_result($privID);
+        if($stmt->fetch()) {
+            $useID = $privID + 1;
+        }
+        else {
+            $useID = 1;
+        }
+        $stmt->close();
+
+        // Create test user priv
+        $testUserPriv = new UserPrivilege();
+
+        // Set the expected exception
+        $this->expectException(InvalidPrivilegeException::class);
+
+        // Trigger it
+        try {
+            $testUserPriv->setPrivilegeID($useID, true);
+        } catch(InvalidPrivilegeException $e) {
+            $this->assertEquals('No privilege exists with id ' . $useID, $e->getMessage());
+        }
     }
 
 }
